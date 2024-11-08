@@ -17,29 +17,36 @@ class PasswordResetController extends Controller
     public function sendResetLinkEmail(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => ['required', 'email'],
+            "email" => ["required", "email"],
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Unable to send password reset link.',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return response()->json(
+                [
+                    "message" => "Unable to send password reset link.",
+                    "errors" => $validator->errors(),
+                ],
+                422
+            );
         }
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $status = Password::sendResetLink($request->only("email"));
 
         if ($status === Password::RESET_LINK_SENT) {
-            return response()->json([
-                'message' => 'Password reset link sent.',
-            ], 200);
+            return response()->json(
+                [
+                    "message" => "Password reset link sent.",
+                ],
+                200
+            );
         }
 
-        return response()->json([
-            'message' => 'Unable to send password reset link.',
-        ], 500);
+        return response()->json(
+            [
+                "message" => "Unable to send password reset link.",
+            ],
+            500
+        );
     }
 
     /**
@@ -48,38 +55,58 @@ class PasswordResetController extends Controller
     public function reset(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'token'                 => ['required'],
-            'email'                 => ['required', 'email'],
-            'password'              => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-            'password_confirmation' => ['required'],
+            "token" => ["required"],
+            "email" => ["required", "email"],
+            "password" => [
+                "required",
+                "confirmed",
+                \Illuminate\Validation\Rules\Password::defaults(),
+            ],
+            "password_confirmation" => ["required"],
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Unable to reset password.',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return response()->json(
+                [
+                    "message" => "Unable to reset password.",
+                    "errors" => $validator->errors(),
+                ],
+                422
+            );
         }
 
         $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
+            $request->only(
+                "email",
+                "password",
+                "password_confirmation",
+                "token"
+            ),
             function ($user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                ])->save();
+                $user
+                    ->forceFill([
+                        "password" => Hash::make($request->password),
+                    ])
+                    ->save();
 
                 $user->tokens()->delete();
             }
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            return response()->json([
-                'message' => 'Password reset successful.',
-            ], 200);
+            return response()->json(
+                [
+                    "message" => "Password reset successful.",
+                ],
+                200
+            );
         }
 
-        return response()->json([
-            'message' => 'Invalid token or email.',
-        ], 400);
+        return response()->json(
+            [
+                "message" => "Invalid token or email.",
+            ],
+            400
+        );
     }
 }

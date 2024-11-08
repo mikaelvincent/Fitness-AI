@@ -20,14 +20,13 @@ class PasswordResetTest extends TestCase
 
         $user = User::factory()->create();
 
-        $response = $this->postJson('/api/forgot-password', [
-            'email' => $user->email,
+        $response = $this->postJson("/api/forgot-password", [
+            "email" => $user->email,
         ]);
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'message' => 'Password reset link sent.',
-            ]);
+        $response->assertStatus(200)->assertJson([
+            "message" => "Password reset link sent.",
+        ]);
 
         Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
@@ -38,43 +37,44 @@ class PasswordResetTest extends TestCase
 
         $token = Password::createToken($user);
 
-        $response = $this->postJson('/api/reset-password', [
-            'email'                 => $user->email,
-            'token'                 => $token,
-            'password'              => 'NewSecurePass123!',
-            'password_confirmation' => 'NewSecurePass123!',
+        $response = $this->postJson("/api/reset-password", [
+            "email" => $user->email,
+            "token" => $token,
+            "password" => "NewSecurePass123!",
+            "password_confirmation" => "NewSecurePass123!",
         ]);
 
-        $response->assertStatus(200)
-            ->assertJson([
-                'message' => 'Password reset successful.',
-            ]);
+        $response->assertStatus(200)->assertJson([
+            "message" => "Password reset successful.",
+        ]);
 
-        $this->assertTrue(Hash::check('NewSecurePass123!', $user->fresh()->password));
+        $this->assertTrue(
+            Hash::check("NewSecurePass123!", $user->fresh()->password)
+        );
     }
 
     public function test_password_reset_fails_with_invalid_token()
     {
         $user = User::factory()->create();
 
-        $response = $this->postJson('/api/reset-password', [
-            'email'                 => $user->email,
-            'token'                 => 'invalid-token',
-            'password'              => 'NewSecurePass123!',
-            'password_confirmation' => 'NewSecurePass123!',
+        $response = $this->postJson("/api/reset-password", [
+            "email" => $user->email,
+            "token" => "invalid-token",
+            "password" => "NewSecurePass123!",
+            "password_confirmation" => "NewSecurePass123!",
         ]);
 
-        $response->assertStatus(400)
-            ->assertJson([
-                'message' => 'Invalid token or email.',
-            ]);
+        $response->assertStatus(400)->assertJson([
+            "message" => "Invalid token or email.",
+        ]);
     }
 
     public function test_password_reset_requires_valid_data()
     {
-        $response = $this->postJson('/api/reset-password', []);
+        $response = $this->postJson("/api/reset-password", []);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['email', 'token', 'password']);
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(["email", "token", "password"]);
     }
 }
