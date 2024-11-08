@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\TokenRefreshController;
 
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
@@ -20,3 +21,6 @@ Route::get('/verify-email/{id}/{hash}', [EmailVerificationController::class, 've
 // Password Reset Routes
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->middleware('guest');
 Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('guest');
+
+// Token Refresh Route
+Route::post('/refresh-token', [TokenRefreshController::class, 'refresh'])->middleware('auth:sanctum');
