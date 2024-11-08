@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 
 class AuthenticatedSessionController extends Controller
@@ -17,9 +18,19 @@ class AuthenticatedSessionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
+
+        $throttleKey = Str::lower($request->input('email')) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json([
+                'message'     => 'Too many login attempts. Please try again in ' . $seconds . ' seconds.',
+                'retry_after' => $seconds,
+            ], 429);
+        }
 
         $credentials = $request->only('email', 'password');
 
@@ -27,6 +38,7 @@ class AuthenticatedSessionController extends Controller
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            RateLimiter::hit($throttleKey);
             return response()->json([
                 'message' => 'Invalid credentials.',
             ], 401);
@@ -34,6 +46,7 @@ class AuthenticatedSessionController extends Controller
 
         // Check if the user's email is verified
         if (!$user->hasVerifiedEmail()) {
+            RateLimiter::clear($throttleKey);
             return response()->json([
                 'message' => 'Email address is not verified.',
             ], 403);
@@ -51,22 +64,25 @@ class AuthenticatedSessionController extends Controller
             $valid = $google2fa->verifyKey($secretKey, $request->two_factor_code);
 
             if (!$valid) {
+                RateLimiter::hit($throttleKey);
                 return response()->json([
                     'message' => 'Invalid two-factor authentication code.',
                 ], 422);
             }
         }
 
+        RateLimiter::clear($throttleKey);
+
         // Create a new API token for the user
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful.',
-            'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
+            'data'    => [
+                'user'  => [
+                    'id'                => $user->id,
+                    'name'              => $user->name,
+                    'email'             => $user->email,
                     'email_verified_at' => $user->email_verified_at,
                 ],
                 'token' => $token,
