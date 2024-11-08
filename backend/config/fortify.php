@@ -17,7 +17,7 @@ return [
         'login' => 'login',
         'two-factor' => 'two-factor',
     ],
-    'views' => true,
+    'views' => false,
     'features' => [
         Features::registration(),
         Features::resetPasswords(),
