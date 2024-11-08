@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\TokenRefreshController;
+use App\Http\Controllers\Auth\TwoFactorAuthenticationController;
 
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
@@ -24,3 +25,10 @@ Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middl
 
 // Token Refresh Route
 Route::post('/refresh-token', [TokenRefreshController::class, 'refresh'])->middleware('auth:sanctum');
+
+// Two-Factor Authentication Routes
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/two-factor-authentication/enable', [TwoFactorAuthenticationController::class, 'enable']);
+    Route::post('/two-factor-authentication/confirm', [TwoFactorAuthenticationController::class, 'confirm']);
+    Route::post('/two-factor-authentication/disable', [TwoFactorAuthenticationController::class, 'disable']);
+});
