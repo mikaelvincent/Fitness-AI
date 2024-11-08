@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PragmaRX\Google2FA\Google2FA;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -20,21 +21,40 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required'],
         ]);
 
-        // Attempt to authenticate the user
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $credentials = $request->only('email', 'password');
+
+        /** @var User $user */
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'message' => 'Invalid credentials.',
             ], 401);
         }
-
-        /** @var User $user */
-        $user = Auth::user();
 
         // Check if the user's email is verified
         if (!$user->hasVerifiedEmail()) {
             return response()->json([
                 'message' => 'Email address is not verified.',
             ], 403);
+        }
+
+        // Check if two-factor authentication is enabled and confirmed
+        if ($user->two_factor_secret && $user->two_factor_confirmed_at) {
+            $request->validate([
+                'two_factor_code' => ['required', 'string'],
+            ]);
+
+            $google2fa = new Google2FA();
+            $secretKey = decrypt($user->two_factor_secret);
+
+            $valid = $google2fa->verifyKey($secretKey, $request->two_factor_code);
+
+            if (!$valid) {
+                return response()->json([
+                    'message' => 'Invalid two-factor authentication code.',
+                ], 422);
+            }
         }
 
         // Create a new API token for the user
