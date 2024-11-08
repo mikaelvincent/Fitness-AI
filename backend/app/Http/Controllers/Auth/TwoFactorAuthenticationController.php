@@ -19,9 +19,13 @@ class TwoFactorAuthenticationController extends Controller
         $user = $request->user();
 
         if ($user->two_factor_secret) {
-            return response()->json([
-                'message' => 'Two-factor authentication is already enabled.',
-            ], 400);
+            return response()->json(
+                [
+                    "message" =>
+                        "Two-factor authentication is already enabled.",
+                ],
+                400
+            );
         }
 
         $google2fa = new Google2FA();
@@ -30,25 +34,35 @@ class TwoFactorAuthenticationController extends Controller
         $secretKey = $google2fa->generateSecretKey();
 
         // Encrypt and save the secret key and recovery codes
-        $user->forceFill([
-            'two_factor_secret' => encrypt($secretKey),
-            'two_factor_recovery_codes' => encrypt(json_encode($this->generateRecoveryCodes())),
-        ])->save();
+        $user
+            ->forceFill([
+                "two_factor_secret" => encrypt($secretKey),
+                "two_factor_recovery_codes" => encrypt(
+                    json_encode($this->generateRecoveryCodes())
+                ),
+            ])
+            ->save();
 
         // Generate the QR code URL
         $qrCodeUrl = $google2fa->getQRCodeUrl(
-            config('app.name'),
+            config("app.name"),
             $user->email,
             $secretKey
         );
 
-        return response()->json([
-            'message' => 'Two-factor authentication enabled.',
-            'data' => [
-                'qr_code_url' => $qrCodeUrl,
-                'recovery_codes' => json_decode(decrypt($user->two_factor_recovery_codes), true),
+        return response()->json(
+            [
+                "message" => "Two-factor authentication enabled.",
+                "data" => [
+                    "qr_code_url" => $qrCodeUrl,
+                    "recovery_codes" => json_decode(
+                        decrypt($user->two_factor_recovery_codes),
+                        true
+                    ),
+                ],
             ],
-        ], 200);
+            200
+        );
     }
 
     /**
@@ -57,15 +71,18 @@ class TwoFactorAuthenticationController extends Controller
     public function confirm(Request $request)
     {
         $request->validate([
-            'code' => 'required|string',
+            "code" => "required|string",
         ]);
 
         $user = $request->user();
 
         if (!$user->two_factor_secret) {
-            return response()->json([
-                'message' => 'Two-factor authentication is not enabled.',
-            ], 400);
+            return response()->json(
+                [
+                    "message" => "Two-factor authentication is not enabled.",
+                ],
+                400
+            );
         }
 
         $google2fa = new Google2FA();
@@ -74,18 +91,26 @@ class TwoFactorAuthenticationController extends Controller
         $valid = $google2fa->verifyKey($secretKey, $request->code);
 
         if (!$valid) {
-            return response()->json([
-                'message' => 'Invalid two-factor authentication code.',
-            ], 422);
+            return response()->json(
+                [
+                    "message" => "Invalid two-factor authentication code.",
+                ],
+                422
+            );
         }
 
-        $user->forceFill([
-            'two_factor_confirmed_at' => now(),
-        ])->save();
+        $user
+            ->forceFill([
+                "two_factor_confirmed_at" => now(),
+            ])
+            ->save();
 
-        return response()->json([
-            'message' => 'Two-factor authentication confirmed.',
-        ], 200);
+        return response()->json(
+            [
+                "message" => "Two-factor authentication confirmed.",
+            ],
+            200
+        );
     }
 
     /**
@@ -96,20 +121,28 @@ class TwoFactorAuthenticationController extends Controller
         $user = $request->user();
 
         if (!$user->two_factor_secret) {
-            return response()->json([
-                'message' => 'Two-factor authentication is not enabled.',
-            ], 400);
+            return response()->json(
+                [
+                    "message" => "Two-factor authentication is not enabled.",
+                ],
+                400
+            );
         }
 
-        $user->forceFill([
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
-            'two_factor_confirmed_at' => null,
-        ])->save();
+        $user
+            ->forceFill([
+                "two_factor_secret" => null,
+                "two_factor_recovery_codes" => null,
+                "two_factor_confirmed_at" => null,
+            ])
+            ->save();
 
-        return response()->json([
-            'message' => 'Two-factor authentication disabled.',
-        ], 200);
+        return response()->json(
+            [
+                "message" => "Two-factor authentication disabled.",
+            ],
+            200
+        );
     }
 
     /**
@@ -117,8 +150,10 @@ class TwoFactorAuthenticationController extends Controller
      */
     protected function generateRecoveryCodes()
     {
-        return collect(range(1, 8))->map(function () {
-            return Str::random(10) . '-' . Str::random(10);
-        })->all();
+        return collect(range(1, 8))
+            ->map(function () {
+                return Str::random(10) . "-" . Str::random(10);
+            })
+            ->all();
     }
 }

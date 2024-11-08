@@ -21,13 +21,16 @@ class TokenRefreshController extends Controller
         }
 
         // Create a new token
-        $newToken = $user->createToken('auth_token')->plainTextToken;
+        $newToken = $user->createToken("auth_token")->plainTextToken;
 
-        return response()->json([
-            'message' => 'Token refreshed successfully.',
-            'data'    => [
-                'token' => $newToken,
+        return response()->json(
+            [
+                "message" => "Token refreshed successfully.",
+                "data" => [
+                    "token" => $newToken,
+                ],
             ],
-        ], 200);
+            200
+        );
     }
 }

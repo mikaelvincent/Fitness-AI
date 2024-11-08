@@ -16,34 +16,32 @@ class TokenRefreshTest extends TestCase
         $user = User::factory()->create();
 
         // Create a token
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken("auth_token")->plainTextToken;
 
         // Use the token to refresh
-        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
-            ->postJson('/api/refresh-token');
+        $response = $this->withHeaders([
+            "Authorization" => "Bearer $token",
+        ])->postJson("/api/refresh-token");
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'message',
-                'data' => [
-                    'token',
-                ],
-            ]);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure(["message", "data" => ["token"]]);
 
         // Assert that the old token is revoked
-        $this->assertDatabaseMissing('personal_access_tokens', [
-            'tokenable_id' => $user->id,
-            'token'        => hash('sha256', explode('|', $token, 2)[1]),
+        $this->assertDatabaseMissing("personal_access_tokens", [
+            "tokenable_id" => $user->id,
+            "token" => hash("sha256", explode("|", $token, 2)[1]),
         ]);
 
         // Assert that a new token is issued
-        $this->assertNotNull($response->json('data.token'));
+        $this->assertNotNull($response->json("data.token"));
     }
 
     public function test_cannot_refresh_with_invalid_token()
     {
-        $response = $this->withHeaders(['Authorization' => "Bearer invalid_token"])
-            ->postJson('/api/refresh-token');
+        $response = $this->withHeaders([
+            "Authorization" => "Bearer invalid_token",
+        ])->postJson("/api/refresh-token");
 
         $response->assertStatus(401);
     }
@@ -53,16 +51,17 @@ class TokenRefreshTest extends TestCase
         $user = User::factory()->create();
 
         // Set token expiration to 1 minute
-        config(['sanctum.expiration' => 1]);
+        config(["sanctum.expiration" => 1]);
 
         // Create a token
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken("auth_token")->plainTextToken;
 
         // Travel 2 minutes into the future
         Carbon::setTestNow(Carbon::now()->addMinutes(2));
 
-        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
-            ->postJson('/api/refresh-token');
+        $response = $this->withHeaders([
+            "Authorization" => "Bearer $token",
+        ])->postJson("/api/refresh-token");
 
         $response->assertStatus(401);
 
@@ -75,24 +74,21 @@ class TokenRefreshTest extends TestCase
         $user = User::factory()->create();
 
         // Set token expiration to 60 minutes
-        config(['sanctum.expiration' => 60]);
+        config(["sanctum.expiration" => 60]);
 
         // Create a token
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken("auth_token")->plainTextToken;
 
         // Travel 59 minutes into the future
         Carbon::setTestNow(Carbon::now()->addMinutes(59));
 
-        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
-            ->postJson('/api/refresh-token');
+        $response = $this->withHeaders([
+            "Authorization" => "Bearer $token",
+        ])->postJson("/api/refresh-token");
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'message',
-                'data' => [
-                    'token',
-                ],
-            ]);
+        $response
+            ->assertStatus(200)
+            ->assertJsonStructure(["message", "data" => ["token"]]);
 
         // Reset time
         Carbon::setTestNow();

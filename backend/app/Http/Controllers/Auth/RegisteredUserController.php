@@ -17,35 +17,47 @@ class RegisteredUserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            "name" => ["required", "string", "max:255"],
+            "email" => [
+                "required",
+                "string",
+                "email",
+                "max:255",
+                "unique:users",
+            ],
+            "password" => ["required", "confirmed", Password::defaults()],
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Registration failed.',
-                'errors'  => $validator->errors(),
-            ], 422);
+            return response()->json(
+                [
+                    "message" => "Registration failed.",
+                    "errors" => $validator->errors(),
+                ],
+                422
+            );
         }
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
+            "name" => $request->name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
         ]);
 
         // Send email verification notification
         $user->sendEmailVerificationNotification();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken("auth_token")->plainTextToken;
 
-        return response()->json([
-            'message' => 'Registration successful.',
-            'data'    => [
-                'user'  => $user,
-                'token' => $token,
+        return response()->json(
+            [
+                "message" => "Registration successful.",
+                "data" => [
+                    "user" => $user,
+                    "token" => $token,
+                ],
             ],
-        ], 201);
+            201
+        );
     }
 }
