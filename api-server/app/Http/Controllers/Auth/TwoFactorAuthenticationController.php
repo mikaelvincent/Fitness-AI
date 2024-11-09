@@ -13,6 +13,26 @@ class TwoFactorAuthenticationController extends Controller
 {
     /**
      * Enable two-factor authentication for the user.
+     *
+     * @group Two-Factor Authentication
+     * @authenticated
+     *
+     * @response 200 {
+     *   "message": "Two-factor authentication enabled.",
+     *   "data": {
+     *     "qr_code_url": "otpauth://totp/AppName:user@example.com?secret=ABCDEF...",
+     *     "recovery_codes": [
+     *       "code1",
+     *       "code2",
+     *       "...",
+     *       "code8"
+     *     ]
+     *   }
+     * }
+     *
+     * @response 400 {
+     *   "message": "Two-factor authentication is already enabled."
+     * }
      */
     public function enable(Request $request)
     {
@@ -67,6 +87,23 @@ class TwoFactorAuthenticationController extends Controller
 
     /**
      * Confirm two-factor authentication setup.
+     *
+     * @group Two-Factor Authentication
+     * @authenticated
+     *
+     * @bodyParam code string required The verification code from the authenticator app.
+     *
+     * @response 200 {
+     *   "message": "Two-factor authentication confirmed."
+     * }
+     *
+     * @response 400 {
+     *   "message": "Two-factor authentication is not enabled."
+     * }
+     *
+     * @response 422 {
+     *   "message": "Invalid two-factor authentication code."
+     * }
      */
     public function confirm(Request $request)
     {
@@ -115,6 +152,17 @@ class TwoFactorAuthenticationController extends Controller
 
     /**
      * Disable two-factor authentication for the user.
+     *
+     * @group Two-Factor Authentication
+     * @authenticated
+     *
+     * @response 200 {
+     *   "message": "Two-factor authentication disabled."
+     * }
+     *
+     * @response 400 {
+     *   "message": "Two-factor authentication is not enabled."
+     * }
      */
     public function disable(Request $request)
     {
@@ -147,6 +195,8 @@ class TwoFactorAuthenticationController extends Controller
 
     /**
      * Generate new recovery codes.
+     *
+     * @return array
      */
     protected function generateRecoveryCodes()
     {
