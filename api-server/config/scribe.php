@@ -45,23 +45,23 @@ return [
     ],
 
     "auth" => [
-        "enabled" => false,
+        "enabled" => true,
         "default" => false,
         "in" => "bearer",
         "name" => "key",
         "use_value" => env("SCRIBE_AUTH_KEY"),
         "placeholder" => "{YOUR_AUTH_KEY}",
         "extra_info" =>
-            "You can retrieve your token by visiting your dashboard and clicking <b>Generate API token</b>.",
+            "Tokens are issued upon successful login via the <code>/api/login</code> endpoint.",
     ],
 
     "intro_text" => <<<INTRO
-This documentation provides information you need to work with our API.
+This documentation provides information you need to work with the Fitness AI API.
 
 <aside>As you scroll, code examples in various programming languages are displayed on the right (or as part of the content on mobile). You can switch languages with the tabs at the top right (or from the nav menu on mobile).</aside>
 INTRO
     ,
-    "example_languages" => ["bash", "javascript"],
+    "example_languages" => ["bash", "javascript", "php", "python"],
 
     "postman" => [
         "enabled" => true,
@@ -82,7 +82,7 @@ INTRO
     "last_updated" => null,
 
     "examples" => [
-        "faker_seed" => null,
+        "faker_seed" => 69420,
         "models_source" => ["factoryCreate", "factoryMake", "databaseFirst"],
     ],
 
