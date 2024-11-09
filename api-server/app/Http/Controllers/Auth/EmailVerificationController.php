@@ -11,6 +11,17 @@ class EmailVerificationController extends Controller
 {
     /**
      * Send a new email verification notification.
+     *
+     * @group Email Verification
+     * @authenticated
+     *
+     * @response 200 {
+     *   "message": "Verification email sent."
+     * }
+     *
+     * @response 400 {
+     *   "message": "Email address already verified."
+     * }
      */
     public function sendVerificationEmail(Request $request)
     {
@@ -35,6 +46,24 @@ class EmailVerificationController extends Controller
 
     /**
      * Verify the user's email address.
+     *
+     * @group Email Verification
+     * @unauthenticated
+     *
+     * @urlParam id integer required The user's ID.
+     * @urlParam hash string required The email verification hash.
+     *
+     * @response 200 {
+     *   "message": "Email verified successfully."
+     * }
+     *
+     * @response 400 {
+     *   "message": "Invalid verification link."
+     * }
+     *
+     * @response 400 {
+     *   "message": "Email address already verified."
+     * }
      */
     public function verify(Request $request, $id, $hash)
     {
