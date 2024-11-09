@@ -9,6 +9,20 @@ class TokenRefreshController extends Controller
 {
     /**
      * Refresh the user's authentication token.
+     *
+     * @group Authentication
+     * @authenticated
+     *
+     * @response 200 {
+     *   "message": "Token refreshed successfully.",
+     *   "data": {
+     *     "token": "new-example-token"
+     *   }
+     * }
+     *
+     * @response 401 {
+     *   "message": "Unauthenticated."
+     * }
      */
     public function refresh(Request $request)
     {
