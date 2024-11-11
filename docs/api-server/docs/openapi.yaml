@@ -1,0 +1,738 @@
+openapi: 3.0.3
+info:
+  title: 'Fitness AI'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://127.0.0.1:8000'
+paths:
+  /api/login:
+    post:
+      summary: 'Handle an incoming login request.'
+      operationId: handleAnIncomingLoginRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Login successful.'
+                  data:
+                    user:
+                      id: 1
+                      name: 'John Doe'
+                      email: john@example.com
+                      email_verified_at: '2023-10-01T12:34:56.000000Z'
+                    token: example-token
+                properties:
+                  message:
+                    type: string
+                    example: 'Login successful.'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: 'John Doe'
+                          email:
+                            type: string
+                            example: john@example.com
+                          email_verified_at:
+                            type: string
+                            example: '2023-10-01T12:34:56.000000Z'
+                      token:
+                        type: string
+                        example: example-token
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid credentials.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid credentials.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Email address is not verified.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Email address is not verified.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid two-factor authentication code.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid two-factor authentication code.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too many login attempts. Please try again in {retry_after} seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'Too many login attempts. Please try again in {retry_after} seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: freddy.balistreri@example.org
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The user''s password.'
+                  example: ')B#Qz?{T8"<Tx'
+                  nullable: false
+                two_factor_code:
+                  type: string
+                  description: 'The two-factor authentication code (if applicable).'
+                  example: voluptatum
+                  nullable: false
+              required:
+                - email
+                - password
+      security: []
+  /api/logout:
+    post:
+      summary: 'Handle an incoming logout request.'
+      operationId: handleAnIncomingLogoutRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Logout successful.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Logout successful.'
+      tags:
+        - Authentication
+  /api/refresh-token:
+    post:
+      summary: 'Refresh the user''s authentication token.'
+      operationId: refreshTheUsersAuthenticationToken
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Token refreshed successfully.'
+                  data:
+                    token: new-example-token
+                properties:
+                  message:
+                    type: string
+                    example: 'Token refreshed successfully.'
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: new-example-token
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Authentication
+  /api/email/verification-notification:
+    post:
+      summary: 'Send a new email verification notification.'
+      operationId: sendANewEmailVerificationNotification
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Verification email sent.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Verification email sent.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Email address already verified.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Email address already verified.'
+      tags:
+        - 'Email Verification'
+  '/api/verify-email/{id}/{hash}':
+    get:
+      summary: 'Verify the user''s email address.'
+      operationId: verifyTheUsersEmailAddress
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Email verified successfully.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Email verified successfully.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: ''
+                    type: object
+                    example:
+                      message: 'Invalid verification link.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Invalid verification link.'
+                  -
+                    description: ''
+                    type: object
+                    example:
+                      message: 'Email address already verified.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Email address already verified.'
+      tags:
+        - 'Email Verification'
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The user''s ID.'
+        example: 10
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: hash
+        description: 'The email verification hash.'
+        example: voluptatum
+        required: true
+        schema:
+          type: string
+  /api/forgot-password:
+    post:
+      summary: 'Send a password reset link to the user''s email.'
+      operationId: sendAPasswordResetLinkToTheUsersEmail
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Password reset link sent.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Password reset link sent.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Unable to send password reset link.'
+                  errors:
+                    email:
+                      - 'The email must be a valid email address.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Unable to send password reset link.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email must be a valid email address.'
+                        items:
+                          type: string
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Unable to send password reset link.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Unable to send password reset link.'
+      tags:
+        - 'Password Reset'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: freddy.balistreri@example.org
+                  nullable: false
+              required:
+                - email
+      security: []
+  /api/reset-password:
+    post:
+      summary: 'Reset the user''s password.'
+      operationId: resetTheUsersPassword
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Password reset successful.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Password reset successful.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid token or email.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid token or email.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Unable to reset password.'
+                  errors:
+                    password:
+                      - 'The password must be at least 8 characters.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Unable to reset password.'
+                  errors:
+                    type: object
+                    properties:
+                      password:
+                        type: array
+                        example:
+                          - 'The password must be at least 8 characters.'
+                        items:
+                          type: string
+      tags:
+        - 'Password Reset'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: 'The password reset token.'
+                  example: voluptatum
+                  nullable: false
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: freddy.balistreri@example.org
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The new password.'
+                  example: ')B#Qz?{T8"<Tx'
+                  nullable: false
+                password_confirmation:
+                  type: string
+                  description: 'Confirmation of the new password.'
+                  example: voluptatum
+                  nullable: false
+              required:
+                - token
+                - email
+                - password
+                - password_confirmation
+      security: []
+  /api/register:
+    post:
+      summary: 'Handle an incoming registration request.'
+      operationId: handleAnIncomingRegistrationRequest
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Registration successful.'
+                  data:
+                    user:
+                      id: 1
+                      name: 'John Doe'
+                      email: john@example.com
+                      created_at: '2023-10-01T12:34:56.000000Z'
+                      updated_at: '2023-10-01T12:34:56.000000Z'
+                    token: example-token
+                properties:
+                  message:
+                    type: string
+                    example: 'Registration successful.'
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: 'John Doe'
+                          email:
+                            type: string
+                            example: john@example.com
+                          created_at:
+                            type: string
+                            example: '2023-10-01T12:34:56.000000Z'
+                          updated_at:
+                            type: string
+                            example: '2023-10-01T12:34:56.000000Z'
+                      token:
+                        type: string
+                        example: example-token
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Registration failed.'
+                  errors:
+                    email:
+                      - 'The email has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Registration failed.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'The user''s full name.'
+                  example: voluptatum
+                  nullable: false
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: freddy.balistreri@example.org
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The user''s password.'
+                  example: ')B#Qz?{T8"<Tx'
+                  nullable: false
+                password_confirmation:
+                  type: string
+                  description: 'Confirmation of the user''s password.'
+                  example: voluptatum
+                  nullable: false
+              required:
+                - name
+                - email
+                - password
+                - password_confirmation
+      security: []
+  /api/two-factor-authentication/enable:
+    post:
+      summary: 'Enable two-factor authentication for the user.'
+      operationId: enableTwoFactorAuthenticationForTheUser
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication enabled.'
+                  data:
+                    qr_code_url: 'otpauth://totp/AppName:user@example.com?secret=ABCDEF...'
+                    recovery_codes:
+                      - code1
+                      - code2
+                      - ...
+                      - code8
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication enabled.'
+                  data:
+                    type: object
+                    properties:
+                      qr_code_url:
+                        type: string
+                        example: 'otpauth://totp/AppName:user@example.com?secret=ABCDEF...'
+                      recovery_codes:
+                        type: array
+                        example:
+                          - code1
+                          - code2
+                          - ...
+                          - code8
+                        items:
+                          type: string
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication is already enabled.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication is already enabled.'
+      tags:
+        - 'Two-Factor Authentication'
+  /api/two-factor-authentication/confirm:
+    post:
+      summary: 'Confirm two-factor authentication setup.'
+      operationId: confirmTwoFactorAuthenticationSetup
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication confirmed.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication confirmed.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication is not enabled.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication is not enabled.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid two-factor authentication code.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid two-factor authentication code.'
+      tags:
+        - 'Two-Factor Authentication'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'The verification code from the authenticator app.'
+                  example: voluptatum
+                  nullable: false
+              required:
+                - code
+  /api/two-factor-authentication/disable:
+    post:
+      summary: 'Disable two-factor authentication for the user.'
+      operationId: disableTwoFactorAuthenticationForTheUser
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication disabled.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication disabled.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication is not enabled.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication is not enabled.'
+      tags:
+        - 'Two-Factor Authentication'
+tags:
+  -
+    name: Authentication
+    description: ''
+  -
+    name: 'Email Verification'
+    description: ''
+  -
+    name: 'Password Reset'
+    description: ''
+  -
+    name: Registration
+    description: ''
+  -
+    name: 'Two-Factor Authentication'
+    description: ''
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'Tokens are issued upon successful login via the <code>/api/login</code> endpoint.'
+security:
+  -
+    default: []
