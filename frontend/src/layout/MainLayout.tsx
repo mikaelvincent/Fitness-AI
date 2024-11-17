@@ -6,7 +6,9 @@ const MainLayout: React.FC = () => {
     <div>
       {/* Header for the main layout */}
       <header>
-        <h1>Main Layout</h1>
+        <h1 className="font-poppins font-bold text-2xl text-orange">
+          Main Layout
+        </h1>
       </header>
       {/* Renders the nested routes */}
       <main>
