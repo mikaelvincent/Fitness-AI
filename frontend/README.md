@@ -19,6 +19,10 @@ Make sure you have the following installed:
 npm install
 ```
 
+```bash
+npm install react-router-dom
+```
+
 ### Running the Application
 
 To start the development server, run:
