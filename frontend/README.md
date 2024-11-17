@@ -13,20 +13,11 @@ Make sure you have the following installed:
 
 ### Installation
 
-1. **Clone the repository**:
+1. **Install dependencies:**:
 
-   ```bash
-   git clone https://github.com/your-username/your-repo.git
-   cd your-repo
-   ```
-
-````
-
-2. **Install dependencies:**:
-
- ```bash
- npm install
-````
+```bash
+npm install
+```
 
 ### Running the Application
 
