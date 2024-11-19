@@ -1,6 +1,6 @@
 import React from "react";
 
-const Login: React.FC = () => {
+const Login = () => {
   return (
     <div>
       {/* Header for the Login page */}

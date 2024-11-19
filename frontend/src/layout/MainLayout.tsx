@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-const MainLayout: React.FC = () => {
+const MainLayout = () => {
   return (
     <div>
       {/* Header for the main layout */}
