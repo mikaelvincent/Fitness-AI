@@ -1,13 +1,21 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import logo from "@/assets/images/logo_Light Mode.svg";
+import Logo from "@/components/ui/logo";
 
 const AuthLayout = () => {
+  // Example: You can determine the theme dynamically or set it statically
+  const currentTheme: "light" | "dark" = "light"; // Replace with dynamic theme detection if available
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header for the authentication layout */}
       <header className="flex items-center justify-center p-6">
-        <img src={logo} alt="Company Logo" className="h-24 w-auto" />
+        <Logo
+          className="w-32" // Adjust width as needed
+          alt="Company Logo"
+          theme={currentTheme}
+          variant="withText" // Change to "withoutText" as needed
+        />
       </header>
 
       {/* Main content area */}
