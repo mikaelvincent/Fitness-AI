@@ -12,13 +12,8 @@ const BackButton = ({ label, buttonLabel, href }: BackButtonProps) => {
   return (
     <>
       <div className="flex items-center justify-center w-full">
-        <p className="text-muted-foreground text-normal">{label}</p>
-        <Button
-          variant="link"
-          className="font-normal text-base"
-          size="sm"
-          asChild
-        >
+        <p className="text-muted-foreground text-sm">{label}</p>
+        <Button variant="link" className="font-normal" size="sm" asChild>
           <Link to={href}>{buttonLabel}</Link>
         </Button>
       </div>
