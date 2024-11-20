@@ -12,7 +12,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header for the authentication layout */}
-      <header className="flex items-center justify-center p-6">
+      <header className="flex items-center justify-center py-6">
         <Logo
           className="w-32" // Adjust width as needed
           alt="Company Logo"
@@ -22,7 +22,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
       </header>
 
       {/* Main content area */}
-      <main className="flex-grow flex flex-col items-center justify-center p-4">
+      <main className="flex-grow flex flex-col items-center justify-center">
         {children}
       </main>
     </div>
