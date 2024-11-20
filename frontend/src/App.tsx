@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const App = () => {
   return (
@@ -36,6 +37,15 @@ const App = () => {
           element={
             <AuthLayout>
               <Signup />
+            </AuthLayout>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthLayout>
+              <ForgotPassword />
             </AuthLayout>
           }
         />
