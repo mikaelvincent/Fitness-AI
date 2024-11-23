@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const SignupSchema = z
+export const RegisterSchema = z
   .object({
     fullName: z.string().min(1, {
       message: "Full name must be at least 1 character",

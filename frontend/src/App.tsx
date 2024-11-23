@@ -5,7 +5,7 @@ import AuthLayout from "./layout/AuthLayout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Signup from "./pages/Signup";
+import Register from "./pages/Register.tsx";
 import ForgotPassword from "./pages/ForgotPassword";
 
 const App = () => {
@@ -33,10 +33,10 @@ const App = () => {
         />
 
         <Route
-          path="/signup"
+          path="/register"
           element={
             <AuthLayout>
-              <Signup />
+              <Register />
             </AuthLayout>
           }
         />

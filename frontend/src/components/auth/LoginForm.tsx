@@ -35,8 +35,8 @@ const LoginForm = () => {
         label="Welcome to Fitness AI"
         title="Login"
         backLabel="Don't have an account?"
-        backButtonHref="/signup"
-        backButtonLabel="Sign up"
+        backButtonHref="/register"
+        backButtonLabel="Register"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

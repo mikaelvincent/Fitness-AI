@@ -11,14 +11,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SignupSchema } from "@/utils/schema/SignupSchema";
+import { RegisterSchema } from "@/utils/schema/RegisterSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 
-const SignupForm = () => {
+const RegisterForm = () => {
   const form = useForm({
-    resolver: zodResolver(SignupSchema),
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
       fullName: "",
       email: "",
@@ -27,7 +27,7 @@ const SignupForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof SignupSchema>) => {
+  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
     console.log(data);
   };
 
@@ -101,7 +101,7 @@ const SignupForm = () => {
               />
             </div>
             <Button type="submit" className="w-full">
-              Sign Up
+              Create Account
             </Button>
           </form>
         </Form>
@@ -110,4 +110,4 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default RegisterForm;
