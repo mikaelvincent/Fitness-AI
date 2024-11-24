@@ -23,6 +23,14 @@ npm install
 npm install react-router-dom
 ```
 
+2. **Environment Configuration (Frontend)**
+
+Duplicate the example environment configuration file:
+
+```bash
+cp .env.example .env
+```
+
 ### Running the Application
 
 To start the development server, run:
