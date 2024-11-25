@@ -1,4 +1,5 @@
-import { useState } from "react";
+// components/auth/forms/LoginForm.tsx
+
 import CardWrapper from "../auth-ui/CardWrapper";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,91 +12,121 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LoginSchema } from "@/utils/schema/LoginSchema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import useFormStatus from "@/hooks/useFormStatus";
+import { LoginSchema } from "@/utils/schema/LoginSchema";
+import { UseFormStatusReturn } from "@/hooks/useFormStatus";
+import AuthErrorMessage from "../auth-ui/AuthErrorMessage";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
 
-const LoginForm = () => {
-  const [loading, setLoading] = useState(false);
+interface LoginFormProps {
+  status: string;
+  formMessage: string;
+  formStatus: UseFormStatusReturn;
+  form: UseFormReturn<z.infer<typeof LoginSchema>>;
+  onSubmit: (data: z.infer<typeof LoginSchema>) => void | Promise<void>;
+  retryAfter: number | null;
+}
 
-  const form = useForm({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+const LoginForm = ({
+  status,
+  formMessage,
+  formStatus,
+  form,
+  onSubmit,
+  retryAfter,
+}: LoginFormProps) => {
+  // Determine the message to display
+  const getMessage = () => {
+    if (status === "error" && retryAfter === null) {
+      return formMessage;
+    }
 
-  const onSubmit = (data: z.infer<typeof LoginSchema>) => {
-    setLoading(true);
-    console.log(data);
+    if (retryAfter !== null && retryAfter > 0) {
+      return `Too many attempts. Please try again in ${retryAfter} second${
+        retryAfter !== 1 ? "s" : ""
+      }.`;
+    }
+
+    return "";
   };
 
-  const status = useFormStatus();
+  // Determine if there's a message to display
+  const displayMessage =
+    (status === "error" && retryAfter === null) ||
+    (retryAfter !== null && retryAfter > 0);
 
   return (
-    <>
-      <CardWrapper
-        label="Welcome to Fitness AI"
-        title="Login"
-        backLabel="Don't have an account?"
-        backButtonHref="/auth/register"
-        backButtonLabel="Register"
-      >
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="example@email.com"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="password" placeholder="******" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormDescription className="flex items-center justify-end w-full text-muted-foreground text-xs">
-                Don't remember your password?
-                <Button
-                  variant="link"
-                  className="font-normal text-xs px-1"
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/auth/forgot-password">Forgot Password</Link>
-                </Button>
-              </FormDescription>
-            </div>
-            <Button type="submit" className="w-full" disabled={status.pending}>
-              {loading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-        </Form>
-      </CardWrapper>
-    </>
+    <CardWrapper
+      label="Welcome to Fitness AI"
+      title="Login"
+      backLabel="Don't have an account?"
+      backButtonHref="/auth/register"
+      backButtonLabel="Register"
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="example@email.com"
+                      disabled={!!retryAfter || formStatus.pending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="******"
+                      disabled={!!retryAfter || formStatus.pending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormDescription className="flex items-center justify-end w-full text-muted-foreground text-xs">
+              <Button
+                variant="link"
+                className="font-normal text-xs px-1s"
+                size="sm"
+                asChild
+              >
+                <Link to="/auth/forgot-password">Forgot Password?</Link>
+              </Button>
+            </FormDescription>
+          </div>
+
+          {displayMessage && <AuthErrorMessage formMessage={getMessage()} />}
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={formStatus.pending || !!retryAfter}
+          >
+            {status === "loading" ? "Logging in..." : "Login"}
+          </Button>
+        </form>
+      </Form>
+    </CardWrapper>
   );
 };
 
