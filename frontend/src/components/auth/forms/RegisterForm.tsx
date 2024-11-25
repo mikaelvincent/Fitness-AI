@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RegisterSchema } from "@/utils/schema/RegisterSchema";
 import { UseFormStatusReturn } from "@/hooks/useFormStatus";
+import AuthErrorMessage from "../auth-ui/AuthErrorMessage";
 
 interface RegisterFormProps {
   status: string;
@@ -53,9 +54,7 @@ const RegisterForm = ({
                     </FormControl>
                     <FormMessage />
                     {status == "error" && invalidInput == "name" && (
-                      <p className="text-sm font-medium text-destructive">
-                        {formMessage}
-                      </p>
+                      <AuthErrorMessage formMessage={formMessage} />
                     )}
                   </FormItem>
                 )}
@@ -75,9 +74,7 @@ const RegisterForm = ({
                     </FormControl>
                     <FormMessage />
                     {status == "error" && invalidInput == "email" && (
-                      <p className="text-sm font-medium text-destructive">
-                        {formMessage}
-                      </p>
+                      <AuthErrorMessage formMessage={formMessage} />
                     )}
                   </FormItem>
                 )}
@@ -93,9 +90,7 @@ const RegisterForm = ({
                     </FormControl>
                     <FormMessage />
                     {status == "error" && invalidInput == "password" && (
-                      <p className="text-sm font-medium text-destructive">
-                        {formMessage}
-                      </p>
+                      <AuthErrorMessage formMessage={formMessage} />
                     )}
                   </FormItem>
                 )}
@@ -114,6 +109,9 @@ const RegisterForm = ({
                 )}
               />
             </div>
+            {status == "error" && invalidInput == "others" && (
+              <AuthErrorMessage formMessage={formMessage} />
+            )}
             <Button
               type="submit"
               className="w-full"
