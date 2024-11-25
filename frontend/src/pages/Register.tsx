@@ -1,4 +1,4 @@
-import RegisterForm from "@/components/auth/RegisterForm.tsx";
+import RegisterForm from "@/components/auth/forms/RegisterForm";
 import React from "react";
 
 const Register = () => {

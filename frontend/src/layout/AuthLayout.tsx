@@ -2,10 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Logo from "@/components/ui/logo";
 
-interface AuthLayoutProps {
-  children: React.ReactNode;
-}
-const AuthLayout = ({ children }: AuthLayoutProps) => {
+const AuthLayout = () => {
   // Example: You can determine the theme dynamically or set it statically
   const currentTheme: "light" | "dark" = "light"; // Replace with dynamic theme detection if available
 
@@ -23,7 +20,8 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
 
       {/* Main content area */}
       <main className="flex-grow flex flex-col items-center justify-center">
-        {children}
+        {/* This will render the child routes */}
+        <Outlet />
       </main>
     </div>
   );

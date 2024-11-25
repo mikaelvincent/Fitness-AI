@@ -1,5 +1,5 @@
 import React from "react";
-import CardWrapper from "./CardWrapper";
+import CardWrapper from "../auth-ui/CardWrapper";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,36 +11,51 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LoginSchema } from "@/utils/schema/LoginSchema";
+import { RegisterSchema } from "@/utils/schema/RegisterSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const form = useForm({
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
+      fullName: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
     console.log(data);
   };
 
   return (
     <>
       <CardWrapper
-        label="Welcome to Fitness AI"
-        title="Login"
-        backLabel="Don't have an account?"
-        backButtonHref="/register"
-        backButtonLabel="Register"
+        label="Don't have an account?"
+        title="Create Account"
+        backLabel="Already have an account?"
+        backButtonHref="/auth/login"
+        backButtonLabel="Login"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="text" placeholder="John Doe" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="email"
@@ -71,22 +86,22 @@ const LoginForm = () => {
                   </FormItem>
                 )}
               />
-              <FormDescription className="flex items-center justify-end w-full">
-                <p className="text-muted-foreground text-xs">
-                  Don't remember your password?
-                </p>
-                <Button
-                  variant="link"
-                  className="font-normal text-xs px-1"
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/forgot-password">Forgot Password</Link>
-                </Button>
-              </FormDescription>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="password" placeholder="******" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <Button type="submit" className="w-full">
-              Login
+              Create Account
             </Button>
           </form>
         </Form>
@@ -95,4 +110,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;

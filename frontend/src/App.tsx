@@ -5,12 +5,12 @@ import AuthLayout from "./layout/AuthLayout";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Register from "./pages/Register.tsx";
+import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 
 const App = () => {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true }}>
       <Routes>
         {/* Main layout routes */}
         <Route
@@ -23,42 +23,14 @@ const App = () => {
         />
 
         {/* Authentication layout routes */}
-        <Route
-          path="/login"
-          element={
-            <AuthLayout>
-              <Login />
-            </AuthLayout>
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            <AuthLayout>
-              <Register />
-            </AuthLayout>
-          }
-        />
-
-        <Route
-          path="/forgot-password"
-          element={
-            <AuthLayout>
-              <ForgotPassword />
-            </AuthLayout>
-          }
-        />
+        <Route path="/auth" element={<AuthLayout />}>
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+        </Route>
 
         {/* Catch-all route for 404 */}
-        <Route
-          path="*"
-          element={
-            <MainLayout>
-              <NotFound />
-            </MainLayout>
-          }
-        />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

@@ -1,5 +1,5 @@
-import React from "react";
-import CardWrapper from "./CardWrapper";
+import { useState } from "react";
+import CardWrapper from "../auth-ui/CardWrapper";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,51 +11,42 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { RegisterSchema } from "@/utils/schema/RegisterSchema";
+import { LoginSchema } from "@/utils/schema/LoginSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import useFormStatus from "@/hooks/useFormStatus";
 
-const RegisterForm = () => {
+const LoginForm = () => {
+  const [loading, setLoading] = useState(false);
+
   const form = useForm({
-    resolver: zodResolver(RegisterSchema),
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
-      fullName: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
+  const onSubmit = (data: z.infer<typeof LoginSchema>) => {
+    setLoading(true);
     console.log(data);
   };
+
+  const status = useFormStatus();
 
   return (
     <>
       <CardWrapper
-        label="Don't have an account?"
-        title="Create Account"
-        backLabel="Already have an account?"
-        backButtonHref="/login"
-        backButtonLabel="Login"
+        label="Welcome to Fitness AI"
+        title="Login"
+        backLabel="Don't have an account?"
+        backButtonHref="/auth/register"
+        backButtonLabel="Register"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="text" placeholder="John Doe" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="email"
@@ -86,22 +77,20 @@ const RegisterForm = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="password" placeholder="******" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormDescription className="flex items-center justify-end w-full text-muted-foreground text-xs">
+                Don't remember your password?
+                <Button
+                  variant="link"
+                  className="font-normal text-xs px-1"
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/auth/forgot-password">Forgot Password</Link>
+                </Button>
+              </FormDescription>
             </div>
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={status.pending}>
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>
@@ -110,4 +99,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
