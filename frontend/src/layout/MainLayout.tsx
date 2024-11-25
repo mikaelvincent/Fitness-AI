@@ -2,11 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-interface MainLayoutProps {
-  children: React.ReactNode;
-}
-
-const MainLayout = ({ children }: MainLayoutProps) => {
+const MainLayout = () => {
   return (
     <div>
       {/* Header for the main layout */}
@@ -17,7 +13,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         <Button>Click me</Button>
       </header>
       {/* Renders the nested routes */}
-      <main>{children}</main>
+      <main>
+        <Outlet />
+      </main>
     </div>
   );
 };

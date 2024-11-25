@@ -7,25 +7,22 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const App = () => {
   return (
     <Router future={{ v7_startTransition: true }}>
       <Routes>
         {/* Main layout routes */}
-        <Route
-          path="/"
-          element={
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
-          }
-        />
+        <Route path="/" element={<MainLayout />}>
+          <Route path="" element={<Dashboard />} />
+        </Route>
 
         {/* Authentication layout routes */}
         <Route path="/auth" element={<AuthLayout />}>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="verify-email" element={<VerifyEmail />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
         </Route>
 
