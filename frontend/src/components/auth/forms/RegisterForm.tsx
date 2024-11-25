@@ -16,7 +16,7 @@ import { UseFormStatusReturn } from "@/hooks/useFormStatus";
 interface RegisterFormProps {
   status: string;
   formMessage: string;
-  usedEmail: boolean;
+  invalidInput: string;
   formStatus: UseFormStatusReturn<z.infer<typeof RegisterSchema>>;
   form: z.infer<typeof RegisterSchema>;
   onSubmit: (data: z.infer<typeof RegisterSchema>) => void | Promise<void>;
@@ -25,7 +25,7 @@ interface RegisterFormProps {
 const RegisterForm = ({
   status,
   formMessage,
-  usedEmail,
+  invalidInput,
   formStatus,
   form,
   onSubmit,
@@ -52,6 +52,11 @@ const RegisterForm = ({
                       <Input {...field} type="text" placeholder="John Doe" />
                     </FormControl>
                     <FormMessage />
+                    {status == "error" && invalidInput == "name" && (
+                      <p className="text-sm font-medium text-destructive">
+                        {formMessage}
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -69,10 +74,10 @@ const RegisterForm = ({
                       />
                     </FormControl>
                     <FormMessage />
-                    {status == "error" && usedEmail && (
-                      <FormDescription className="text-sm font-medium text-destructive">
+                    {status == "error" && invalidInput == "email" && (
+                      <p className="text-sm font-medium text-destructive">
                         {formMessage}
-                      </FormDescription>
+                      </p>
                     )}
                   </FormItem>
                 )}
@@ -87,6 +92,11 @@ const RegisterForm = ({
                       <Input {...field} type="password" placeholder="******" />
                     </FormControl>
                     <FormMessage />
+                    {status == "error" && invalidInput == "password" && (
+                      <p className="text-sm font-medium text-destructive">
+                        {formMessage}
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -103,11 +113,6 @@ const RegisterForm = ({
                   </FormItem>
                 )}
               />
-              {status == "error" && !usedEmail && (
-                <p className="text-sm font-medium text-destructive">
-                  {formMessage}
-                </p>
-              )}
             </div>
             <Button
               type="submit"

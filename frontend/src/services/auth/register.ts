@@ -34,11 +34,12 @@ export const registerUser = async (data: z.infer<typeof RegisterSchema>) => {
           ? "name"
           : responseData.errors["password"]
           ? "password"
-          : null,
+          : "others",
         errors:
           responseData.errors["email"] ||
           responseData.errors["name"] ||
-          responseData.errors["password"],
+          responseData.errors["password"] ||
+          "Registration failed. Please try again.",
       };
     }
     if (response.status === 500) {

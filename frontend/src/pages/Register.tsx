@@ -13,7 +13,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [formMessage, setFormMessage] = useState<string>("");
   const [invalidInput, setInvalidInput] = useState<
-    "none" | "name" | "email" | "password"
+    "none" | "name" | "email" | "password" | "others"
   >("none");
 
   const form = useForm({
