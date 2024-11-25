@@ -1,4 +1,3 @@
-import React from "react";
 import CardWrapper from "../auth-ui/CardWrapper";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,25 +11,25 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RegisterSchema } from "@/utils/schema/RegisterSchema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { UseFormStatusReturn } from "@/hooks/useFormStatus";
 
-const RegisterForm = () => {
-  const form = useForm({
-    resolver: zodResolver(RegisterSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
+interface RegisterFormProps {
+  status: string;
+  formMessage: string;
+  usedEmail: boolean;
+  formStatus: UseFormStatusReturn<z.infer<typeof RegisterSchema>>;
+  form: z.infer<typeof RegisterSchema>;
+  onSubmit: (data: z.infer<typeof RegisterSchema>) => void | Promise<void>;
+}
 
-  const onSubmit = (data: z.infer<typeof RegisterSchema>) => {
-    console.log(data);
-  };
-
+const RegisterForm = ({
+  status,
+  formMessage,
+  usedEmail,
+  formStatus,
+  form,
+  onSubmit,
+}: RegisterFormProps) => {
   return (
     <>
       <CardWrapper
@@ -45,7 +44,7 @@ const RegisterForm = () => {
             <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="fullName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
@@ -70,6 +69,11 @@ const RegisterForm = () => {
                       />
                     </FormControl>
                     <FormMessage />
+                    {status == "error" && usedEmail && (
+                      <FormDescription className="text-sm font-medium text-destructive">
+                        {formMessage}
+                      </FormDescription>
+                    )}
                   </FormItem>
                 )}
               />
@@ -88,7 +92,7 @@ const RegisterForm = () => {
               />
               <FormField
                 control={form.control}
-                name="confirmPassword"
+                name="password_confirmation"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
@@ -99,9 +103,18 @@ const RegisterForm = () => {
                   </FormItem>
                 )}
               />
+              {status == "error" && !usedEmail && (
+                <p className="text-sm font-medium text-destructive">
+                  {formMessage}
+                </p>
+              )}
             </div>
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={formStatus.pending}
+            >
+              {status == "loading" ? "Creating Account..." : "Register"}
             </Button>
           </form>
         </Form>

@@ -5,7 +5,7 @@ import { useState, useCallback } from "react";
 type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
 
 // Define the return type of the hook, making it generic for flexibility
-interface UseFormStatusReturn<T = any> {
+export interface UseFormStatusReturn<T = any> {
   pending: boolean;
   data: T | null;
   method: HttpMethod;
