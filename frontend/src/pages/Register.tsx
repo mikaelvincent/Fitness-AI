@@ -12,7 +12,9 @@ const Register = () => {
   const { status, setLoading, setDone, setError } = useStatus();
   const navigate = useNavigate();
   const [formMessage, setFormMessage] = useState<string>("");
-  const [usedEmail, setUsedEmail] = useState<boolean>(false);
+  const [invalidInput, setInvalidInput] = useState<
+    "none" | "name" | "email" | "password"
+  >("none");
 
   const form = useForm({
     resolver: zodResolver(RegisterSchema),
@@ -33,7 +35,7 @@ const Register = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
       console.log(response);
       if (!response?.success) {
-        setUsedEmail(true);
+        setInvalidInput(response?.message ? response?.message : "none");
         setError();
         setFormMessage(response?.errors);
       }
@@ -60,7 +62,7 @@ const Register = () => {
       <RegisterForm
         status={status}
         formMessage={formMessage}
-        usedEmail={usedEmail}
+        invalidInput={invalidInput}
         formStatus={formStatus}
         form={form}
         onSubmit={onSubmit}

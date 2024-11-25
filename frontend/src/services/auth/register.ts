@@ -24,24 +24,35 @@ export const registerUser = async (data: z.infer<typeof RegisterSchema>) => {
         message: responseData.message,
         data: responseData.data,
       };
-    } else if (response.status === 422 && !response.ok) {
+    }
+    if (response.status === 422 && !response.ok) {
       return {
         success: false,
-        message: responseData.message,
-        errors: responseData.errors, // Return all validation errors
+        message: responseData.errors["email"]
+          ? "email"
+          : responseData.errors["name"]
+          ? "name"
+          : responseData.errors["password"]
+          ? "password"
+          : null,
+        errors:
+          responseData.errors["email"] ||
+          responseData.errors["name"] ||
+          responseData.errors["password"],
       };
-    } else if (response.status === 500) {
+    }
+    if (response.status === 500) {
       return {
         success: false,
         message: "Internal server error",
         errors: "Registration failed. Please try again.",
       };
-    } else {
-      // Handle other unexpected statuses
-      throw new Error(
-        `Unexpected HTTP error! Status: ${response.status} - ${response.statusText}`
-      );
     }
+
+    // Handle other unexpected statuses
+    throw new Error(
+      `Unexpected HTTP error! Status: ${response.status} - ${response.statusText}`
+    );
   } catch (error) {
     console.error("Registration error:", error);
     return {
