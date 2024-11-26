@@ -57,5 +57,5 @@ frontend/
     ├── App.tsx
     ├── index.css
     └── main.tsx
-└── tailwind.config.js
+└── tailwind.config.cjs
 ```
