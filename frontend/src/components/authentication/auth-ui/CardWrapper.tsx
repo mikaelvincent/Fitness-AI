@@ -8,6 +8,8 @@ import {
 import AuthHeader from "./AuthHeader";
 import BackButton from "./BackButton";
 import {MdMarkEmailUnread} from "react-icons/md";
+import Logo from "@/components/ui/Logo";
+import {useTheme} from "@/components/theme/theme-provider.tsx";
 
 interface CardWrapperProps {
     label: string;
@@ -15,7 +17,7 @@ interface CardWrapperProps {
     backLabel: string;
     backButtonHref: string;
     backButtonLabel: string;
-    logo: "none" | "verify-email";
+    logo: "none" | "verify-email" | "logo";
     children: React.ReactNode;
 }
 
@@ -28,11 +30,18 @@ const CardWrapper = ({
                          logo,
                          children,
                      }: CardWrapperProps) => {
+    const {appliedTheme} = useTheme();
     return (
         <>
             <Card className={`border-0 shadow-none w-10/12 md:w-1/2 lg:w-2/3`}>
                 <CardHeader className="flex items-center">
                     {logo === "verify-email" && (<MdMarkEmailUnread className="text-6xl text-center md:text-8xl"/>)}
+                    {logo === "logo" && <Logo
+                        className="w-28 lg:w-60"
+                        alt="Company Logo"
+                        toUseTheme={appliedTheme}
+                        variant="withoutText"
+                    />}
                     <AuthHeader label={label} title={title}/>
                 </CardHeader>
                 <CardContent>{children}</CardContent>
