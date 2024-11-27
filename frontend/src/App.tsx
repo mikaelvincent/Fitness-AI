@@ -1,5 +1,4 @@
 // src/App.jsx
-import React from 'react';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import AuthLayout from './layout/AuthLayout';
@@ -10,6 +9,8 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import VerifyEmail from './pages/VerifyEmail';
 import {ThemeProvider} from './components/theme/theme-provider.tsx';
+import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
+import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 
 const App = () => {
     return (
@@ -17,12 +18,12 @@ const App = () => {
             <Router>
                 <Routes>
                     {/* Main layout routes */}
-                    <Route path="/" element={<MainLayout/>}>
+                    <Route path="/" element={<ProtectedRoute><MainLayout/> </ProtectedRoute>}>
                         <Route index element={<Dashboard/>}/>
                     </Route>
 
                     {/* Authentication layout routes */}
-                    <Route path="/auth" element={<AuthLayout/>}>
+                    <Route path="/auth" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
                         <Route path="verify-email" element={<VerifyEmail/>}/>
@@ -30,7 +31,7 @@ const App = () => {
                     </Route>
 
                     {/* Catch-all route for 404 */}
-                    <Route path="*" element={<NotFound/>}/>
+                    <Route path="*" element={<ProtectedRoute> <NotFound/> </ProtectedRoute>}/>
                 </Routes>
             </Router>
         </ThemeProvider>

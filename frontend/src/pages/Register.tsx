@@ -1,4 +1,4 @@
-import RegisterForm from "@/components/auth/forms/RegisterForm";
+import RegisterForm from "@/components/authentication/forms/RegisterForm";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {RegisterSchema} from "@/utils/schema/RegisterSchema";
@@ -14,7 +14,7 @@ const Register = () => {
     const navigate = useNavigate();
     const [formMessage, setFormMessage] = useState<string>("");
     const [invalidInput, setInvalidInput] = useState<
-        "none" | "name" | "email" | "password" | "others"
+        "none" | "name" | "email" | "password" | "others" | string
     >("none");
 
     const form = useForm({
@@ -41,12 +41,13 @@ const Register = () => {
                 setFormMessage(response?.errors || "Registration failed.");
             }
 
-            if (response?.success && response?.data && response?.data.token) {
+            if (response?.success && response?.token) {
                 setDone();
                 setFormMessage(response?.message || "Registration successful!");
-                console.log(response.data);
+                console.log(response.token);
                 // Navigate to the VerifyEmail page, passing data via state
-                navigate("/auth/verify-email", {state: {data: response.data}});
+                sessionStorage.setItem("fromRegister", "true");
+                navigate("/auth/verify-email", {state: {fromRegister: true, token: response.token, email: data.email}});
             }
         } catch (error) {
             console.error("Error during submission:", error);

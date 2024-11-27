@@ -1,6 +1,4 @@
 // frontend/src/components/ui/logo.tsx
-
-import React from "react";
 import logoLightWithText from "@/assets/images/logo_Light Mode.svg";
 import logoLightWithoutText from "@/assets/images/logo_Light Mode - No Text.svg";
 import logoDarkWithText from "@/assets/images/logo_Dark Mode.svg";

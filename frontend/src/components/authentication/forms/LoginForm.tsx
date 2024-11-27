@@ -61,6 +61,7 @@ const LoginForm = ({
             backLabel="Don't have an account?"
             backButtonHref="/auth/register"
             backButtonLabel="Register here"
+            logo="none"
         >
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 ">

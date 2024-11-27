@@ -1,10 +1,8 @@
-import {useState} from "react";
-import {useLocation, Navigate, useNavigate} from "react-router-dom";
-import VerifyEmailCard from "@/components/auth/forms/VerifyEmailCard";
+import {useState, useEffect} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import VerifyEmailCard from "@/components/authentication/forms/VerifyEmailForm.tsx";
 import {resendVerificationEmail} from "@/services/auth/resendVerificationEmail";
 import useStatus from "@/hooks/useStatus";
-import {RegisterLoginResponseData} from "@/types/react-router"; // Import the shared type
-import {useUser} from "@/hooks/context/UserContext"; // Import useUser from UserContext
 
 // Wrapper Component
 const VerifyEmail = () => {
@@ -13,26 +11,26 @@ const VerifyEmail = () => {
     const {status, setLoading, setDone, setError} = useStatus();
     const [responseMessage, setResponseMessageMessage] = useState<string>("");
 
-    const state = location.state as { data: RegisterLoginResponseData } | undefined;
-    const email = state?.data?.email;
-    const token = state?.data?.token;
+    const data = location.state as { fromRegister: boolean; token: string; email: string } | undefined;
+    const email = data?.email;
+    const token = data?.token;
 
-    const {loginUser: contextLoginUser} = useUser(); // Destructure loginUser from UserContext
+    useEffect(() => {
+        // Check both location.state and sessionStorage
+        const fromRegister = data?.fromRegister || sessionStorage.getItem("fromRegister") === "true";
 
-
-    const handleLogin = () => {
-        // Set user data and token in UserContext before navigating
-        if (state?.data && token) {
-            contextLoginUser(
-                {
-                    id: state.data.id,
-                    name: state.data.name,
-                    email: state.data.email,
-                },
-                token
-            );
+        if (!fromRegister) {
+            // If user did not come from register page, redirect
+            navigate("/auth/login", {replace: true});
+        } else {
+            // Remove the flag after verification
+            sessionStorage.removeItem("fromRegister");
         }
-        navigate("/");
+    }, [data, navigate]);
+
+    const handleRouteLogin = () => {
+        // Set user data and token in UserContext before navigating
+        navigate("/auth/login");
     };
 
     const handleSubmit = async () => {
@@ -59,15 +57,10 @@ const VerifyEmail = () => {
         }
     };
 
-    // // Redirect if no email is provided
-    if (!email) {
-        return <Navigate to="/auth/login" replace/>;
-    }
-
     return (
         <VerifyEmailCard
             email={email}
-            handleLogin={handleLogin}
+            handleLogin={handleRouteLogin}
             handleSubmit={handleSubmit}
             responseMessage={responseMessage}
         />

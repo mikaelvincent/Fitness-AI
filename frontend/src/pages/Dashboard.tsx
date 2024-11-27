@@ -1,5 +1,3 @@
-import {UserProvider} from "@/hooks/context/UserContext.tsx";
-
 const Dashboard = () => {
     return (
         <div>

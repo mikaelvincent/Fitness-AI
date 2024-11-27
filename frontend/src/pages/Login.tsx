@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import LoginForm from "@/components/auth/forms/LoginForm";
+import LoginForm from "@/components/authentication/forms/LoginForm";
 import {LoginSchema} from "@/utils/schema/LoginSchema";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -64,21 +64,21 @@ const Login = () => {
                 startRetryTimer(retrySeconds);
             }
 
-            if (response?.success && response?.data && response?.data.token) {
-                console.log()
+            // Ensure response.success, response.token, and response.data are all present
+            if (response?.success && response?.token && response.data) {
                 setDone();
                 setFormMessage(response?.message || "Login successful!");
                 // Set user data and token in UserContext
-                contextLoginUser(
-                    {
-                        id: response.data.id,
-                        name: response.data.name,
-                        email: response.data.email,
-                    },
-                    response.data.token
-                );
-                // Navigate to the dashboard, passing data and token via state
-                navigate("/", {state: {data: response.data}});
+                contextLoginUser(response.data, response.token);
+
+                // Navigate to the dashboard
+                navigate("/");
+            }
+
+            if (response?.success && response?.token) {
+                // Handle cases where response.data might be missing unexpectedly
+                setError();
+                setFormMessage("User data is missing from the response.");
             }
         } catch (error) {
             console.error("Error during submission:", error);

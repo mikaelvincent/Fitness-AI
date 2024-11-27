@@ -1,13 +1,12 @@
 import {ENV} from "@/utils/env";
 import {RegisterSchema} from "@/utils/schema/RegisterSchema";
-import {RegisterLoginResponseData} from "@/types/react-router"; // Import the shared type
 import {z} from "zod";
 
 interface RegisterResponse {
     success: boolean;
     message: string;
     status?: number;
-    data?: RegisterLoginResponseData;
+    token?: string;
     errors?: string | null;
 }
 
@@ -56,12 +55,7 @@ export const registerUser = async (data: z.infer<typeof RegisterSchema>): Promis
             return {
                 success: true,
                 message: responseData.message || "Registration successful!",
-                data: {
-                    id: responseData.data.user.id,
-                    name: responseData.data.user.name,
-                    email: responseData.data.user.email,
-                    token: responseData.data.token,
-                },
+                token: responseData.data.token,
             };
         }
 

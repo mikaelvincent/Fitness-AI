@@ -1,5 +1,4 @@
 // frontend/src/layout/MainLayout.tsx
-
 import {useEffect} from "react";
 import {Outlet, useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button";
