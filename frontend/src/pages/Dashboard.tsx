@@ -1,12 +1,12 @@
-import React from "react";
+import {UserProvider} from "@/hooks/context/UserContext.tsx";
 
 const Dashboard = () => {
-  return (
-    <div>
-      {/* Header for the Dashboard page */}
-      <h1>Dashboard</h1>
-    </div>
-  );
+    return (
+        <div>
+            {/* Header for the Dashboard page */}
+            <h1>Dashboard</h1>
+        </div>
+    );
 };
 
 export default Dashboard;

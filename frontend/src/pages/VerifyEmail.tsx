@@ -1,58 +1,77 @@
-import { useState } from "react";
-import { useLocation, Navigate, useNavigate } from "react-router-dom";
+import {useState} from "react";
+import {useLocation, Navigate, useNavigate} from "react-router-dom";
 import VerifyEmailCard from "@/components/auth/forms/VerifyEmailCard";
-import { resendVerificationEmail } from "@/services/auth/resendVerificationEmail";
+import {resendVerificationEmail} from "@/services/auth/resendVerificationEmail";
 import useStatus from "@/hooks/useStatus";
+import {RegisterLoginResponseData} from "@/types/react-router"; // Import the shared type
+import {useUser} from "@/hooks/context/UserContext"; // Import useUser from UserContext
 
 // Wrapper Component
 const VerifyEmail = () => {
-  const location = useLocation();
-  const email = location.state?.email;
-  const navigate = useNavigate();
-  const { status, setLoading, setDone, setError } = useStatus();
-  const [responseMessage, setResponseMessageMessage] = useState<string>("");
+    const location = useLocation();
+    const navigate = useNavigate();
+    const {status, setLoading, setDone, setError} = useStatus();
+    const [responseMessage, setResponseMessageMessage] = useState<string>("");
 
-  const handleRouteLogin = () => {
-    navigate("/auth/login");
-  };
+    const state = location.state as { data: RegisterLoginResponseData } | undefined;
+    const email = state?.data?.email;
+    const token = state?.data?.token;
 
-  const handleSubmit = async () => {
-    setLoading();
+    const {loginUser: contextLoginUser} = useUser(); // Destructure loginUser from UserContext
 
-    try {
-      // Await the registerUser call
-      const response = await resendVerificationEmail();
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
-      if (!response?.success) {
-        setResponseMessageMessage(response?.message);
-      }
-
-      if (response?.success) {
-        setResponseMessageMessage(response?.message);
+    const handleLogin = () => {
+        // Set user data and token in UserContext before navigating
+        if (state?.data && token) {
+            contextLoginUser(
+                {
+                    id: state.data.id,
+                    name: state.data.name,
+                    email: state.data.email,
+                },
+                token
+            );
+        }
         navigate("/");
-      }
-    } catch (error) {
-      setError();
-      console.error("Error during submission:", error);
-      setResponseMessageMessage("Error during sending, please try again.");
-    } finally {
-      setDone();
+    };
+
+    const handleSubmit = async () => {
+        setLoading();
+        console.log(token)
+        try {
+            // Await the registerUser call
+            const response = await resendVerificationEmail(token);
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
+
+            if (!response?.success) {
+                setResponseMessageMessage(response?.message);
+            }
+
+            if (response?.success) {
+                setResponseMessageMessage(response?.message);
+            }
+        } catch (error) {
+            setError();
+            console.error("Error during submission:", error);
+            setResponseMessageMessage("Error during sending, please try again.");
+        } finally {
+            setDone();
+        }
+    };
+
+    // // Redirect if no email is provided
+    if (!email) {
+        return <Navigate to="/auth/login" replace/>;
     }
-  };
 
-  // // Redirect if no email is provided
-  // if (!email) {
-  //   return <Navigate to="/auth/register" />;
-  // }
-
-  return (
-    <VerifyEmailCard
-      email={email}
-      handleRouteLogin={handleRouteLogin}
-      handleSubmit={handleSubmit}
-    />
-  );
+    return (
+        <VerifyEmailCard
+            email={email}
+            handleLogin={handleLogin}
+            handleSubmit={handleSubmit}
+            responseMessage={responseMessage}
+        />
+    );
 };
 
 export default VerifyEmail;
