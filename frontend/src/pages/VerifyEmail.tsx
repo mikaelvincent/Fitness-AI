@@ -28,11 +28,6 @@ const VerifyEmail = () => {
         }
     }, [data, navigate]);
 
-    const handleRouteLogin = () => {
-        // Set user data and token in UserContext before navigating
-        navigate("/auth/login");
-    };
-
     const handleSubmit = async () => {
         setLoading();
         console.log(token)
@@ -60,7 +55,6 @@ const VerifyEmail = () => {
     return (
         <VerifyEmailCard
             email={email}
-            handleLogin={handleRouteLogin}
             handleSubmit={handleSubmit}
             responseMessage={responseMessage}
         />
