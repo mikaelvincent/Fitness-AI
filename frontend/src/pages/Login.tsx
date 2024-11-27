@@ -74,7 +74,7 @@ const Login = () => {
                 // Navigate to the dashboard
                 navigate("/");
             }
-            
+
         } catch (error) {
             console.error("Error during submission:", error);
             setError();
