@@ -30,14 +30,6 @@ export const loginUser = async (data: z.infer<typeof LoginSchema>): Promise<Logi
 
         console.log("Response data:", responseData);
 
-        if (!response.ok && response.status !== 429) {
-            return {
-                success: response.ok,
-                message: responseData.message,
-                status: response.status,
-            };
-        }
-
         if (!response.ok && response.status === 429) {
             return {
                 success: false,
@@ -47,17 +39,21 @@ export const loginUser = async (data: z.infer<typeof LoginSchema>): Promise<Logi
             };
         }
 
-        if (response.ok && response.status === 200) {
+        if (!response.ok) {
             return {
-                success: true,
-                message: responseData.message || "Login successful!",
-                data: {name: responseData.data.user.name},
-                token: responseData.data.token,
+                success: response.ok,
+                message: responseData.message,
+                status: response.status,
             };
         }
 
-        // Handle other unexpected statuses
-        throw new Error(`Unexpected HTTP error! Status: ${response.status} - ${response.statusText}`);
+        return {
+            success: true,
+            message: responseData.message || "Login successful!",
+            data: {name: responseData.data.user.name},
+            token: responseData.data.token,
+        };
+
     } catch (error) {
         console.error("Login error:", error);
         return {

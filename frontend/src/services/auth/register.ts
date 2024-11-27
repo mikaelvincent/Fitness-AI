@@ -42,33 +42,25 @@ export const registerUser = async (data: z.infer<typeof RegisterSchema>): Promis
             };
         }
 
-        if (response.status === 500) {
+        if (!response.ok) {
             return {
-                success: false,
-                message: "Internal server error",
-                errors: "Registration failed. Please try again.",
+                success: !response.ok,
+                message: responseData.message,
                 status: response.status,
             };
         }
 
-        if (response.ok && response.status === 201) {
-            return {
-                success: true,
-                message: responseData.message || "Registration successful!",
-                token: responseData.data.token,
-            };
-        }
+        return {
+            success: true,
+            message: responseData.message || "Registration successful!",
+            token: responseData.data.token,
+        };
 
-        // Handle other unexpected statuses
-        throw new Error(
-            `Unexpected HTTP error! Status: ${response.status} - ${response.statusText}`
-        );
     } catch (error) {
         console.error("Registration error:", error);
         return {
             success: false,
             message: "An unexpected error occurred.",
-            errors: null,
             status: 500,
         };
     }
