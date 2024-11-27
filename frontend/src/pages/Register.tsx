@@ -38,7 +38,7 @@ const Register = () => {
             if (!response?.success) {
                 setInvalidInput(response?.message ? response?.message : "none");
                 setError();
-                setFormMessage(response?.errors || "Registration failed.");
+                setFormMessage(response?.errors || response?.message || "Registration failed.");
             }
 
             if (response?.success && response?.token) {
