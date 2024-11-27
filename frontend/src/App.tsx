@@ -11,6 +11,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import {ThemeProvider} from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
+import ResetPassword from "@/pages/ResetPassword.tsx";
 
 const App = () => {
     return (
@@ -28,6 +29,7 @@ const App = () => {
                         <Route path="register" element={<Register/>}/>
                         <Route path="verify-email" element={<VerifyEmail/>}/>
                         <Route path="forgot-password" element={<ForgotPassword/>}/>
+                        <Route path="reset-password" element={<ResetPassword/>}/>
                     </Route>
 
                     {/* Catch-all route for 404 */}
