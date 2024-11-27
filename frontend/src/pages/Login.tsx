@@ -74,12 +74,7 @@ const Login = () => {
                 // Navigate to the dashboard
                 navigate("/");
             }
-
-            if (response?.success && response?.token) {
-                // Handle cases where response.data might be missing unexpectedly
-                setError();
-                setFormMessage("User data is missing from the response.");
-            }
+            
         } catch (error) {
             console.error("Error during submission:", error);
             setError();
