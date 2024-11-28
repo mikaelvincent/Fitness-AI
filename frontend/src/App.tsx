@@ -17,14 +17,36 @@ const App = () => {
     return (
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
             <Router>
+                {/*Uncomment for protected routes*/}
+                {/*<Routes>*/}
+                {/*    /!* Main layout routes *!/*/}
+                {/*    <Route path="/" element={<ProtectedRoute><MainLayout/> </ProtectedRoute>}>*/}
+                {/*        <Route index element={<Dashboard/>}/>*/}
+                {/*    </Route>*/}
+
+                {/*    /!* Authentication layout routes *!/*/}
+                {/*    <Route path="/auth" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
+                {/*        <Route path="login" element={<Login/>}/>*/}
+                {/*        <Route path="register" element={<Register/>}/>*/}
+                {/*        <Route path="verify-email" element={<VerifyEmail/>}/>*/}
+                {/*        <Route path="forgot-password" element={<ForgotPassword/>}/>*/}
+                {/*        <Route path="reset-password" element={<ResetPassword/>}/>*/}
+                {/*    </Route>*/}
+
+                {/*    /!* Catch-all route for 404 *!/*/}
+                {/*    <Route path="*" element={<ProtectedRoute> <NotFound/> </ProtectedRoute>}/>*/}
+                {/*</Routes>*/}
+
+                {/*For development to remove protected routes*/}
+
                 <Routes>
                     {/* Main layout routes */}
-                    <Route path="/" element={<ProtectedRoute><MainLayout/> </ProtectedRoute>}>
+                    <Route path="/" element={<MainLayout/>}>
                         <Route index element={<Dashboard/>}/>
                     </Route>
 
                     {/* Authentication layout routes */}
-                    <Route path="/auth" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>
+                    <Route path="/auth" element={<AuthLayout/>}>
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
                         <Route path="verify-email" element={<VerifyEmail/>}/>
@@ -33,8 +55,9 @@ const App = () => {
                     </Route>
 
                     {/* Catch-all route for 404 */}
-                    <Route path="*" element={<ProtectedRoute> <NotFound/> </ProtectedRoute>}/>
+                    <Route path="*" element={<NotFound/>}/>
                 </Routes>
+
             </Router>
         </ThemeProvider>
     );

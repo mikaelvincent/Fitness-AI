@@ -2,10 +2,10 @@ import * as z from "zod";
 
 export const ResetPasswordSchema = z.object({
     token: z.string().min(1, {
-        message: "Please enter a valid email address",
+        message: "Please enter a code",
     }),
     email: z.string().email({
-        message: "Enter a password",
+        message: "Please enter a valid email address",
     }),
     password: z.string().min(1, {
         message: "Please enter a password",
