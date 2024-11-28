@@ -72,6 +72,23 @@ const LoginForm = ({
                         />
                         <FormField
                             control={form.control}
+                            name="token"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Token</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            type="text"
+                                            placeholder="token1232321"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
                             name="password"
                             render={({field}) => (
                                 <FormItem>

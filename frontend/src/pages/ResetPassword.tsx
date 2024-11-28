@@ -19,18 +19,19 @@ const ResetPassword = () => {
     const data = location.state as { fromForgotPassword: boolean; email: string } | undefined;
     const email = data?.email;
 
-    useEffect(() => {
-        // Check both location.state and sessionStorage
-        const fromForgotPassword = data?.fromForgotPassword || sessionStorage.getItem("fromForgotPassword") === "true";
-
-        if (!fromForgotPassword) {
-            // If user did not come from forgot password page, redirect
-            navigate("/auth/login", {replace: true});
-        } else {
-            // Remove the flag after verification
-            sessionStorage.removeItem("fromForgotPassword");
-        }
-    }, [data, navigate]);
+    // Uncomment for development and comment for protected routes
+    // useEffect(() => {
+    //     // Check both location.state and sessionStorage
+    //     const fromForgotPassword = data?.fromForgotPassword || sessionStorage.getItem("fromForgotPassword") === "true";
+    //
+    //     if (!fromForgotPassword) {
+    //         // If user did not come from forgot password page, redirect
+    //         navigate("/auth/login", {replace: true});
+    //     } else {
+    //         // Remove the flag after verification
+    //         sessionStorage.removeItem("fromForgotPassword");
+    //     }
+    // }, [data, navigate]);
 
     const form = useForm<z.infer<typeof ResetPasswordSchema>>({
         resolver: zodResolver(ResetPasswordSchema),
