@@ -14,7 +14,7 @@ const AuthLayout = () => {
 
     return (
         <div
-            className={`min-h-screen flex text-foreground flex-col lg:flex-row gap-10 md:gap-40`}>
+            className={`min-h-screen flex text-foreground flex-col lg:flex-row gap-10 md:gap-40 lg:gap-0`}>
             {/* Header for the authentication layout */}
             <header
                 className={`flex-none flex flex-col items-center justify-center pt-6 w-full bg-background lg:w-1/2 ${
