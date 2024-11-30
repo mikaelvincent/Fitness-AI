@@ -21,7 +21,7 @@ const VerifyEmail = () => {
 
         if (!fromRegister) {
             // If user did not come from register page, redirect
-            navigate("/auth/login", {replace: true});
+            navigate("/login", {replace: true});
         } else {
             // Remove the flag after verification
             sessionStorage.removeItem("fromRegister");

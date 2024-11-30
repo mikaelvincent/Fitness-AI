@@ -44,7 +44,7 @@ const LoginForm = ({
             label="Please Enter Your New Password with Reset Code"
             title="Reset Password"
             backLabel="Remembered your password?"
-            backButtonHref="/auth/login"
+            backButtonHref="/login"
             backButtonLabel="Go back to login"
             logo="none"
         >

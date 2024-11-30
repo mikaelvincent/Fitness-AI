@@ -47,7 +47,7 @@ const Register = () => {
                 console.log(response.token);
                 // Navigate to the VerifyEmail page, passing data via state
                 sessionStorage.setItem("fromRegister", "true");
-                navigate("/auth/verify-email", {state: {fromRegister: true, token: response.token, email: data.email}});
+                navigate("/verify-email", {state: {fromRegister: true, token: response.token, email: data.email}});
             }
         } catch (error) {
             console.error("Error during submission:", error);

@@ -16,7 +16,7 @@ const VerifyEmailCard = ({
     return (
         <>
             <CardWrapper label="" title=" Verify your email address" backLabel="Did you already verify your email?"
-                         backButtonHref="/auth/login"
+                         backButtonHref="/login"
                          backButtonLabel="Login new Account"
                          logo="verify-email">
                 <div className="flex flex-col items-center justify-center text-center">

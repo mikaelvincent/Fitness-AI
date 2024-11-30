@@ -25,7 +25,7 @@ const App = () => {
                 {/*    </Route>*/}
 
                 {/*    /!* Authentication layout routes *!/*/}
-                {/*    <Route path="/auth" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
+                {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
                 {/*        <Route path="login" element={<Login/>}/>*/}
                 {/*        <Route path="register" element={<Register/>}/>*/}
                 {/*        <Route path="verify-email" element={<VerifyEmail/>}/>*/}
@@ -46,7 +46,7 @@ const App = () => {
                     </Route>
 
                     {/* Authentication layout routes */}
-                    <Route path="/auth" element={<AuthLayout/>}>
+                    <Route path="/" element={<AuthLayout/>}>
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
                         <Route path="verify-email" element={<VerifyEmail/>}/>

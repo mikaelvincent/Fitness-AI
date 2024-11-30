@@ -43,7 +43,7 @@ const ForgotPasswordForm = ({
             label="Please enter your email address"
             title="Forgot Your Password?"
             backLabel="Remembered your password?"
-            backButtonHref="/auth/login"
+            backButtonHref="/login"
             backButtonLabel="Go back to login"
             logo="none"
         >

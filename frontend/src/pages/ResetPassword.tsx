@@ -26,7 +26,7 @@ const ResetPassword = () => {
     //
     //     if (!fromForgotPassword) {
     //         // If user did not come from forgot password page, redirect
-    //         navigate("/auth/login", {replace: true});
+    //         navigate("/login", {replace: true});
     //     } else {
     //         // Remove the flag after verification
     //         sessionStorage.removeItem("fromForgotPassword");
@@ -63,7 +63,7 @@ const ResetPassword = () => {
                 setDone();
                 setFormMessage(response?.message);
                 // Navigate to the login page
-                navigate("/auth/login");
+                navigate("/login");
             }
 
         } catch (error) {
