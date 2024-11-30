@@ -22,6 +22,7 @@ interface ForgotPasswordFormProps {
     formStatus: UseFormStatusReturn;
     form: UseFormReturn<z.infer<typeof ForgotPasswordSchema>>;
     onSubmit: (data: z.infer<typeof ForgotPasswordSchema>) => void | Promise<void>;
+    cooldown: number;
 }
 
 const ForgotPasswordForm = ({
@@ -30,6 +31,7 @@ const ForgotPasswordForm = ({
                                 formStatus,
                                 form,
                                 onSubmit,
+                                cooldown,
                             }: ForgotPasswordFormProps) => {
     // Determine the message to display
     const getMessage = () => {
@@ -74,10 +76,16 @@ const ForgotPasswordForm = ({
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={formStatus.pending}
+                        disabled={formStatus.pending || cooldown > 0}
                     >
-                        {status === "loading" ? "Submitting..." : "Submit"}
+                        {formStatus.pending ? "Submitting..." : cooldown > 0 ? `Please wait (${cooldown}s)` : "Submit"}
                     </Button>
+
+                    {cooldown > 0 && (
+                        <FormDescription className="text-sm text-muted-foreground">
+                            You can request another password reset in {cooldown} seconds.
+                        </FormDescription>
+                    )}
                 </form>
             </Form>
         </CardWrapper>
