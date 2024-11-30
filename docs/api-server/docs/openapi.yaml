@@ -196,6 +196,89 @@ paths:
                     example: Unauthenticated.
       tags:
         - Authentication
+  /api/password/update:
+    post:
+      summary: 'Update the authenticated user''s password.'
+      operationId: updateTheAuthenticatedUsersPassword
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Password updated successfully.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Password updated successfully.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Current password does not match.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Current password does not match.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Validation failed.'
+                  errors:
+                    password:
+                      - 'The password must be at least 8 characters.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Validation failed.'
+                  errors:
+                    type: object
+                    properties:
+                      password:
+                        type: array
+                        example:
+                          - 'The password must be at least 8 characters.'
+                        items:
+                          type: string
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                  description: 'The user''s current password.'
+                  example: voluptatum
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The new password.'
+                  example: ')B#Qz?{T8"<Tx'
+                  nullable: false
+                password_confirmation:
+                  type: string
+                  description: 'Confirmation of the new password.'
+                  example: voluptatum
+                  nullable: false
+              required:
+                - current_password
+                - password
+                - password_confirmation
   /api/email/verification-notification:
     post:
       summary: 'Send a new email verification notification.'

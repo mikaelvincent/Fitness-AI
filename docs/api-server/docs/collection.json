@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "26ef753f-5319-4f27-b710-20e4da8f4fd8",
+        "_postman_id": "67540c5b-bd59-4e6b-9db0-857ab5a00cd9",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -147,6 +147,53 @@
                             "header": [],
                             "code": 401,
                             "body": "{\n  \"message\": \"Unauthenticated.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Update the authenticated user's password.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/password\/update",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/password\/update"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"current_password\":\"voluptatum\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
+                        },
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Password updated successfully.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Current password does not match.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"password\": [\n      \"The password must be at least 8 characters.\"\n    ]\n  }\n}",
                             "name": ""
                         }
                     ]
