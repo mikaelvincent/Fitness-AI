@@ -22,7 +22,7 @@ const VerifyEmail = () => {
         timeLeft: cooldown,
         start: startCooldown,
         reset: resetCooldown,
-    } = useTimer(60, () => {
+    } = useTimer(0, () => {
         // Optional: Notify the user when cooldown ends
         toast({
             title: "Cooldown Ended",
