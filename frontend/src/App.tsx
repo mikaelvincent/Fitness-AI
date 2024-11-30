@@ -12,11 +12,13 @@ import {ThemeProvider} from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 import ResetPassword from "@/pages/ResetPassword.tsx";
+import {Toaster} from "@/components/ui/toaster";
 
 const App = () => {
     return (
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
             <Router>
+                <Toaster/>
                 {/*Uncomment for protected routes*/}
                 {/*<Routes>*/}
                 {/*    /!* Main layout routes *!/*/}

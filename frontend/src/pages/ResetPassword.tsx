@@ -8,6 +8,7 @@ import {z} from "zod";
 import {ResetPasswordSchema} from "@/utils/schema/ResetPasswordSchema.ts";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {SendResetPasswordRequest} from "@/services/auth/resetPassword.ts";
+import {toast} from "@/hooks/use-toast";
 
 const ResetPassword = () => {
     const location = useLocation();
@@ -61,6 +62,10 @@ const ResetPassword = () => {
                 setDone();
                 setFormMessage(response?.message);
                 // Navigate to the login page
+                toast({
+                    title: "Password Reset Successful",
+                    description: "Your password has been reset. Please log in with your new password.",
+                });
                 navigate("/login");
             }
 
