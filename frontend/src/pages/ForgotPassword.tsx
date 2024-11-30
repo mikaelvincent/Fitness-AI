@@ -42,9 +42,6 @@ const ForgotPassword = () => {
             if (response?.success) {
                 setDone();
                 setFormMessage(response?.message);
-                // Navigate to the reset-password page
-                sessionStorage.setItem("fromForgotPassword", "true");
-                // navigate("/reset-password", {state: {fromForgotPassword: true, email: data.email}});
             }
 
         } catch (error) {
