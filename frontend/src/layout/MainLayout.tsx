@@ -18,7 +18,7 @@ const MainLayout = () => {
 
     const handleLogout = () => {
         logoutUser();
-        navigate("/auth/login");
+        navigate("/login");
     };
 
     return (
