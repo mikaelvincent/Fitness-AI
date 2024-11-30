@@ -6,12 +6,14 @@ interface VerifyEmailProps {
     email: any;
     handleSubmit: () => void;
     responseMessage?: string;
+    cooldown: number;
 }
 
 const VerifyEmailCard = ({
                              email,
                              handleSubmit,
                              responseMessage,
+                             cooldown,
                          }: VerifyEmailProps) => {
     return (
         <>
@@ -26,12 +28,18 @@ const VerifyEmailCard = ({
                     <p className="text-muted-foreground pb-10">
                         Please check your inbox or spam folder
                     </p>
-                    {responseMessage && (
-                        <AuthErrorMessage formMessage={responseMessage}/>
-                    )}
-                    <Button onClick={handleSubmit} className="mb-4">
-                        Resend Email
+                    <Button
+                        onClick={handleSubmit}
+                        className="mb-4"
+                        disabled={cooldown > 0}
+                    >
+                        {cooldown > 0 ? `Resend Email (${cooldown}s)` : "Resend Email"}
                     </Button>
+                    {cooldown > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                            You can resend the verification email in {cooldown} seconds.
+                        </p>
+                    )}
                 </div>
             </CardWrapper>
         </>
