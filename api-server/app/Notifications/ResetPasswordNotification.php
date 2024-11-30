@@ -3,9 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPasswordNotification;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\URL;
 
 class ResetPasswordNotification extends BaseResetPasswordNotification
 {
@@ -14,19 +11,7 @@ class ResetPasswordNotification extends BaseResetPasswordNotification
      */
     protected function resetUrl($notifiable)
     {
-        return URL::temporarySignedRoute(
-            "password.reset",
-            Carbon::now()->addMinutes(
-                Config::get(
-                    "auth.passwords." .
-                        Config::get("auth.defaults.passwords") .
-                        ".expire"
-                )
-            ),
-            [
-                "token" => $this->token,
-                "email" => $notifiable->getEmailForPasswordReset(),
-            ]
-        );
+        // Generate a reset URL pointing to the frontend application
+        return config('app.frontend_url') . '/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
     }
 }
