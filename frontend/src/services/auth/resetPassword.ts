@@ -1,6 +1,4 @@
 import {ENV} from "@/utils/env";
-import {ForgotPasswordSchema} from "@/utils/schema/ForgotPasswordSchema.ts";
-import {z} from "zod";
 
 interface ResetPasswordResponse {
     success: boolean;
@@ -9,7 +7,14 @@ interface ResetPasswordResponse {
     errors?: string | null;
 }
 
-export const SendResetPasswordRequest = async (data: z.infer<typeof ForgotPasswordSchema>): Promise<ResetPasswordResponse> => {
+interface ResetPasswordDataProps {
+    token: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
+
+export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Promise<ResetPasswordResponse> => {
     console.log("SendResendPasswordRequest data:", data);
     try {
         const url = new URL("/api/reset-password", ENV.API_URL);
@@ -42,7 +47,7 @@ export const SendResetPasswordRequest = async (data: z.infer<typeof ForgotPasswo
         if (!response.ok) {
             return {
                 success: response.ok,
-                message: responseData.message || "Unable to send password reset link.",
+                message: responseData.message || "Unable to reset password.",
                 status: response.status,
             };
         }
@@ -50,7 +55,7 @@ export const SendResetPasswordRequest = async (data: z.infer<typeof ForgotPasswo
 
         return {
             success: true,
-            message: responseData.message || "Login successful!",
+            message: responseData.message || "Reset Password Successful",
             status: response.status,
         };
 

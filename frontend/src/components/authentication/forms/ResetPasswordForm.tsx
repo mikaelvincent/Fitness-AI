@@ -22,6 +22,7 @@ interface ResetPasswordFormProps {
     formStatus: UseFormStatusReturn;
     form: UseFormReturn<z.infer<typeof ResetPasswordSchema>>;
     onSubmit: (data: z.infer<typeof ResetPasswordSchema>) => void | Promise<void>;
+    email: string;
 }
 
 const LoginForm = ({
@@ -30,6 +31,7 @@ const LoginForm = ({
                        formStatus,
                        form,
                        onSubmit,
+                       email,
                    }: ResetPasswordFormProps) => {
     // Determine the message to display
     const getMessage = () => {
@@ -52,8 +54,7 @@ const LoginForm = ({
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 " noValidate>
                     <div className="space-y-4">
                         <FormField
-                            control={form.control}
-                            name="email"
+                            name="email_display"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
@@ -62,7 +63,8 @@ const LoginForm = ({
                                             {...field}
                                             type="email"
                                             placeholder="example@email.com"
-                                            defaultValue={form.getValues("email")}
+                                            defaultValue={email}
+                                            value={email}
                                             readOnly
                                         />
                                     </FormControl>

@@ -15,29 +15,27 @@ const ResetPassword = () => {
     const navigate = useNavigate();
     const [formMessage, setFormMessage] = useState<string>("");
     const formStatus = useFormStatus();
-
-    const data = location.state as { fromForgotPassword: boolean; email: string } | undefined;
-    const email = data?.email;
+    const [email, setEmail] = useState<string>("");
+    const [token, setToken] = useState<string>("");
 
     // Uncomment for development and comment for protected routes
-    // useEffect(() => {
-    //     // Check both location.state and sessionStorage
-    //     const fromForgotPassword = data?.fromForgotPassword || sessionStorage.getItem("fromForgotPassword") === "true";
-    //
-    //     if (!fromForgotPassword) {
-    //         // If user did not come from forgot password page, redirect
-    //         navigate("/login", {replace: true});
-    //     } else {
-    //         // Remove the flag after verification
-    //         sessionStorage.removeItem("fromForgotPassword");
-    //     }
-    // }, [data, navigate]);
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tokenParam = queryParams.get("token");
+        const emailParam = queryParams.get("email");
+
+        if (tokenParam && emailParam) {
+            setToken(tokenParam);
+            setEmail(emailParam);
+        } else {
+            // If token or email is missing, redirect to login
+            navigate("/login", {replace: true});
+        }
+    }, [location.search, navigate]);
 
     const form = useForm<z.infer<typeof ResetPasswordSchema>>({
         resolver: zodResolver(ResetPasswordSchema),
         defaultValues: {
-            token: "",
-            email: email || "",
             password: "",
             password_confirmation: "",
         },
@@ -49,7 +47,7 @@ const ResetPassword = () => {
 
         try {
             // Await the loginUser call
-            const response = await SendResetPasswordRequest(data);
+            const response = await SendResetPasswordRequest({...data, token, email});
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
             if (!response?.success) {
@@ -79,7 +77,7 @@ const ResetPassword = () => {
     return (
         <>
             <ResetPasswordForm form={form} onSubmit={onSubmit} formStatus={formStatus} formMessage={formMessage}
-                               status={status}/>
+                               status={status} email={email}/>
         </>
     );
 };
