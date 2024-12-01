@@ -13,14 +13,16 @@ use PragmaRX\Google2FA\Google2FA;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Handle an incoming login request.
+     * Log in a user and issue an authentication token.
+     *
+     * Validates user credentials and issues a new API token. If two-factor authentication is enabled, a valid code is required.
      *
      * @group Authentication
      * @unauthenticated
      *
-     * @bodyParam email string required The user's email address.
+     * @bodyParam email string required The user's email address. Example: user@example.com
      * @bodyParam password string required The user's password.
-     * @bodyParam two_factor_code string The two-factor authentication code (if applicable).
+     * @bodyParam two_factor_code string The two-factor authentication code if enabled.
      *
      * @response 200 {
      *   "message": "Login successful.",
@@ -28,8 +30,8 @@ class AuthenticatedSessionController extends Controller
      *     "user": {
      *       "id": 1,
      *       "name": "John Doe",
-     *       "email": "john@example.com",
-     *       "email_verified_at": "2023-10-01T12:34:56.000000Z"
+     *       "email": "user@example.com",
+     *       "email_verified_at": "2024-12-02T12:00:00.000000Z"
      *     },
      *     "token": "example-token"
      *   }
@@ -40,7 +42,10 @@ class AuthenticatedSessionController extends Controller
      * }
      *
      * @response 422 {
-     *   "message": "Invalid two-factor authentication code."
+     *   "message": "Invalid two-factor authentication code.",
+     *   "errors": {
+     *     "two_factor_code": ["The two_factor_code field is required."]
+     *   }
      * }
      *
      * @response 429 {
@@ -131,13 +136,19 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming logout request.
+     * Log out the authenticated user.
+     *
+     * Revokes the current access token, effectively logging out the user.
      *
      * @group Authentication
      * @authenticated
      *
      * @response 200 {
      *   "message": "Logout successful."
+     * }
+     *
+     * @response 401 {
+     *   "message": "Unauthenticated."
      * }
      */
     public function destroy(Request $request)
