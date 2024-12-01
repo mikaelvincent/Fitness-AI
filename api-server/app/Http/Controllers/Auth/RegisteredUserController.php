@@ -280,4 +280,111 @@ class RegisteredUserController extends Controller
             200
         );
     }
+
+    /**
+     * Complete the user registration by providing name and password.
+     *
+     * @group Registration
+     * @unauthenticated
+     *
+     * @bodyParam token string required The registration token.
+     * @bodyParam name string required The user's full name.
+     * @bodyParam password string required The user's password.
+     * @bodyParam password_confirmation string required Confirmation of the user's password.
+     *
+     * @response 201 {
+     *   "message": "Registration completed successfully.",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com",
+     *       "email_verified_at": "2024-12-01T12:00:00.000000Z"
+     *     },
+     *     "token": "example-token"
+     *   }
+     * }
+     *
+     * @response 400 {
+     *   "message": "Invalid or expired registration token."
+     * }
+     *
+     * @response 422 {
+     *   "message": "Registration failed.",
+     *   "errors": {
+     *     "name": [
+     *       "The name field is required."
+     *     ],
+     *     "password": [
+     *       "The password must be at least 8 characters."
+     *     ]
+     *   }
+     * }
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'message' => 'Registration failed.',
+                    'errors' => $validator->errors(),
+                ],
+                422
+            );
+        }
+
+        $hashedToken = hash('sha256', $request->input('token'));
+        $registrationToken = RegistrationToken::where('token', $hashedToken)->first();
+
+        if (!$registrationToken || $registrationToken->isExpired()) {
+            return response()->json(
+                [
+                    'message' => 'Invalid or expired registration token.',
+                ],
+                400
+            );
+        }
+
+        if (User::where('email', $registrationToken->email)->exists()) {
+            return response()->json(
+                [
+                    'message' => 'User already registered with this email.',
+                ],
+                400
+            );
+        }
+
+        $user = User::create([
+            'name' => $request->input('name'),
+            'email' => $registrationToken->email,
+            'password' => Hash::make($request->input('password')),
+            'email_verified_at' => now(),
+        ]);
+
+        $registrationToken->delete();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json(
+            [
+                'message' => 'Registration completed successfully.',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'email_verified_at' => $user->email_verified_at,
+                    ],
+                    'token' => $token,
+                ],
+            ],
+            201
+        );
+    }
 }
