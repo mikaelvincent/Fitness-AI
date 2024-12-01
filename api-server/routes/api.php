@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\TwoFactorAuthenticationController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 
 Route::post('/register/initiate', [RegisteredUserController::class, 'initiate']);
+Route::post('/register/resend', [RegisteredUserController::class, 'resend']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
