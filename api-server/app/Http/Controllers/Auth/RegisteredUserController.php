@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\RegistrationToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use App\Notifications\RegistrationTokenNotification;
 
 class RegisteredUserController extends Controller
 {
@@ -29,6 +31,10 @@ class RegisteredUserController extends Controller
      *       "The email has already been taken."
      *     ]
      *   }
+     * }
+     *
+     * @response 500 {
+     *   "message": "Failed to send verification email."
      * }
      */
     public function initiate(Request $request)
@@ -64,6 +70,20 @@ class RegisteredUserController extends Controller
                 'expires_at' => now()->addHour(),
             ]
         );
+
+        try {
+            // Send the verification email
+            Notification::route('mail', $request->email)
+                ->notify(new RegistrationTokenNotification($token));
+        } catch (\Exception $e) {
+            // Handle email sending failure
+            return response()->json(
+                [
+                    'message' => 'Failed to send verification email.',
+                ],
+                500
+            );
+        }
 
         return response()->json(
             [
