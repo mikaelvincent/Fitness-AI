@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\RegistrationTokenNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -32,10 +33,12 @@ class RegistrationTest extends TestCase
         ]);
 
         Notification::assertSentTo(
-            new class {
-                public $email = 'john.doe@example.com';
-            },
-            RegistrationTokenNotification::class
+            new AnonymousNotifiable,
+            RegistrationTokenNotification::class,
+            function ($notification, $channels, $notifiable) {
+                return isset($notifiable->routes['mail']) &&
+                       $notifiable->routes['mail'] === 'john.doe@example.com';
+            }
         );
     }
 
