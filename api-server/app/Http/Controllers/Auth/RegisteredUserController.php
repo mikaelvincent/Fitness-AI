@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\RegistrationToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use App\Notifications\RegistrationTokenNotification;
 
 class RegisteredUserController extends Controller
@@ -77,7 +77,6 @@ class RegisteredUserController extends Controller
             Notification::route('mail', $request->email)
                 ->notify(new RegistrationTokenNotification($token));
         } catch (\Exception $e) {
-            // Handle email sending failure
             return response()->json(
                 [
                     'message' => 'Failed to send verification email.',
@@ -179,7 +178,6 @@ class RegisteredUserController extends Controller
             Notification::route('mail', $email)
                 ->notify(new RegistrationTokenNotification($token));
         } catch (\Exception $e) {
-            // Handle email sending failure
             return response()->json(
                 [
                     'message' => 'Failed to resend verification email.',
@@ -193,6 +191,91 @@ class RegisteredUserController extends Controller
         return response()->json(
             [
                 'message' => 'Verification email resent successfully.',
+            ],
+            200
+        );
+    }
+
+    /**
+     * Validate the registration token.
+     *
+     * @group Registration
+     * @unauthenticated
+     *
+     * @bodyParam token string required The registration token.
+     *
+     * @response 200 {
+     *   "message": "Token is valid.",
+     *   "data": {
+     *     "status": "valid",
+     *     "expires_in": 3600
+     *   }
+     * }
+     *
+     * @response 400 {
+     *   "message": "Token is invalid or has expired.",
+     *   "data": {
+     *     "status": "expired"
+     *   }
+     * }
+     *
+     * @response 422 {
+     *   "message": "Validation failed.",
+     *   "errors": {
+     *     "token": [
+     *       "The token field is required."
+     *     ]
+     *   }
+     * }
+     */
+    public function validateToken(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => ['required', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'message' => 'Validation failed.',
+                    'errors' => $validator->errors(),
+                ],
+                422
+            );
+        }
+
+        $hashedToken = hash('sha256', $request->token);
+        $registrationToken = RegistrationToken::where('token', $hashedToken)->first();
+
+        if (!$registrationToken) {
+            return response()->json(
+                [
+                    'message' => 'Token is invalid or has expired.',
+                    'data' => ['status' => 'invalid'],
+                ],
+                400
+            );
+        }
+
+        if ($registrationToken->isExpired()) {
+            return response()->json(
+                [
+                    'message' => 'Token is invalid or has expired.',
+                    'data' => ['status' => 'expired'],
+                ],
+                400
+            );
+        }
+
+        $expiresIn = $registrationToken->timeUntilExpiration();
+
+        return response()->json(
+            [
+                'message' => 'Token is valid.',
+                'data' => [
+                    'status' => 'valid',
+                    'expires_in' => $expiresIn,
+                ],
             ],
             200
         );
