@@ -9,13 +9,14 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule)
     {
-        // Define scheduled tasks here
+        // Schedule the cleanup of expired registration tokens every hour
+        $schedule->command('registration-tokens:cleanup')->hourly();
     }
 
     protected function commands()
     {
-        $this->load(__DIR__ . "/Commands");
+        $this->load(__DIR__ . '/Commands');
 
-        require base_path("routes/console.php");
+        require base_path('routes/console.php');
     }
 }
