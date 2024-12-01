@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rules\Password;
 use App\Notifications\RegistrationTokenNotification;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class RegisteredUserController extends Controller
 {
