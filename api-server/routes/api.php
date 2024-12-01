@@ -8,26 +8,27 @@ use App\Http\Controllers\Auth\TokenRefreshController;
 use App\Http\Controllers\Auth\TwoFactorAuthenticationController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 
-Route::post('/register/initiate', [RegisteredUserController::class, 'initiate']);
-Route::post('/register/resend', [RegisteredUserController::class, 'resend']);
-Route::post('/register/validate-token', [RegisteredUserController::class, 'validateToken']);
-Route::post('/register', [RegisteredUserController::class, 'store']);
+// Registration Routes
+Route::group([], function () {
+    Route::post('/register/initiate', [RegisteredUserController::class, 'initiate']);
+    Route::post('/register/resend', [RegisteredUserController::class, 'resend']);
+    Route::post('/register/validate-token', [RegisteredUserController::class, 'validateToken']);
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+});
+
+// Authentication Routes
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/refresh-token', [TokenRefreshController::class, 'refresh'])->middleware('auth:sanctum');
 
-// Password Reset Routes
+// Password Management Routes
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->middleware('guest');
 Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('guest');
-
-// Token Refresh Route
-Route::post('/refresh-token', [TokenRefreshController::class, 'refresh'])->middleware('auth:sanctum');
+Route::post('/password/update', [ChangePasswordController::class, 'update'])->middleware('auth:sanctum');
 
 // Two-Factor Authentication Routes
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/two-factor-authentication/enable', [TwoFactorAuthenticationController::class, 'enable']);
     Route::post('/two-factor-authentication/confirm', [TwoFactorAuthenticationController::class, 'confirm']);
     Route::post('/two-factor-authentication/disable', [TwoFactorAuthenticationController::class, 'disable']);
-
-    // Password Update Route
-    Route::post('/password/update', [ChangePasswordController::class, 'update']);
 });
