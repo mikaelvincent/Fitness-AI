@@ -14,10 +14,12 @@ class PasswordResetController extends Controller
     /**
      * Send a password reset link to the user's email.
      *
-     * @group Password Reset
+     * Initiates the password reset process by emailing a reset link to the user.
+     *
+     * @group Password Management
      * @unauthenticated
      *
-     * @bodyParam email string required The user's email address.
+     * @bodyParam email string required The user's email address. Example: user@example.com
      *
      * @response 200 {
      *   "message": "Password reset link sent."
@@ -26,9 +28,7 @@ class PasswordResetController extends Controller
      * @response 422 {
      *   "message": "Unable to send password reset link.",
      *   "errors": {
-     *     "email": [
-     *       "The email must be a valid email address."
-     *     ]
+     *     "email": ["The email must be a valid email address."]
      *   }
      * }
      *
@@ -72,13 +72,15 @@ class PasswordResetController extends Controller
     }
 
     /**
-     * Reset the user's password.
+     * Reset the user's password using the provided token.
      *
-     * @group Password Reset
+     * Validates the token and updates the user's password.
+     *
+     * @group Password Management
      * @unauthenticated
      *
      * @bodyParam token string required The password reset token.
-     * @bodyParam email string required The user's email address.
+     * @bodyParam email string required The user's email address. Example: user@example.com
      * @bodyParam password string required The new password.
      * @bodyParam password_confirmation string required Confirmation of the new password.
      *
@@ -93,9 +95,7 @@ class PasswordResetController extends Controller
      * @response 422 {
      *   "message": "Unable to reset password.",
      *   "errors": {
-     *     "password": [
-     *       "The password must be at least 8 characters."
-     *     ]
+     *     "password": ["The password must be at least 8 characters."]
      *   }
      * }
      */
