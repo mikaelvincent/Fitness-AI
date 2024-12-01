@@ -39,7 +39,7 @@ const RegisterForm = ({
                 label="Don't have an account?"
                 title="Create Account"
                 backLabel="Already have an account?"
-                backButtonHref="/auth/login"
+                backButtonHref="/login"
                 backButtonLabel="Login here"
                 logo="none"
             >

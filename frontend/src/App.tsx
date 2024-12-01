@@ -12,11 +12,13 @@ import {ThemeProvider} from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 import ResetPassword from "@/pages/ResetPassword.tsx";
+import {Toaster} from "@/components/ui/toaster";
 
 const App = () => {
     return (
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
             <Router>
+                <Toaster/>
                 {/*Uncomment for protected routes*/}
                 {/*<Routes>*/}
                 {/*    /!* Main layout routes *!/*/}
@@ -25,7 +27,7 @@ const App = () => {
                 {/*    </Route>*/}
 
                 {/*    /!* Authentication layout routes *!/*/}
-                {/*    <Route path="/auth" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
+                {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
                 {/*        <Route path="login" element={<Login/>}/>*/}
                 {/*        <Route path="register" element={<Register/>}/>*/}
                 {/*        <Route path="verify-email" element={<VerifyEmail/>}/>*/}
@@ -46,7 +48,7 @@ const App = () => {
                     </Route>
 
                     {/* Authentication layout routes */}
-                    <Route path="/auth" element={<AuthLayout/>}>
+                    <Route path="/" element={<AuthLayout/>}>
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
                         <Route path="verify-email" element={<VerifyEmail/>}/>

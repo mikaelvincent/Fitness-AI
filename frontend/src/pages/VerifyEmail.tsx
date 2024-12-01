@@ -3,17 +3,32 @@ import {useLocation, useNavigate} from "react-router-dom";
 import VerifyEmailCard from "@/components/authentication/forms/VerifyEmailForm.tsx";
 import {resendVerificationEmail} from "@/services/auth/resendVerificationEmail";
 import useStatus from "@/hooks/useStatus";
+import useTimer from "@/hooks/useTimer";
+import {toast} from "@/hooks/use-toast";
 
 // Wrapper Component
 const VerifyEmail = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const {status, setLoading, setDone, setError} = useStatus();
-    const [responseMessage, setResponseMessageMessage] = useState<string>("");
+    const [responseMessage, setResponseMessage] = useState<string>("");
 
     const data = location.state as { fromRegister: boolean; token: string; email: string } | undefined;
     const email = data?.email;
     const token = data?.token;
+
+    // Initialize the timer with a 60-second cooldown
+    const {
+        timeLeft: cooldown,
+        start: startCooldown,
+        reset: resetCooldown,
+    } = useTimer(0, () => {
+        // Optional: Notify the user when cooldown ends
+        toast({
+            title: "Cooldown Ended",
+            description: "You can now resend the verification email.",
+        });
+    }, "verifyEmailCooldown");
 
     useEffect(() => {
         // Check both location.state and sessionStorage
@@ -21,42 +36,60 @@ const VerifyEmail = () => {
 
         if (!fromRegister) {
             // If user did not come from register page, redirect
-            navigate("/auth/login", {replace: true});
+            navigate("/login", {replace: true});
         } else {
             // Remove the flag after verification
             sessionStorage.removeItem("fromRegister");
         }
     }, [data, navigate]);
 
-    const handleSubmit = async () => {
+    const handleResend = async () => {
         setLoading();
-        console.log(token)
         try {
-            // Await the registerUser call
             const response = await resendVerificationEmail(token);
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
             if (!response?.success) {
-                setResponseMessageMessage(response?.message);
+                setError();
+                setResponseMessage(response?.message || "Failed to resend verification email.");
+                toast({
+                    title: "Error",
+                    description: response?.message || "Failed to resend verification email.",
+                    variant: "destructive",
+                });
+                return;
             }
 
             if (response?.success) {
-                setResponseMessageMessage(response?.message);
+                setDone();
+                setResponseMessage(response?.message || "Verification email resent successfully.");
+                toast({
+                    title: "Success",
+                    description: response?.message || "Verification email resent successfully.",
+                });
+                // Start the cooldown timer
+                startCooldown(60);
             }
         } catch (error) {
+            console.error("Error during resending verification email:", error);
             setError();
-            console.error("Error during submission:", error);
-            setResponseMessageMessage("Error during sending, please try again.");
+            setResponseMessage("An unexpected error occurred.");
+            toast({
+                title: "Error",
+                description: "An unexpected error occurred.",
+                variant: "destructive",
+            });
         } finally {
-            setDone();
+            setLoading();
         }
     };
 
     return (
         <VerifyEmailCard
             email={email}
-            handleSubmit={handleSubmit}
+            handleSubmit={handleResend}
             responseMessage={responseMessage}
+            cooldown={cooldown}
         />
     );
 };

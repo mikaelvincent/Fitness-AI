@@ -59,7 +59,7 @@ const LoginForm = ({
             label="Welcome to Fitness AI"
             title="Login"
             backLabel="Don't have an account?"
-            backButtonHref="/auth/register"
+            backButtonHref="/register"
             backButtonLabel="Register here"
             logo="none"
         >
@@ -107,7 +107,7 @@ const LoginForm = ({
                                 size="sm"
                                 asChild
                             >
-                                <Link to="/auth/forgot-password">Forgot Password?</Link>
+                                <Link to="/forgot-password">Forgot Password?</Link>
                             </Button>
                         </FormDescription>
                     </div>
