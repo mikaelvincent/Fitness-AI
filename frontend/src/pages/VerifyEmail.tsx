@@ -1,21 +1,29 @@
-import {useState, useEffect} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
-import VerifyEmailCard from "@/components/authentication/forms/VerifyEmailForm.tsx";
-import {resendVerificationEmail} from "@/services/auth/resendVerificationEmail";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
+import VerifyEmailForm from "@/components/authentication/forms/VerifyEmailForm.tsx";
 import useStatus from "@/hooks/useStatus";
 import useTimer from "@/hooks/useTimer";
 import {toast} from "@/hooks/use-toast";
+import {VerifyEmailSchema} from "@/utils/schema/VerifyEmailSchema.ts";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import useFormStatus from "@/hooks/useFormStatus";
+import {initiateVerifyEmail} from "@/services/auth/initiateVerifyEmail.ts";
+import {z} from "zod";
 
 // Wrapper Component
 const VerifyEmail = () => {
-    const location = useLocation();
     const navigate = useNavigate();
     const {status, setLoading, setDone, setError} = useStatus();
     const [responseMessage, setResponseMessage] = useState<string>("");
+    const formStatus = useFormStatus();
 
-    const data = location.state as { fromRegister: boolean; token: string; email: string } | undefined;
-    const email = data?.email;
-    const token = data?.token;
+    const form = useForm({
+        resolver: zodResolver(VerifyEmailSchema),
+        defaultValues: {
+            email: "",
+        },
+    });
 
     // Initialize the timer with a 60-second cooldown
     const {
@@ -26,52 +34,39 @@ const VerifyEmail = () => {
         // Optional: Notify the user when cooldown ends
         toast({
             title: "Cooldown Ended",
-            description: "You can now resend the verification email.",
+            description: "You can now enter the verification email.",
         });
     }, "verifyEmailCooldown");
 
-    useEffect(() => {
-        // Check both location.state and sessionStorage
-        const fromRegister = data?.fromRegister || sessionStorage.getItem("fromRegister") === "true";
 
-        if (!fromRegister) {
-            // If user did not come from register page, redirect
-            navigate("/login", {replace: true});
-        } else {
-            // Remove the flag after verification
-            sessionStorage.removeItem("fromRegister");
-        }
-    }, [data, navigate]);
-
-    const handleResend = async () => {
+    const handleInitiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema>) => {
         setLoading();
         try {
-            const response = await resendVerificationEmail(token);
+            const response = await initiateVerifyEmail(data);
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
             if (!response?.success) {
                 setError();
-                setResponseMessage(response?.message || "Failed to resend verification email.");
-                toast({
-                    title: "Error",
-                    description: response?.message || "Failed to resend verification email.",
-                    variant: "destructive",
-                });
-                return;
+                setResponseMessage(response?.errors || response?.message || "Registration Initiation failed.");
+            }
+
+            if (!response?.success && response?.status === 429) {
+                setError();
+                setResponseMessage(response?.message || "Too many attempts. Please try again later.");
+                startCooldown(response?.retry_after || 60);
             }
 
             if (response?.success) {
                 setDone();
-                setResponseMessage(response?.message || "Verification email resent successfully.");
+                setResponseMessage(response?.message || "Registration Initiation successful. Please check your email.");
                 toast({
                     title: "Success",
-                    description: response?.message || "Verification email resent successfully.",
+                    description: response?.message || "Registration Initiation successful. Please check your email.",
                 });
-                // Start the cooldown timer
                 startCooldown(60);
             }
         } catch (error) {
-            console.error("Error during resending verification email:", error);
+            console.error("Error during Registration Initation", error);
             setError();
             setResponseMessage("An unexpected error occurred.");
             toast({
@@ -85,10 +80,12 @@ const VerifyEmail = () => {
     };
 
     return (
-        <VerifyEmailCard
-            email={email}
-            handleSubmit={handleResend}
-            responseMessage={responseMessage}
+        <VerifyEmailForm
+            status={status}
+            formMessage={responseMessage}
+            form={form}
+            formStatus={formStatus}
+            onSubmit={handleInitiateVerifyEmail}
             cooldown={cooldown}
         />
     );
