@@ -25,7 +25,7 @@ class SessionController extends Controller
      * @bodyParam two_factor_code string The two-factor authentication code if enabled.
      *
      * @response 200 {
-     *   "message": "Login successful.",
+     *   "message": "Login successful. You are now authenticated.",
      *   "data": {
      *     "user": {...},
      *     "token": "example-token"
@@ -33,11 +33,15 @@ class SessionController extends Controller
      * }
      *
      * @response 401 {
-     *   "message": "Invalid credentials."
+     *   "message": "Invalid email or password provided."
+     * }
+     *
+     * @response 422 {
+     *   "message": "The two-factor authentication code is invalid."
      * }
      *
      * @response 429 {
-     *   "message": "Too many requests. Please try again later.",
+     *   "message": "You have exceeded the maximum number of login attempts. Please try again in {retry_after} seconds.",
      *   "retry_after": 60
      * }
      */
@@ -55,7 +59,7 @@ class SessionController extends Controller
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json([
-                'message' => 'Invalid credentials.',
+                'message' => 'Invalid email or password provided.',
             ], 401);
         }
 
@@ -69,7 +73,7 @@ class SessionController extends Controller
 
             if (!$google2fa->verifyKey($secretKey, $request->two_factor_code)) {
                 return response()->json([
-                    'message' => 'Invalid two-factor authentication code.',
+                    'message' => 'The two-factor authentication code is invalid.',
                 ], 422);
             }
         }
@@ -77,7 +81,7 @@ class SessionController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful.',
+            'message' => 'Login successful. You are now authenticated.',
             'data' => [
                 'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
                 'token' => $token,
@@ -94,7 +98,7 @@ class SessionController extends Controller
      * @authenticated
      *
      * @response 200 {
-     *   "message": "Logout successful."
+     *   "message": "You have been successfully logged out."
      * }
      */
     public function logout(Request $request)
@@ -102,7 +106,7 @@ class SessionController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logout successful.',
+            'message' => 'You have been successfully logged out.',
         ], 200);
     }
 }
