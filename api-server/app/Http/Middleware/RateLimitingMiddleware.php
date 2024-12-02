@@ -18,7 +18,7 @@ class RateLimitingMiddleware
             $retryAfter = RateLimiter::availableIn($key);
 
             return response()->json([
-                'message' => 'Too many requests. Please try again later.',
+                'message' => "You have exceeded the maximum number of attempts. Please try again in {$retryAfter} seconds.",
                 'retry_after' => $retryAfter,
             ], 429);
         }
