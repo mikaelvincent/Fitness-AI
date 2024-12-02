@@ -19,7 +19,7 @@ class TokenController extends Controller
      * @authenticated
      *
      * @response 200 {
-     *   "message": "Token refreshed successfully.",
+     *   "message": "Your authentication token has been refreshed successfully.",
      *   "data": {
      *     "token": "new-example-token"
      *   }
@@ -33,7 +33,7 @@ class TokenController extends Controller
         $newToken = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Token refreshed successfully.',
+            'message' => 'Your authentication token has been refreshed successfully.',
             'data' => [
                 'token' => $newToken,
             ],
