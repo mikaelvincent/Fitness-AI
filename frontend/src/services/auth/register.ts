@@ -1,4 +1,5 @@
 import {ENV} from "@/utils/env";
+import User from "@/hooks/context/UserContext.tsx";
 
 interface RegisterResponse {
     success: boolean;
@@ -8,6 +9,7 @@ interface RegisterResponse {
     errors?: string | null;
     retry_after?: number;
     errorKey?: string;
+    data?: User;
 }
 
 interface RegisterDataProps {
@@ -64,6 +66,7 @@ export const registerUser = async (data: RegisterDataProps): Promise<RegisterRes
             success: true,
             message: responseData.message || "Registration successful!",
             token: responseData.data.token,
+            data: {name: responseData.data.user.name},
         };
 
     } catch (error) {
