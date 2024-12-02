@@ -24,7 +24,7 @@ class PasswordController extends Controller
      * @bodyParam email string required The user's email address.
      *
      * @response 200 {
-     *   "message": "If your email exists in our system, a password reset link has been sent."
+     *   "message": "Your request has been received. If your email is registered, you will receive a password reset link shortly."
      * }
      */
     public function sendResetLink(Request $request)
@@ -36,7 +36,7 @@ class PasswordController extends Controller
         Password::sendResetLink($request->only('email'));
 
         return response()->json([
-            'message' => 'If your email exists in our system, a password reset link has been sent.',
+            'message' => 'Your request has been received. If your email is registered, you will receive a password reset link shortly.',
         ], 200);
     }
 
@@ -54,7 +54,11 @@ class PasswordController extends Controller
      * @bodyParam password_confirmation string required Confirmation of the new password.
      *
      * @response 200 {
-     *   "message": "Password reset successful."
+     *   "message": "Your password has been successfully reset."
+     * }
+     *
+     * @response 400 {
+     *   "message": "The provided token or email is invalid or has expired."
      * }
      */
     public function reset(Request $request)
@@ -78,12 +82,12 @@ class PasswordController extends Controller
 
         if ($status === Password::PASSWORD_RESET) {
             return response()->json([
-                'message' => 'Password reset successful.',
+                'message' => 'Your password has been successfully reset.',
             ], 200);
         }
 
         return response()->json([
-            'message' => 'Invalid token or email.',
+            'message' => 'The provided token or email is invalid or has expired.',
         ], 400);
     }
 
@@ -100,7 +104,11 @@ class PasswordController extends Controller
      * @bodyParam password_confirmation string required Confirmation of the new password.
      *
      * @response 200 {
-     *   "message": "Password updated successfully."
+     *   "message": "Your password has been updated successfully."
+     * }
+     *
+     * @response 400 {
+     *   "message": "The current password you provided does not match our records."
      * }
      */
     public function change(Request $request)
@@ -112,7 +120,7 @@ class PasswordController extends Controller
 
         if (!Hash::check($request->current_password, $request->user()->password)) {
             return response()->json([
-                'message' => 'Current password does not match.',
+                'message' => 'The current password you provided does not match our records.',
             ], 400);
         }
 
@@ -121,7 +129,7 @@ class PasswordController extends Controller
         ])->save();
 
         return response()->json([
-            'message' => 'Password updated successfully.',
+            'message' => 'Your password has been updated successfully.',
         ], 200);
     }
 }
