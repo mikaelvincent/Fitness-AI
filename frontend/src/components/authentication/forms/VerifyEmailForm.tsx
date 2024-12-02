@@ -37,7 +37,7 @@ const VerifyEmailForm = ({
         <>
             <CardWrapper
                 label="Don't have an account?"
-                title="Enter your email for verification"
+                title="Enter your email for registration"
                 backLabel="Already have an account?"
                 backButtonHref="/login"
                 backButtonLabel="Login here"
