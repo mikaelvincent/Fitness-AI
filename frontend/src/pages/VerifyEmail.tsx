@@ -1,5 +1,4 @@
 import {useState} from "react";
-import {useNavigate} from "react-router-dom";
 import VerifyEmailForm from "@/components/authentication/forms/VerifyEmailForm.tsx";
 import useStatus from "@/hooks/useStatus";
 import useTimer from "@/hooks/useTimer";
@@ -13,7 +12,6 @@ import {z} from "zod";
 
 // Wrapper Component
 const VerifyEmail = () => {
-    const navigate = useNavigate();
     const {status, setLoading, setDone, setError} = useStatus();
     const [responseMessage, setResponseMessage] = useState<string>("");
     const formStatus = useFormStatus();

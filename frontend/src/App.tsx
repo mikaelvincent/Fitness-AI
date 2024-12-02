@@ -29,7 +29,7 @@ const App = () => {
                 {/*    /!* Authentication layout routes *!/*/}
                 {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
                 {/*        <Route path="login" element={<Login/>}/>*/}
-                {/*        <Route path="register" element={<Register/>}/>*/}
+                {/*        <Route path="complete-registration" element={<Register/>}/>*/}
                 {/*        <Route path="verify-email" element={<VerifyEmail/>}/>*/}
                 {/*        <Route path="forgot-password" element={<ForgotPassword/>}/>*/}
                 {/*        <Route path="reset-password" element={<ResetPassword/>}/>*/}
@@ -50,7 +50,7 @@ const App = () => {
                     {/* Authentication layout routes */}
                     <Route path="/" element={<AuthLayout/>}>
                         <Route path="login" element={<Login/>}/>
-                        <Route path="register" element={<Register/>}/>
+                        <Route path="complete-registration" element={<Register/>}/>
                         <Route path="verify-email" element={<VerifyEmail/>}/>
                         <Route path="forgot-password" element={<ForgotPassword/>}/>
                         <Route path="reset-password" element={<ResetPassword/>}/>
