@@ -28,7 +28,7 @@ class RegistrationController extends Controller
      * @bodyParam email string required The user's email address.
      *
      * @response 200 {
-     *   "message": "Registration initiated successfully."
+     *   "message": "Registration process has been initiated. Please check your email for further instructions."
      * }
      */
     public function initiate(Request $request)
@@ -51,7 +51,7 @@ class RegistrationController extends Controller
             ->notify(new RegistrationTokenNotification($token));
 
         return response()->json([
-            'message' => 'Registration initiated successfully.',
+            'message' => 'Registration process has been initiated. Please check your email for further instructions.',
         ], 200);
     }
 
@@ -64,7 +64,7 @@ class RegistrationController extends Controller
      * @bodyParam email string required The user's email address.
      *
      * @response 200 {
-     *   "message": "Verification email resent successfully."
+     *   "message": "A new verification email has been sent to your address."
      * }
      */
     public function resend(Request $request)
@@ -83,7 +83,7 @@ class RegistrationController extends Controller
             ->notify(new RegistrationTokenNotification($registrationToken->token));
 
         return response()->json([
-            'message' => 'Verification email resent successfully.',
+            'message' => 'A new verification email has been sent to your address.',
         ], 200);
     }
 
@@ -98,10 +98,14 @@ class RegistrationController extends Controller
      * @bodyParam token string required The registration token.
      *
      * @response 200 {
-     *   "message": "Token is valid.",
+     *   "message": "The registration token is valid.",
      *   "data": {
      *     "expires_in": 3600
      *   }
+     * }
+     *
+     * @response 400 {
+     *   "message": "The registration token is invalid or has expired."
      * }
      */
     public function validateToken(Request $request)
@@ -115,12 +119,12 @@ class RegistrationController extends Controller
 
         if ($registrationToken->isExpired()) {
             return response()->json([
-                'message' => 'Token is invalid or has expired.',
+                'message' => 'The registration token is invalid or has expired.',
             ], 400);
         }
 
         return response()->json([
-            'message' => 'Token is valid.',
+            'message' => 'The registration token is valid.',
             'data' => [
                 'expires_in' => $registrationToken->timeUntilExpiration(),
             ],
@@ -139,11 +143,15 @@ class RegistrationController extends Controller
      * @bodyParam password_confirmation string required Confirmation of the password.
      *
      * @response 201 {
-     *   "message": "Registration completed successfully.",
+     *   "message": "Registration completed successfully. Welcome aboard!",
      *   "data": {
      *     "user": {...},
      *     "token": "example-token"
      *   }
+     * }
+     *
+     * @response 400 {
+     *   "message": "The registration token provided is invalid or has expired."
      * }
      */
     public function complete(Request $request)
@@ -159,7 +167,7 @@ class RegistrationController extends Controller
 
         if ($registrationToken->isExpired()) {
             return response()->json([
-                'message' => 'Invalid or expired registration token.',
+                'message' => 'The registration token provided is invalid or has expired.',
             ], 400);
         }
 
@@ -175,7 +183,7 @@ class RegistrationController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Registration completed successfully.',
+            'message' => 'Registration completed successfully. Welcome aboard!',
             'data' => [
                 'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
                 'token' => $token,
