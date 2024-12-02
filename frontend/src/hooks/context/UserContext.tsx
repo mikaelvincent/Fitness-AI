@@ -1,7 +1,8 @@
 import {createContext, useContext, useState, ReactNode} from "react";
 import Cookies from "js-cookie";
+import {useNavigate} from "react-router-dom";
 
-// Define the User interface
+// Define the User interface for development only
 export default interface User {
     name: string;
 }
@@ -34,6 +35,7 @@ interface UserProviderProps {
 
 // UserProvider component
 export const UserProvider = ({children}: UserProviderProps) => {
+    const navigate = useNavigate();
     const [user, setUser] = useState<User | null>(() => {
         // Retrieve user data from cookies if available
         const savedUser = Cookies.get("user");
@@ -49,6 +51,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
         setToken(userToken);
         Cookies.set("user", JSON.stringify(userData), {expires: 1});
         Cookies.set("token", userToken, {expires: 1, secure: true, sameSite: "strict"});
+        navigate("/", {replace: true});
     };
 
     //adjust logout
