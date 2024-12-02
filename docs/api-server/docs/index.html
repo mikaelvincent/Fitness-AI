@@ -76,42 +76,29 @@
                 </li>
                                     <ul id="tocify-subheader-authentication" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="authentication-POSTapi-login">
-                                <a href="#authentication-POSTapi-login">Handle an incoming login request.</a>
+                                <a href="#authentication-POSTapi-login">Log in a user and issue an authentication token.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="authentication-POSTapi-logout">
-                                <a href="#authentication-POSTapi-logout">Handle an incoming logout request.</a>
+                                <a href="#authentication-POSTapi-logout">Log out the authenticated user.</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="authentication-POSTapi-refresh-token">
                                 <a href="#authentication-POSTapi-refresh-token">Refresh the user's authentication token.</a>
                             </li>
-                                                                                <li class="tocify-item level-2" data-unique="authentication-POSTapi-password-update">
-                                <a href="#authentication-POSTapi-password-update">Update the authenticated user's password.</a>
-                            </li>
                                                                         </ul>
                             </ul>
-                    <ul id="tocify-header-email-verification" class="tocify-header">
-                <li class="tocify-item level-1" data-unique="email-verification">
-                    <a href="#email-verification">Email Verification</a>
+                    <ul id="tocify-header-password-management" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="password-management">
+                    <a href="#password-management">Password Management</a>
                 </li>
-                                    <ul id="tocify-subheader-email-verification" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="email-verification-POSTapi-email-verification-notification">
-                                <a href="#email-verification-POSTapi-email-verification-notification">Send a new email verification notification.</a>
+                                    <ul id="tocify-subheader-password-management" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="password-management-POSTapi-forgot-password">
+                                <a href="#password-management-POSTapi-forgot-password">Send a password reset link to the user's email.</a>
                             </li>
-                                                                                <li class="tocify-item level-2" data-unique="email-verification-GETapi-verify-email--id---hash-">
-                                <a href="#email-verification-GETapi-verify-email--id---hash-">Verify the user's email address.</a>
+                                                                                <li class="tocify-item level-2" data-unique="password-management-POSTapi-reset-password">
+                                <a href="#password-management-POSTapi-reset-password">Reset the user's password using the provided token.</a>
                             </li>
-                                                                        </ul>
-                            </ul>
-                    <ul id="tocify-header-password-reset" class="tocify-header">
-                <li class="tocify-item level-1" data-unique="password-reset">
-                    <a href="#password-reset">Password Reset</a>
-                </li>
-                                    <ul id="tocify-subheader-password-reset" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="password-reset-POSTapi-forgot-password">
-                                <a href="#password-reset-POSTapi-forgot-password">Send a password reset link to the user's email.</a>
-                            </li>
-                                                                                <li class="tocify-item level-2" data-unique="password-reset-POSTapi-reset-password">
-                                <a href="#password-reset-POSTapi-reset-password">Reset the user's password.</a>
+                                                                                <li class="tocify-item level-2" data-unique="password-management-POSTapi-password-update">
+                                <a href="#password-management-POSTapi-password-update">Update the authenticated user's password.</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -120,8 +107,17 @@
                     <a href="#registration">Registration</a>
                 </li>
                                     <ul id="tocify-subheader-registration" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="registration-POSTapi-register">
-                                <a href="#registration-POSTapi-register">Handle an incoming registration request.</a>
+                                                    <li class="tocify-item level-2" data-unique="registration-POSTapi-register-initiate">
+                                <a href="#registration-POSTapi-register-initiate">Initiate the registration process by accepting the user's email.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="registration-POSTapi-register-resend">
+                                <a href="#registration-POSTapi-register-resend">Resend the verification email containing the registration token.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="registration-POSTapi-register-validate-token">
+                                <a href="#registration-POSTapi-register-validate-token">Validate the registration token and return its status.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="registration-POSTapi-register">
+                                <a href="#registration-POSTapi-register">Complete the registration by creating a new user account.</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -173,12 +169,12 @@
 
     
 
-                                <h2 id="authentication-POSTapi-login">Handle an incoming login request.</h2>
+                                <h2 id="authentication-POSTapi-login">Log in a user and issue an authentication token.</h2>
 
 <p>
 </p>
 
-
+<p>Validates user credentials and issues a new API token. If two-factor authentication is enabled, a valid code is required.</p>
 
 <span id="example-requests-POSTapi-login">
 <blockquote>Example request:</blockquote>
@@ -190,7 +186,7 @@
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"email\": \"freddy.balistreri@example.org\",
+    \"email\": \"user@example.com\",
     \"password\": \")B#Qz?{T8\\\"&lt;Tx\",
     \"two_factor_code\": \"voluptatum\"
 }"
@@ -208,7 +204,7 @@ const headers = {
 };
 
 let body = {
-    "email": "freddy.balistreri@example.org",
+    "email": "user@example.com",
     "password": ")B#Qz?{T8\"&lt;Tx",
     "two_factor_code": "voluptatum"
 };
@@ -231,7 +227,7 @@ $response = $client-&gt;post(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'email' =&gt; 'freddy.balistreri@example.org',
+            'email' =&gt; 'user@example.com',
             'password' =&gt; ')B#Qz?{T8"&lt;Tx',
             'two_factor_code' =&gt; 'voluptatum',
         ],
@@ -247,7 +243,7 @@ import json
 
 url = 'http://127.0.0.1:8000/api/login'
 payload = {
-    "email": "freddy.balistreri@example.org",
+    "email": "user@example.com",
     "password": ")B#Qz?{T8\"&lt;Tx",
     "two_factor_code": "voluptatum"
 }
@@ -273,8 +269,8 @@ response.json()</code></pre></div>
         &quot;user&quot;: {
             &quot;id&quot;: 1,
             &quot;name&quot;: &quot;John Doe&quot;,
-            &quot;email&quot;: &quot;john@example.com&quot;,
-            &quot;email_verified_at&quot;: &quot;2023-10-01T12:34:56.000000Z&quot;
+            &quot;email&quot;: &quot;user@example.com&quot;,
+            &quot;email_verified_at&quot;: &quot;2024-12-02T12:00:00.000000Z&quot;
         },
         &quot;token&quot;: &quot;example-token&quot;
     }
@@ -290,21 +286,17 @@ response.json()</code></pre></div>
 }</code>
  </pre>
             <blockquote>
-            <p>Example response (403):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Email address is not verified.&quot;
-}</code>
- </pre>
-            <blockquote>
             <p>Example response (422):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Invalid two-factor authentication code.&quot;
+    &quot;message&quot;: &quot;Invalid two-factor authentication code.&quot;,
+    &quot;errors&quot;: {
+        &quot;two_factor_code&quot;: [
+            &quot;The two_factor_code field is required.&quot;
+        ]
+    }
 }</code>
  </pre>
             <blockquote>
@@ -394,10 +386,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="email"                data-endpoint="POSTapi-login"
-               value="freddy.balistreri@example.org"
+               value="user@example.com"
                data-component="body">
     <br>
-<p>The user's email address. Example: <code>freddy.balistreri@example.org</code></p>
+<p>The user's email address. Example: <code>user@example.com</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
@@ -419,17 +411,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="voluptatum"
                data-component="body">
     <br>
-<p>The two-factor authentication code (if applicable). Example: <code>voluptatum</code></p>
+<p>The two-factor authentication code if enabled. Example: <code>voluptatum</code></p>
         </div>
         </form>
 
-                    <h2 id="authentication-POSTapi-logout">Handle an incoming logout request.</h2>
+                    <h2 id="authentication-POSTapi-logout">Log out the authenticated user.</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Revokes the current access token, effectively logging out the user.</p>
 
 <span id="example-requests-POSTapi-logout">
 <blockquote>Example request:</blockquote>
@@ -501,6 +493,15 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;Logout successful.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
 }</code>
  </pre>
     </span>
@@ -592,7 +593,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Revokes the current token and issues a new one.</p>
 
 <span id="example-requests-POSTapi-refresh-token">
 <blockquote>Example request:</blockquote>
@@ -761,13 +762,474 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
-                    <h2 id="authentication-POSTapi-password-update">Update the authenticated user&#039;s password.</h2>
+                <h1 id="password-management">Password Management</h1>
+
+    
+
+                                <h2 id="password-management-POSTapi-forgot-password">Send a password reset link to the user&#039;s email.</h2>
+
+<p>
+</p>
+
+<p>Initiates the password reset process by emailing a reset link to the user.
+A generic response is returned regardless of whether the email exists.
+Additional rate limiting is applied to prevent abuse.</p>
+
+<span id="example-requests-POSTapi-forgot-password">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1:8000/api/forgot-password" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"email\": \"user@example.com\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/forgot-password"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "email": "user@example.com"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/forgot-password';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'email' =&gt; 'user@example.com',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/forgot-password'
+payload = {
+    "email": "user@example.com"
+}
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-forgot-password">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;If your email exists in our system, a password reset link has been sent.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unable to send password reset link.&quot;,
+    &quot;errors&quot;: {
+        &quot;email&quot;: [
+            &quot;The email field is required.&quot;,
+            &quot;The email must be a valid email address.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Too many attempts. Please try again in {retry_after} seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-forgot-password" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-forgot-password"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-forgot-password"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-forgot-password" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-forgot-password">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-forgot-password" data-method="POST"
+      data-path="api/forgot-password"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-forgot-password', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-forgot-password"
+                    onclick="tryItOut('POSTapi-forgot-password');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-forgot-password"
+                    onclick="cancelTryOut('POSTapi-forgot-password');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-forgot-password"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/forgot-password</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-forgot-password"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-forgot-password"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-forgot-password"
+               value="user@example.com"
+               data-component="body">
+    <br>
+<p>The user's email address. Example: <code>user@example.com</code></p>
+        </div>
+        </form>
+
+                    <h2 id="password-management-POSTapi-reset-password">Reset the user&#039;s password using the provided token.</h2>
+
+<p>
+</p>
+
+<p>Validates the token and updates the user's password. Rate limiting is applied to prevent abuse.</p>
+
+<span id="example-requests-POSTapi-reset-password">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1:8000/api/reset-password" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"token\": \"voluptatum\",
+    \"email\": \"user@example.com\",
+    \"password\": \")B#Qz?{T8\\\"&lt;Tx\",
+    \"password_confirmation\": \"voluptatum\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/reset-password"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "token": "voluptatum",
+    "email": "user@example.com",
+    "password": ")B#Qz?{T8\"&lt;Tx",
+    "password_confirmation": "voluptatum"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/reset-password';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'token' =&gt; 'voluptatum',
+            'email' =&gt; 'user@example.com',
+            'password' =&gt; ')B#Qz?{T8"&lt;Tx',
+            'password_confirmation' =&gt; 'voluptatum',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/reset-password'
+payload = {
+    "token": "voluptatum",
+    "email": "user@example.com",
+    "password": ")B#Qz?{T8\"&lt;Tx",
+    "password_confirmation": "voluptatum"
+}
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-reset-password">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Password reset successful.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Invalid token or email.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unable to reset password.&quot;,
+    &quot;errors&quot;: {
+        &quot;email&quot;: [
+            &quot;The email field is required.&quot;,
+            &quot;The email must be a valid email address.&quot;
+        ],
+        &quot;password&quot;: [
+            &quot;The password must be at least 8 characters.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Too many attempts. Please try again in {retry_after} seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-reset-password" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-reset-password"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-reset-password"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-reset-password" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-reset-password">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-reset-password" data-method="POST"
+      data-path="api/reset-password"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-reset-password', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-reset-password"
+                    onclick="tryItOut('POSTapi-reset-password');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-reset-password"
+                    onclick="cancelTryOut('POSTapi-reset-password');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-reset-password"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/reset-password</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-reset-password"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-reset-password"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>token</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="token"                data-endpoint="POSTapi-reset-password"
+               value="voluptatum"
+               data-component="body">
+    <br>
+<p>The password reset token. Example: <code>voluptatum</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-reset-password"
+               value="user@example.com"
+               data-component="body">
+    <br>
+<p>The user's email address. Example: <code>user@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="password"                data-endpoint="POSTapi-reset-password"
+               value=")B#Qz?{T8"<Tx"
+               data-component="body">
+    <br>
+<p>The new password. Example: <code>)B#Qz?{T8"&lt;Tx</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>password_confirmation</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="password_confirmation"                data-endpoint="POSTapi-reset-password"
+               value="voluptatum"
+               data-component="body">
+    <br>
+<p>Confirmation of the new password. Example: <code>voluptatum</code></p>
+        </div>
+        </form>
+
+                    <h2 id="password-management-POSTapi-password-update">Update the authenticated user&#039;s password.</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Validates the current password and updates it to the new password.</p>
 
 <span id="example-requests-POSTapi-password-update">
 <blockquote>Example request:</blockquote>
@@ -1004,399 +1466,36 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-                <h1 id="email-verification">Email Verification</h1>
+                <h1 id="registration">Registration</h1>
 
     
 
-                                <h2 id="email-verification-POSTapi-email-verification-notification">Send a new email verification notification.</h2>
+                                <h2 id="registration-POSTapi-register-initiate">Initiate the registration process by accepting the user&#039;s email.</h2>
 
 <p>
-<small class="badge badge-darkred">requires authentication</small>
 </p>
 
+<p>Generates a registration token and sends a verification email containing the token.
+The token is valid for 1 hour.</p>
 
-
-<span id="example-requests-POSTapi-email-verification-notification">
+<span id="example-requests-POSTapi-register-initiate">
 <blockquote>Example request:</blockquote>
 
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1:8000/api/email/verification-notification" \
-    --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1:8000/api/email/verification-notification"
-);
-
-const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_KEY}",
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-}).then(response =&gt; response.json());</code></pre></div>
-
-
-<div class="php-example">
-    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://127.0.0.1:8000/api/email/verification-notification';
-$response = $client-&gt;post(
-    $url,
-    [
-        'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_KEY}',
-            'Content-Type' =&gt; 'application/json',
-            'Accept' =&gt; 'application/json',
-        ],
-    ]
-);
-$body = $response-&gt;getBody();
-print_r(json_decode((string) $body));</code></pre></div>
-
-
-<div class="python-example">
-    <pre><code class="language-python">import requests
-import json
-
-url = 'http://127.0.0.1:8000/api/email/verification-notification'
-headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_KEY}',
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
-}
-
-response = requests.request('POST', url, headers=headers)
-response.json()</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTapi-email-verification-notification">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Verification email sent.&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (400):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Email address already verified.&quot;
-}</code>
- </pre>
-    </span>
-<span id="execution-results-POSTapi-email-verification-notification" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTapi-email-verification-notification"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-email-verification-notification"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTapi-email-verification-notification" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-email-verification-notification">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTapi-email-verification-notification" data-method="POST"
-      data-path="api/email/verification-notification"
-      data-authed="1"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-email-verification-notification', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-email-verification-notification"
-                    onclick="tryItOut('POSTapi-email-verification-notification');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-email-verification-notification"
-                    onclick="cancelTryOut('POSTapi-email-verification-notification');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-email-verification-notification"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>api/email/verification-notification</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-email-verification-notification"
-               value="Bearer {YOUR_AUTH_KEY}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_KEY}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-email-verification-notification"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-email-verification-notification"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                        </form>
-
-                    <h2 id="email-verification-GETapi-verify-email--id---hash-">Verify the user&#039;s email address.</h2>
-
-<p>
-</p>
-
-
-
-<span id="example-requests-GETapi-verify-email--id---hash-">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request GET \
-    --get "http://127.0.0.1:8000/api/verify-email/10/voluptatum" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1:8000/api/verify-email/10/voluptatum"
-);
-
-const headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-fetch(url, {
-    method: "GET",
-    headers,
-}).then(response =&gt; response.json());</code></pre></div>
-
-
-<div class="php-example">
-    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://127.0.0.1:8000/api/verify-email/10/voluptatum';
-$response = $client-&gt;get(
-    $url,
-    [
-        'headers' =&gt; [
-            'Content-Type' =&gt; 'application/json',
-            'Accept' =&gt; 'application/json',
-        ],
-    ]
-);
-$body = $response-&gt;getBody();
-print_r(json_decode((string) $body));</code></pre></div>
-
-
-<div class="python-example">
-    <pre><code class="language-python">import requests
-import json
-
-url = 'http://127.0.0.1:8000/api/verify-email/10/voluptatum'
-headers = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
-}
-
-response = requests.request('GET', url, headers=headers)
-response.json()</code></pre></div>
-
-</span>
-
-<span id="example-responses-GETapi-verify-email--id---hash-">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Email verified successfully.&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (400):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Invalid verification link.&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (400):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Email address already verified.&quot;
-}</code>
- </pre>
-    </span>
-<span id="execution-results-GETapi-verify-email--id---hash-" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-GETapi-verify-email--id---hash-"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-GETapi-verify-email--id---hash-"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-GETapi-verify-email--id---hash-" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-GETapi-verify-email--id---hash-">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-GETapi-verify-email--id---hash-" data-method="GET"
-      data-path="api/verify-email/{id}/{hash}"
-      data-authed="0"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-verify-email--id---hash-', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-GETapi-verify-email--id---hash-"
-                    onclick="tryItOut('GETapi-verify-email--id---hash-');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-GETapi-verify-email--id---hash-"
-                    onclick="cancelTryOut('GETapi-verify-email--id---hash-');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-GETapi-verify-email--id---hash-"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-green">GET</small>
-            <b><code>api/verify-email/{id}/{hash}</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="GETapi-verify-email--id---hash-"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="GETapi-verify-email--id---hash-"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
-                    <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="id"                data-endpoint="GETapi-verify-email--id---hash-"
-               value="10"
-               data-component="url">
-    <br>
-<p>The user's ID. Example: <code>10</code></p>
-            </div>
-                    <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>hash</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="hash"                data-endpoint="GETapi-verify-email--id---hash-"
-               value="voluptatum"
-               data-component="url">
-    <br>
-<p>The email verification hash. Example: <code>voluptatum</code></p>
-            </div>
-                    </form>
-
-                <h1 id="password-reset">Password Reset</h1>
-
-    
-
-                                <h2 id="password-reset-POSTapi-forgot-password">Send a password reset link to the user&#039;s email.</h2>
-
-<p>
-</p>
-
-
-
-<span id="example-requests-POSTapi-forgot-password">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1:8000/api/forgot-password" \
+    "http://127.0.0.1:8000/api/register/initiate" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"email\": \"freddy.balistreri@example.org\"
+    \"email\": \"user@example.com\"
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1:8000/api/forgot-password"
+    "http://127.0.0.1:8000/api/register/initiate"
 );
 
 const headers = {
@@ -1405,7 +1504,7 @@ const headers = {
 };
 
 let body = {
-    "email": "freddy.balistreri@example.org"
+    "email": "user@example.com"
 };
 
 fetch(url, {
@@ -1417,7 +1516,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://127.0.0.1:8000/api/forgot-password';
+$url = 'http://127.0.0.1:8000/api/register/initiate';
 $response = $client-&gt;post(
     $url,
     [
@@ -1426,7 +1525,7 @@ $response = $client-&gt;post(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'email' =&gt; 'freddy.balistreri@example.org',
+            'email' =&gt; 'user@example.com',
         ],
     ]
 );
@@ -1438,9 +1537,9 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://127.0.0.1:8000/api/forgot-password'
+url = 'http://127.0.0.1:8000/api/register/initiate'
 payload = {
-    "email": "freddy.balistreri@example.org"
+    "email": "user@example.com"
 }
 headers = {
   'Content-Type': 'application/json',
@@ -1452,14 +1551,14 @@ response.json()</code></pre></div>
 
 </span>
 
-<span id="example-responses-POSTapi-forgot-password">
+<span id="example-responses-POSTapi-register-initiate">
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Password reset link sent.&quot;
+    &quot;message&quot;: &quot;Registration initiated successfully.&quot;
 }</code>
  </pre>
             <blockquote>
@@ -1468,61 +1567,62 @@ response.json()</code></pre></div>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unable to send password reset link.&quot;,
+    &quot;message&quot;: &quot;Registration initiation failed.&quot;,
     &quot;errors&quot;: {
         &quot;email&quot;: [
-            &quot;The email must be a valid email address.&quot;
+            &quot;The email has already been taken.&quot;
         ]
     }
 }</code>
  </pre>
             <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (429):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unable to send password reset link.&quot;
+    &quot;message&quot;: &quot;Too many attempts. Please try again in {retry_after} seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
-<span id="execution-results-POSTapi-forgot-password" hidden>
+<span id="execution-results-POSTapi-register-initiate" hidden>
     <blockquote>Received response<span
-                id="execution-response-status-POSTapi-forgot-password"></span>:
+                id="execution-response-status-POSTapi-register-initiate"></span>:
     </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-forgot-password"
+    <pre class="json"><code id="execution-response-content-POSTapi-register-initiate"
       data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
 </span>
-<span id="execution-error-POSTapi-forgot-password" hidden>
+<span id="execution-error-POSTapi-register-initiate" hidden>
     <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-forgot-password">
+    <pre><code id="execution-error-message-POSTapi-register-initiate">
 
 Tip: Check that you&#039;re properly connected to the network.
 If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
 You can check the Dev Tools console for debugging information.</code></pre>
 </span>
-<form id="form-POSTapi-forgot-password" data-method="POST"
-      data-path="api/forgot-password"
+<form id="form-POSTapi-register-initiate" data-method="POST"
+      data-path="api/register/initiate"
       data-authed="0"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-forgot-password', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-register-initiate', this);">
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
                     style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-forgot-password"
-                    onclick="tryItOut('POSTapi-forgot-password');">Try it out ⚡
+                    id="btn-tryout-POSTapi-register-initiate"
+                    onclick="tryItOut('POSTapi-register-initiate');">Try it out ⚡
             </button>
             <button type="button"
                     style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-forgot-password"
-                    onclick="cancelTryOut('POSTapi-forgot-password');" hidden>Cancel 🛑
+                    id="btn-canceltryout-POSTapi-register-initiate"
+                    onclick="cancelTryOut('POSTapi-register-initiate');" hidden>Cancel 🛑
             </button>&nbsp;&nbsp;
             <button type="submit"
                     style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-forgot-password"
+                    id="btn-executetryout-POSTapi-register-initiate"
                     data-initial-text="Send Request 💥"
                     data-loading-text="⏱ Sending..."
                     hidden>Send Request 💥
@@ -1530,7 +1630,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </h3>
             <p>
             <small class="badge badge-black">POST</small>
-            <b><code>api/forgot-password</code></b>
+            <b><code>api/register/initiate</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
@@ -1538,7 +1638,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-forgot-password"
+                              name="Content-Type"                data-endpoint="POSTapi-register-initiate"
                value="application/json"
                data-component="header">
     <br>
@@ -1549,7 +1649,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-forgot-password"
+                              name="Accept"                data-endpoint="POSTapi-register-initiate"
                value="application/json"
                data-component="header">
     <br>
@@ -1561,42 +1661,39 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small>string</small>&nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="email"                data-endpoint="POSTapi-forgot-password"
-               value="freddy.balistreri@example.org"
+                              name="email"                data-endpoint="POSTapi-register-initiate"
+               value="user@example.com"
                data-component="body">
     <br>
-<p>The user's email address. Example: <code>freddy.balistreri@example.org</code></p>
+<p>The user's email address. Example: <code>user@example.com</code></p>
         </div>
         </form>
 
-                    <h2 id="password-reset-POSTapi-reset-password">Reset the user&#039;s password.</h2>
+                    <h2 id="registration-POSTapi-register-resend">Resend the verification email containing the registration token.</h2>
 
 <p>
 </p>
 
+<p>Allows users to resend the verification email. Rate limiting is applied to prevent abuse.</p>
 
-
-<span id="example-requests-POSTapi-reset-password">
+<span id="example-requests-POSTapi-register-resend">
 <blockquote>Example request:</blockquote>
 
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1:8000/api/reset-password" \
+    "http://127.0.0.1:8000/api/register/resend" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"token\": \"voluptatum\",
-    \"email\": \"freddy.balistreri@example.org\",
-    \"password\": \")B#Qz?{T8\\\"&lt;Tx\",
-    \"password_confirmation\": \"voluptatum\"
+    \"email\": \"user@example.com\"
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1:8000/api/reset-password"
+    "http://127.0.0.1:8000/api/register/resend"
 );
 
 const headers = {
@@ -1605,10 +1702,7 @@ const headers = {
 };
 
 let body = {
-    "token": "voluptatum",
-    "email": "freddy.balistreri@example.org",
-    "password": ")B#Qz?{T8\"&lt;Tx",
-    "password_confirmation": "voluptatum"
+    "email": "user@example.com"
 };
 
 fetch(url, {
@@ -1620,7 +1714,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://127.0.0.1:8000/api/reset-password';
+$url = 'http://127.0.0.1:8000/api/register/resend';
 $response = $client-&gt;post(
     $url,
     [
@@ -1629,10 +1723,7 @@ $response = $client-&gt;post(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'token' =&gt; 'voluptatum',
-            'email' =&gt; 'freddy.balistreri@example.org',
-            'password' =&gt; ')B#Qz?{T8"&lt;Tx',
-            'password_confirmation' =&gt; 'voluptatum',
+            'email' =&gt; 'user@example.com',
         ],
     ]
 );
@@ -1644,12 +1735,9 @@ print_r(json_decode((string) $body));</code></pre></div>
     <pre><code class="language-python">import requests
 import json
 
-url = 'http://127.0.0.1:8000/api/reset-password'
+url = 'http://127.0.0.1:8000/api/register/resend'
 payload = {
-    "token": "voluptatum",
-    "email": "freddy.balistreri@example.org",
-    "password": ")B#Qz?{T8\"&lt;Tx",
-    "password_confirmation": "voluptatum"
+    "email": "user@example.com"
 }
 headers = {
   'Content-Type': 'application/json',
@@ -1661,23 +1749,14 @@ response.json()</code></pre></div>
 
 </span>
 
-<span id="example-responses-POSTapi-reset-password">
+<span id="example-responses-POSTapi-register-resend">
             <blockquote>
             <p>Example response (200):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Password reset successful.&quot;
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (400):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Invalid token or email.&quot;
+    &quot;message&quot;: &quot;Verification email resent successfully.&quot;
 }</code>
  </pre>
             <blockquote>
@@ -1686,52 +1765,62 @@ response.json()</code></pre></div>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unable to reset password.&quot;,
+    &quot;message&quot;: &quot;Resend failed.&quot;,
     &quot;errors&quot;: {
-        &quot;password&quot;: [
-            &quot;The password must be at least 8 characters.&quot;
+        &quot;email&quot;: [
+            &quot;The email field is required.&quot;
         ]
     }
 }</code>
  </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Too many attempts. Please try again in {retry_after} seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
     </span>
-<span id="execution-results-POSTapi-reset-password" hidden>
+<span id="execution-results-POSTapi-register-resend" hidden>
     <blockquote>Received response<span
-                id="execution-response-status-POSTapi-reset-password"></span>:
+                id="execution-response-status-POSTapi-register-resend"></span>:
     </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-reset-password"
+    <pre class="json"><code id="execution-response-content-POSTapi-register-resend"
       data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
 </span>
-<span id="execution-error-POSTapi-reset-password" hidden>
+<span id="execution-error-POSTapi-register-resend" hidden>
     <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-reset-password">
+    <pre><code id="execution-error-message-POSTapi-register-resend">
 
 Tip: Check that you&#039;re properly connected to the network.
 If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
 You can check the Dev Tools console for debugging information.</code></pre>
 </span>
-<form id="form-POSTapi-reset-password" data-method="POST"
-      data-path="api/reset-password"
+<form id="form-POSTapi-register-resend" data-method="POST"
+      data-path="api/register/resend"
       data-authed="0"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-reset-password', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-register-resend', this);">
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
                     style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-reset-password"
-                    onclick="tryItOut('POSTapi-reset-password');">Try it out ⚡
+                    id="btn-tryout-POSTapi-register-resend"
+                    onclick="tryItOut('POSTapi-register-resend');">Try it out ⚡
             </button>
             <button type="button"
                     style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-reset-password"
-                    onclick="cancelTryOut('POSTapi-reset-password');" hidden>Cancel 🛑
+                    id="btn-canceltryout-POSTapi-register-resend"
+                    onclick="cancelTryOut('POSTapi-register-resend');" hidden>Cancel 🛑
             </button>&nbsp;&nbsp;
             <button type="submit"
                     style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-reset-password"
+                    id="btn-executetryout-POSTapi-register-resend"
                     data-initial-text="Send Request 💥"
                     data-loading-text="⏱ Sending..."
                     hidden>Send Request 💥
@@ -1739,7 +1828,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </h3>
             <p>
             <small class="badge badge-black">POST</small>
-            <b><code>api/reset-password</code></b>
+            <b><code>api/register/resend</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
@@ -1747,7 +1836,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-reset-password"
+                              name="Content-Type"                data-endpoint="POSTapi-register-resend"
                value="application/json"
                data-component="header">
     <br>
@@ -1758,7 +1847,211 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-reset-password"
+                              name="Accept"                data-endpoint="POSTapi-register-resend"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-register-resend"
+               value="user@example.com"
+               data-component="body">
+    <br>
+<p>The user's email address. Example: <code>user@example.com</code></p>
+        </div>
+        </form>
+
+                    <h2 id="registration-POSTapi-register-validate-token">Validate the registration token and return its status.</h2>
+
+<p>
+</p>
+
+<p>Checks if the provided token is valid or has expired, and returns the remaining time until expiration.</p>
+
+<span id="example-requests-POSTapi-register-validate-token">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1:8000/api/register/validate-token" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"token\": \"voluptatum\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/register/validate-token"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "token": "voluptatum"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/register/validate-token';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'token' =&gt; 'voluptatum',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/register/validate-token'
+payload = {
+    "token": "voluptatum"
+}
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-register-validate-token">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Token is valid.&quot;,
+    &quot;data&quot;: {
+        &quot;status&quot;: &quot;valid&quot;,
+        &quot;expires_in&quot;: 3600
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Token is invalid or has expired.&quot;,
+    &quot;data&quot;: {
+        &quot;status&quot;: &quot;invalid&quot;
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Validation failed.&quot;,
+    &quot;errors&quot;: {
+        &quot;token&quot;: [
+            &quot;The token field is required.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-register-validate-token" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-register-validate-token"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-register-validate-token"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-register-validate-token" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-register-validate-token">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-register-validate-token" data-method="POST"
+      data-path="api/register/validate-token"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-register-validate-token', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-register-validate-token"
+                    onclick="tryItOut('POSTapi-register-validate-token');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-register-validate-token"
+                    onclick="cancelTryOut('POSTapi-register-validate-token');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-register-validate-token"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/register/validate-token</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-register-validate-token"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-register-validate-token"
                value="application/json"
                data-component="header">
     <br>
@@ -1770,57 +2063,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small>string</small>&nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="token"                data-endpoint="POSTapi-reset-password"
+                              name="token"                data-endpoint="POSTapi-register-validate-token"
                value="voluptatum"
                data-component="body">
     <br>
-<p>The password reset token. Example: <code>voluptatum</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="email"                data-endpoint="POSTapi-reset-password"
-               value="freddy.balistreri@example.org"
-               data-component="body">
-    <br>
-<p>The user's email address. Example: <code>freddy.balistreri@example.org</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="password"                data-endpoint="POSTapi-reset-password"
-               value=")B#Qz?{T8"<Tx"
-               data-component="body">
-    <br>
-<p>The new password. Example: <code>)B#Qz?{T8"&lt;Tx</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>password_confirmation</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="password_confirmation"                data-endpoint="POSTapi-reset-password"
-               value="voluptatum"
-               data-component="body">
-    <br>
-<p>Confirmation of the new password. Example: <code>voluptatum</code></p>
+<p>The registration token to validate. Example: <code>voluptatum</code></p>
         </div>
         </form>
 
-                <h1 id="registration">Registration</h1>
-
-    
-
-                                <h2 id="registration-POSTapi-register">Handle an incoming registration request.</h2>
+                    <h2 id="registration-POSTapi-register">Complete the registration by creating a new user account.</h2>
 
 <p>
 </p>
 
-
+<p>Validates the registration token and creates a new user with the provided name and password.</p>
 
 <span id="example-requests-POSTapi-register">
 <blockquote>Example request:</blockquote>
@@ -1832,8 +2088,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"name\": \"voluptatum\",
-    \"email\": \"freddy.balistreri@example.org\",
+    \"token\": \"voluptatum\",
+    \"name\": \"John Doe\",
     \"password\": \")B#Qz?{T8\\\"&lt;Tx\",
     \"password_confirmation\": \"voluptatum\"
 }"
@@ -1851,8 +2107,8 @@ const headers = {
 };
 
 let body = {
-    "name": "voluptatum",
-    "email": "freddy.balistreri@example.org",
+    "token": "voluptatum",
+    "name": "John Doe",
     "password": ")B#Qz?{T8\"&lt;Tx",
     "password_confirmation": "voluptatum"
 };
@@ -1875,8 +2131,8 @@ $response = $client-&gt;post(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'name' =&gt; 'voluptatum',
-            'email' =&gt; 'freddy.balistreri@example.org',
+            'token' =&gt; 'voluptatum',
+            'name' =&gt; 'John Doe',
             'password' =&gt; ')B#Qz?{T8"&lt;Tx',
             'password_confirmation' =&gt; 'voluptatum',
         ],
@@ -1892,8 +2148,8 @@ import json
 
 url = 'http://127.0.0.1:8000/api/register'
 payload = {
-    "name": "voluptatum",
-    "email": "freddy.balistreri@example.org",
+    "token": "voluptatum",
+    "name": "John Doe",
     "password": ")B#Qz?{T8\"&lt;Tx",
     "password_confirmation": "voluptatum"
 }
@@ -1914,17 +2170,25 @@ response.json()</code></pre></div>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Registration successful.&quot;,
+    &quot;message&quot;: &quot;Registration completed successfully.&quot;,
     &quot;data&quot;: {
         &quot;user&quot;: {
             &quot;id&quot;: 1,
             &quot;name&quot;: &quot;John Doe&quot;,
-            &quot;email&quot;: &quot;john@example.com&quot;,
-            &quot;created_at&quot;: &quot;2023-10-01T12:34:56.000000Z&quot;,
-            &quot;updated_at&quot;: &quot;2023-10-01T12:34:56.000000Z&quot;
+            &quot;email&quot;: &quot;user@example.com&quot;,
+            &quot;email_verified_at&quot;: &quot;2024-12-02T12:00:00.000000Z&quot;
         },
         &quot;token&quot;: &quot;example-token&quot;
     }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (400):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Invalid or expired registration token.&quot;
 }</code>
  </pre>
             <blockquote>
@@ -1935,10 +2199,20 @@ response.json()</code></pre></div>
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;Registration failed.&quot;,
     &quot;errors&quot;: {
-        &quot;email&quot;: [
-            &quot;The email has already been taken.&quot;
+        &quot;name&quot;: [
+            &quot;The name field is required.&quot;
         ]
     }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Too many attempts. Please try again in {retry_after} seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -2013,26 +2287,26 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                                 <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>token</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="token"                data-endpoint="POSTapi-register"
+               value="voluptatum"
+               data-component="body">
+    <br>
+<p>The registration token provided via email. Example: <code>voluptatum</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
                 <input type="text" style="display: none"
                               name="name"                data-endpoint="POSTapi-register"
-               value="voluptatum"
+               value="John Doe"
                data-component="body">
     <br>
-<p>The user's full name. Example: <code>voluptatum</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="email"                data-endpoint="POSTapi-register"
-               value="freddy.balistreri@example.org"
-               data-component="body">
-    <br>
-<p>The user's email address. Example: <code>freddy.balistreri@example.org</code></p>
+<p>The user's full name. Example: <code>John Doe</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
@@ -2054,7 +2328,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="voluptatum"
                data-component="body">
     <br>
-<p>Confirmation of the user's password. Example: <code>voluptatum</code></p>
+<p>Confirmation of the password. Example: <code>voluptatum</code></p>
         </div>
         </form>
 
@@ -2068,7 +2342,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Generates a secret key and recovery codes for two-factor authentication.</p>
 
 <span id="example-requests-POSTapi-two-factor-authentication-enable">
 <blockquote>Example request:</blockquote>
@@ -2249,7 +2523,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Validates the code from the authenticator app to confirm setup.</p>
 
 <span id="example-requests-POSTapi-two-factor-authentication-confirm">
 <blockquote>Example request:</blockquote>
@@ -2457,7 +2731,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-
+<p>Removes two-factor authentication settings from the user's account.</p>
 
 <span id="example-requests-POSTapi-two-factor-authentication-disable">
 <blockquote>Example request:</blockquote>
