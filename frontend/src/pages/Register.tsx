@@ -12,7 +12,7 @@ import {z} from "zod";
 const Register = () => {
     const {status, setLoading, setDone, setError} = useStatus();
     const navigate = useNavigate();
-    const [formMessage, setFormMessage] = useState<string>("");
+    const [responseMessage, setResponseMessage] = useState<string>("");
     const [invalidInput, setInvalidInput] = useState<
         "none" | "name" | "email" | "password" | "others" | string
     >("none");
@@ -38,12 +38,12 @@ const Register = () => {
             if (!response?.success) {
                 setInvalidInput(response?.message ? response?.message : "none");
                 setError();
-                setFormMessage(response?.errors || response?.message || "Registration failed.");
+                setResponseMessage(response?.errors || response?.message || "Registration failed.");
             }
 
             if (response?.success && response?.token) {
                 setDone();
-                setFormMessage(response?.message || "Registration successful!");
+                setResponseMessage(response?.message || "Registration successful!");
                 console.log(response.token);
                 // Navigate to the VerifyEmail page, passing data via state
                 sessionStorage.setItem("fromRegister", "true");
@@ -51,7 +51,7 @@ const Register = () => {
             }
         } catch (error) {
             console.error("Error during submission:", error);
-            setFormMessage("An error occurred during registration.");
+            setResponseMessage("An error occurred during registration.");
             setError();
         } finally {
             formStatus.endSubmission();
@@ -64,7 +64,7 @@ const Register = () => {
         <>
             <RegisterForm
                 status={status}
-                formMessage={formMessage}
+                formMessage={responseMessage}
                 invalidInput={invalidInput}
                 formStatus={formStatus}
                 form={form}
