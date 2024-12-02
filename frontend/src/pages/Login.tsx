@@ -70,6 +70,9 @@ const Login = () => {
                 setFormMessage(response?.message || "Login successful!");
                 // Set user data and token in UserContext
                 contextLoginUser(response.data, response.token);
+
+                // Navigate to the dashboard
+                navigate("/");
             }
 
         } catch (error) {
