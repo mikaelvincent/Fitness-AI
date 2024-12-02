@@ -14,20 +14,19 @@ class LoginTest extends TestCase
     public function test_user_can_login_with_correct_credentials()
     {
         $user = User::factory()->create([
-            "password" => bcrypt("SecurePass123!"),
-            "email_verified_at" => now(),
+            'password' => bcrypt('SecurePass123!'),
         ]);
 
-        $response = $this->postJson("/api/login", [
-            "email" => $user->email,
-            "password" => "SecurePass123!",
+        $response = $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'SecurePass123!',
         ]);
 
         $response->assertStatus(200)->assertJsonStructure([
-            "message",
-            "data" => [
-                "user" => ["id", "name", "email", "email_verified_at"],
-                "token",
+            'message',
+            'data' => [
+                'user' => ['id', 'name', 'email', 'email_verified_at'],
+                'token',
             ],
         ]);
     }
@@ -35,44 +34,26 @@ class LoginTest extends TestCase
     public function test_login_fails_with_incorrect_password()
     {
         $user = User::factory()->create([
-            "password" => bcrypt("SecurePass123!"),
-            "email_verified_at" => now(),
+            'password' => bcrypt('SecurePass123!'),
         ]);
 
-        $response = $this->postJson("/api/login", [
-            "email" => $user->email,
-            "password" => "WrongPassword!",
+        $response = $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'WrongPassword!',
         ]);
 
         $response->assertStatus(401)->assertJson([
-            "message" => "Invalid credentials.",
-        ]);
-    }
-
-    public function test_login_fails_if_email_not_verified()
-    {
-        $user = User::factory()->create([
-            "password" => bcrypt("SecurePass123!"),
-            "email_verified_at" => null,
-        ]);
-
-        $response = $this->postJson("/api/login", [
-            "email" => $user->email,
-            "password" => "SecurePass123!",
-        ]);
-
-        $response->assertStatus(403)->assertJson([
-            "message" => "Email address is not verified.",
+            'message' => 'Invalid credentials.',
         ]);
     }
 
     public function test_login_requires_email_and_password()
     {
-        $response = $this->postJson("/api/login", []);
+        $response = $this->postJson('/api/login', []);
 
         $response
             ->assertStatus(422)
-            ->assertJsonValidationErrors(["email", "password"]);
+            ->assertJsonValidationErrors(['email', 'password']);
     }
 
     public function test_user_is_locked_out_after_too_many_failed_attempts()

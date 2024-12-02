@@ -9,9 +9,9 @@ servers:
 paths:
   /api/login:
     post:
-      summary: 'Handle an incoming login request.'
-      operationId: handleAnIncomingLoginRequest
-      description: ''
+      summary: 'Log in a user and issue an authentication token.'
+      operationId: logInAUserAndIssueAnAuthenticationToken
+      description: 'Validates user credentials and issues a new API token. If two-factor authentication is enabled, a valid code is required.'
       parameters: []
       responses:
         200:
@@ -26,8 +26,8 @@ paths:
                     user:
                       id: 1
                       name: 'John Doe'
-                      email: john@example.com
-                      email_verified_at: '2023-10-01T12:34:56.000000Z'
+                      email: user@example.com
+                      email_verified_at: '2024-12-02T12:00:00.000000Z'
                     token: example-token
                 properties:
                   message:
@@ -47,10 +47,10 @@ paths:
                             example: 'John Doe'
                           email:
                             type: string
-                            example: john@example.com
+                            example: user@example.com
                           email_verified_at:
                             type: string
-                            example: '2023-10-01T12:34:56.000000Z'
+                            example: '2024-12-02T12:00:00.000000Z'
                       token:
                         type: string
                         example: example-token
@@ -66,18 +66,6 @@ paths:
                   message:
                     type: string
                     example: 'Invalid credentials.'
-        403:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Email address is not verified.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Email address is not verified.'
         422:
           description: ''
           content:
@@ -86,10 +74,22 @@ paths:
                 type: object
                 example:
                   message: 'Invalid two-factor authentication code.'
+                  errors:
+                    two_factor_code:
+                      - 'The two_factor_code field is required.'
                 properties:
                   message:
                     type: string
                     example: 'Invalid two-factor authentication code.'
+                  errors:
+                    type: object
+                    properties:
+                      two_factor_code:
+                        type: array
+                        example:
+                          - 'The two_factor_code field is required.'
+                        items:
+                          type: string
         429:
           description: ''
           content:
@@ -118,7 +118,7 @@ paths:
                 email:
                   type: string
                   description: 'The user''s email address.'
-                  example: freddy.balistreri@example.org
+                  example: user@example.com
                   nullable: false
                 password:
                   type: string
@@ -127,7 +127,7 @@ paths:
                   nullable: false
                 two_factor_code:
                   type: string
-                  description: 'The two-factor authentication code (if applicable).'
+                  description: 'The two-factor authentication code if enabled.'
                   example: voluptatum
                   nullable: false
               required:
@@ -136,9 +136,9 @@ paths:
       security: []
   /api/logout:
     post:
-      summary: 'Handle an incoming logout request.'
-      operationId: handleAnIncomingLogoutRequest
-      description: ''
+      summary: 'Log out the authenticated user.'
+      operationId: logOutTheAuthenticatedUser
+      description: 'Revokes the current access token, effectively logging out the user.'
       parameters: []
       responses:
         200:
@@ -153,13 +153,25 @@ paths:
                   message:
                     type: string
                     example: 'Logout successful.'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
       tags:
         - Authentication
   /api/refresh-token:
     post:
       summary: 'Refresh the user''s authentication token.'
       operationId: refreshTheUsersAuthenticationToken
-      description: ''
+      description: 'Revokes the current token and issues a new one.'
       parameters: []
       responses:
         200:
@@ -196,11 +208,205 @@ paths:
                     example: Unauthenticated.
       tags:
         - Authentication
+  /api/forgot-password:
+    post:
+      summary: 'Send a password reset link to the user''s email.'
+      operationId: sendAPasswordResetLinkToTheUsersEmail
+      description: "Initiates the password reset process by emailing a reset link to the user.\nA generic response is returned regardless of whether the email exists.\nAdditional rate limiting is applied to prevent abuse."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'If your email exists in our system, a password reset link has been sent.'
+                properties:
+                  message:
+                    type: string
+                    example: 'If your email exists in our system, a password reset link has been sent.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Unable to send password reset link.'
+                  errors:
+                    email:
+                      - 'The email field is required.'
+                      - 'The email must be a valid email address.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Unable to send password reset link.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email field is required.'
+                          - 'The email must be a valid email address.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
+      tags:
+        - 'Password Management'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: user@example.com
+                  nullable: false
+              required:
+                - email
+      security: []
+  /api/reset-password:
+    post:
+      summary: 'Reset the user''s password using the provided token.'
+      operationId: resetTheUsersPasswordUsingTheProvidedToken
+      description: 'Validates the token and updates the user''s password. Rate limiting is applied to prevent abuse.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Password reset successful.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Password reset successful.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid token or email.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid token or email.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Unable to reset password.'
+                  errors:
+                    email:
+                      - 'The email field is required.'
+                      - 'The email must be a valid email address.'
+                    password:
+                      - 'The password must be at least 8 characters.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Unable to reset password.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email field is required.'
+                          - 'The email must be a valid email address.'
+                        items:
+                          type: string
+                      password:
+                        type: array
+                        example:
+                          - 'The password must be at least 8 characters.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
+      tags:
+        - 'Password Management'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: 'The password reset token.'
+                  example: voluptatum
+                  nullable: false
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: user@example.com
+                  nullable: false
+                password:
+                  type: string
+                  description: 'The new password.'
+                  example: ')B#Qz?{T8"<Tx'
+                  nullable: false
+                password_confirmation:
+                  type: string
+                  description: 'Confirmation of the new password.'
+                  example: voluptatum
+                  nullable: false
+              required:
+                - token
+                - email
+                - password
+                - password_confirmation
+      security: []
   /api/password/update:
     post:
       summary: 'Update the authenticated user''s password.'
       operationId: updateTheAuthenticatedUsersPassword
-      description: ''
+      description: 'Validates the current password and updates it to the new password.'
       parameters: []
       responses:
         200:
@@ -252,7 +458,7 @@ paths:
                         items:
                           type: string
       tags:
-        - Authentication
+        - 'Password Management'
       requestBody:
         required: true
         content:
@@ -279,11 +485,11 @@ paths:
                 - current_password
                 - password
                 - password_confirmation
-  /api/email/verification-notification:
+  /api/register/initiate:
     post:
-      summary: 'Send a new email verification notification.'
-      operationId: sendANewEmailVerificationNotification
-      description: ''
+      summary: 'Initiate the registration process by accepting the user''s email.'
+      operationId: initiateTheRegistrationProcessByAcceptingTheUsersEmail
+      description: "Generates a registration token and sends a verification email containing the token.\nThe token is valid for 1 hour."
       parameters: []
       responses:
         200:
@@ -293,107 +499,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Verification email sent.'
+                  message: 'Registration initiated successfully.'
                 properties:
                   message:
                     type: string
-                    example: 'Verification email sent.'
-        400:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Email address already verified.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Email address already verified.'
-      tags:
-        - 'Email Verification'
-  '/api/verify-email/{id}/{hash}':
-    get:
-      summary: 'Verify the user''s email address.'
-      operationId: verifyTheUsersEmailAddress
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Email verified successfully.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Email verified successfully.'
-        400:
-          description: ''
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  -
-                    description: ''
-                    type: object
-                    example:
-                      message: 'Invalid verification link.'
-                    properties:
-                      message:
-                        type: string
-                        example: 'Invalid verification link.'
-                  -
-                    description: ''
-                    type: object
-                    example:
-                      message: 'Email address already verified.'
-                    properties:
-                      message:
-                        type: string
-                        example: 'Email address already verified.'
-      tags:
-        - 'Email Verification'
-      security: []
-    parameters:
-      -
-        in: path
-        name: id
-        description: 'The user''s ID.'
-        example: 10
-        required: true
-        schema:
-          type: integer
-      -
-        in: path
-        name: hash
-        description: 'The email verification hash.'
-        example: voluptatum
-        required: true
-        schema:
-          type: string
-  /api/forgot-password:
-    post:
-      summary: 'Send a password reset link to the user''s email.'
-      operationId: sendAPasswordResetLinkToTheUsersEmail
-      description: ''
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Password reset link sent.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Password reset link sent.'
+                    example: 'Registration initiated successfully.'
         422:
           description: ''
           content:
@@ -401,37 +511,41 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Unable to send password reset link.'
+                  message: 'Registration initiation failed.'
                   errors:
                     email:
-                      - 'The email must be a valid email address.'
+                      - 'The email has already been taken.'
                 properties:
                   message:
                     type: string
-                    example: 'Unable to send password reset link.'
+                    example: 'Registration initiation failed.'
                   errors:
                     type: object
                     properties:
                       email:
                         type: array
                         example:
-                          - 'The email must be a valid email address.'
+                          - 'The email has already been taken.'
                         items:
                           type: string
-        500:
+        429:
           description: ''
           content:
             application/json:
               schema:
                 type: object
                 example:
-                  message: 'Unable to send password reset link.'
+                  message: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after: 60
                 properties:
                   message:
                     type: string
-                    example: 'Unable to send password reset link.'
+                    example: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
-        - 'Password Reset'
+        - Registration
       requestBody:
         required: true
         content:
@@ -442,16 +556,16 @@ paths:
                 email:
                   type: string
                   description: 'The user''s email address.'
-                  example: freddy.balistreri@example.org
+                  example: user@example.com
                   nullable: false
               required:
                 - email
       security: []
-  /api/reset-password:
+  /api/register/resend:
     post:
-      summary: 'Reset the user''s password.'
-      operationId: resetTheUsersPassword
-      description: ''
+      summary: 'Resend the verification email containing the registration token.'
+      operationId: resendTheVerificationEmailContainingTheRegistrationToken
+      description: 'Allows users to resend the verification email. Rate limiting is applied to prevent abuse.'
       parameters: []
       responses:
         200:
@@ -461,23 +575,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Password reset successful.'
+                  message: 'Verification email resent successfully.'
                 properties:
                   message:
                     type: string
-                    example: 'Password reset successful.'
-        400:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Invalid token or email.'
-                properties:
-                  message:
-                    type: string
-                    example: 'Invalid token or email.'
+                    example: 'Verification email resent successfully.'
         422:
           description: ''
           content:
@@ -485,25 +587,133 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Unable to reset password.'
+                  message: 'Resend failed.'
                   errors:
-                    password:
-                      - 'The password must be at least 8 characters.'
+                    email:
+                      - 'The email field is required.'
                 properties:
                   message:
                     type: string
-                    example: 'Unable to reset password.'
+                    example: 'Resend failed.'
                   errors:
                     type: object
                     properties:
-                      password:
+                      email:
                         type: array
                         example:
-                          - 'The password must be at least 8 characters.'
+                          - 'The email field is required.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
+      tags:
+        - Registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'The user''s email address.'
+                  example: user@example.com
+                  nullable: false
+              required:
+                - email
+      security: []
+  /api/register/validate-token:
+    post:
+      summary: 'Validate the registration token and return its status.'
+      operationId: validateTheRegistrationTokenAndReturnItsStatus
+      description: 'Checks if the provided token is valid or has expired, and returns the remaining time until expiration.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Token is valid.'
+                  data:
+                    status: valid
+                    expires_in: 3600
+                properties:
+                  message:
+                    type: string
+                    example: 'Token is valid.'
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: valid
+                      expires_in:
+                        type: integer
+                        example: 3600
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Token is invalid or has expired.'
+                  data:
+                    status: invalid
+                properties:
+                  message:
+                    type: string
+                    example: 'Token is invalid or has expired.'
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: invalid
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Validation failed.'
+                  errors:
+                    token:
+                      - 'The token field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Validation failed.'
+                  errors:
+                    type: object
+                    properties:
+                      token:
+                        type: array
+                        example:
+                          - 'The token field is required.'
                         items:
                           type: string
       tags:
-        - 'Password Reset'
+        - Registration
       requestBody:
         required: true
         content:
@@ -513,35 +723,17 @@ paths:
               properties:
                 token:
                   type: string
-                  description: 'The password reset token.'
-                  example: voluptatum
-                  nullable: false
-                email:
-                  type: string
-                  description: 'The user''s email address.'
-                  example: freddy.balistreri@example.org
-                  nullable: false
-                password:
-                  type: string
-                  description: 'The new password.'
-                  example: ')B#Qz?{T8"<Tx'
-                  nullable: false
-                password_confirmation:
-                  type: string
-                  description: 'Confirmation of the new password.'
+                  description: 'The registration token to validate.'
                   example: voluptatum
                   nullable: false
               required:
                 - token
-                - email
-                - password
-                - password_confirmation
       security: []
   /api/register:
     post:
-      summary: 'Handle an incoming registration request.'
-      operationId: handleAnIncomingRegistrationRequest
-      description: ''
+      summary: 'Complete the registration by creating a new user account.'
+      operationId: completeTheRegistrationByCreatingANewUserAccount
+      description: 'Validates the registration token and creates a new user with the provided name and password.'
       parameters: []
       responses:
         201:
@@ -551,19 +743,18 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Registration successful.'
+                  message: 'Registration completed successfully.'
                   data:
                     user:
                       id: 1
                       name: 'John Doe'
-                      email: john@example.com
-                      created_at: '2023-10-01T12:34:56.000000Z'
-                      updated_at: '2023-10-01T12:34:56.000000Z'
+                      email: user@example.com
+                      email_verified_at: '2024-12-02T12:00:00.000000Z'
                     token: example-token
                 properties:
                   message:
                     type: string
-                    example: 'Registration successful.'
+                    example: 'Registration completed successfully.'
                   data:
                     type: object
                     properties:
@@ -578,16 +769,25 @@ paths:
                             example: 'John Doe'
                           email:
                             type: string
-                            example: john@example.com
-                          created_at:
+                            example: user@example.com
+                          email_verified_at:
                             type: string
-                            example: '2023-10-01T12:34:56.000000Z'
-                          updated_at:
-                            type: string
-                            example: '2023-10-01T12:34:56.000000Z'
+                            example: '2024-12-02T12:00:00.000000Z'
                       token:
                         type: string
                         example: example-token
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid or expired registration token.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid or expired registration token.'
         422:
           description: ''
           content:
@@ -597,8 +797,8 @@ paths:
                 example:
                   message: 'Registration failed.'
                   errors:
-                    email:
-                      - 'The email has already been taken.'
+                    name:
+                      - 'The name field is required.'
                 properties:
                   message:
                     type: string
@@ -606,12 +806,28 @@ paths:
                   errors:
                     type: object
                     properties:
-                      email:
+                      name:
                         type: array
                         example:
-                          - 'The email has already been taken.'
+                          - 'The name field is required.'
                         items:
                           type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'Too many attempts. Please try again in {retry_after} seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Registration
       requestBody:
@@ -621,15 +837,15 @@ paths:
             schema:
               type: object
               properties:
+                token:
+                  type: string
+                  description: 'The registration token provided via email.'
+                  example: voluptatum
+                  nullable: false
                 name:
                   type: string
                   description: 'The user''s full name.'
-                  example: voluptatum
-                  nullable: false
-                email:
-                  type: string
-                  description: 'The user''s email address.'
-                  example: freddy.balistreri@example.org
+                  example: 'John Doe'
                   nullable: false
                 password:
                   type: string
@@ -638,12 +854,12 @@ paths:
                   nullable: false
                 password_confirmation:
                   type: string
-                  description: 'Confirmation of the user''s password.'
+                  description: 'Confirmation of the password.'
                   example: voluptatum
                   nullable: false
               required:
+                - token
                 - name
-                - email
                 - password
                 - password_confirmation
       security: []
@@ -651,7 +867,7 @@ paths:
     post:
       summary: 'Enable two-factor authentication for the user.'
       operationId: enableTwoFactorAuthenticationForTheUser
-      description: ''
+      description: 'Generates a secret key and recovery codes for two-factor authentication.'
       parameters: []
       responses:
         200:
@@ -706,7 +922,7 @@ paths:
     post:
       summary: 'Confirm two-factor authentication setup.'
       operationId: confirmTwoFactorAuthenticationSetup
-      description: ''
+      description: 'Validates the code from the authenticator app to confirm setup.'
       parameters: []
       responses:
         200:
@@ -765,7 +981,7 @@ paths:
     post:
       summary: 'Disable two-factor authentication for the user.'
       operationId: disableTwoFactorAuthenticationForTheUser
-      description: ''
+      description: 'Removes two-factor authentication settings from the user''s account.'
       parameters: []
       responses:
         200:
@@ -799,10 +1015,7 @@ tags:
     name: Authentication
     description: ''
   -
-    name: 'Email Verification'
-    description: ''
-  -
-    name: 'Password Reset'
+    name: 'Password Management'
     description: ''
   -
     name: Registration

@@ -14,6 +14,8 @@ class TwoFactorAuthenticationController extends Controller
     /**
      * Enable two-factor authentication for the user.
      *
+     * Generates a secret key and recovery codes for two-factor authentication.
+     *
      * @group Two-Factor Authentication
      * @authenticated
      *
@@ -88,6 +90,8 @@ class TwoFactorAuthenticationController extends Controller
     /**
      * Confirm two-factor authentication setup.
      *
+     * Validates the code from the authenticator app to confirm setup.
+     *
      * @group Two-Factor Authentication
      * @authenticated
      *
@@ -152,6 +156,8 @@ class TwoFactorAuthenticationController extends Controller
 
     /**
      * Disable two-factor authentication for the user.
+     *
+     * Removes two-factor authentication settings from the user's account.
      *
      * @group Two-Factor Authentication
      * @authenticated

@@ -10,6 +10,8 @@ class TokenRefreshController extends Controller
     /**
      * Refresh the user's authentication token.
      *
+     * Revokes the current token and issues a new one.
+     *
      * @group Authentication
      * @authenticated
      *

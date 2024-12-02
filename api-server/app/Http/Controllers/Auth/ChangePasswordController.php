@@ -13,7 +13,9 @@ class ChangePasswordController extends Controller
     /**
      * Update the authenticated user's password.
      *
-     * @group Authentication
+     * Validates the current password and updates it to the new password.
+     *
+     * @group Password Management
      * @authenticated
      *
      * @bodyParam current_password string required The user's current password.
@@ -31,9 +33,7 @@ class ChangePasswordController extends Controller
      * @response 422 {
      *   "message": "Validation failed.",
      *   "errors": {
-     *     "password": [
-     *       "The password must be at least 8 characters."
-     *     ]
+     *     "password": ["The password must be at least 8 characters."]
      *   }
      * }
      */

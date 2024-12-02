@@ -9,17 +9,23 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\Rules\Password;
 use App\Notifications\RegistrationTokenNotification;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class RegisteredUserController extends Controller
 {
     /**
-     * Initiate the registration process with email only.
+     * Initiate the registration process by accepting the user's email.
+     *
+     * Generates a registration token and sends a verification email containing the token.
+     * The token is valid for 1 hour.
      *
      * @group Registration
      * @unauthenticated
      *
-     * @bodyParam email string required The user's email address.
+     * @bodyParam email string required The user's email address. Example: user@example.com
      *
      * @response 200 {
      *   "message": "Registration initiated successfully."
@@ -28,18 +34,32 @@ class RegisteredUserController extends Controller
      * @response 422 {
      *   "message": "Registration initiation failed.",
      *   "errors": {
-     *     "email": [
-     *       "The email has already been taken."
-     *     ]
+     *     "email": ["The email has already been taken."]
      *   }
      * }
      *
-     * @response 500 {
-     *   "message": "Failed to send verification email."
+     * @response 429 {
+     *   "message": "Too many attempts. Please try again in {retry_after} seconds.",
+     *   "retry_after": 60
      * }
      */
     public function initiate(Request $request)
     {
+        $email = $request->input('email');
+
+        $throttleKey = 'registration_initiate:' . Str::lower($email) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json(
+                [
+                    'message' => 'Too many attempts. Please try again in ' . $seconds . ' seconds.',
+                    'retry_after' => $seconds,
+                ],
+                429
+            );
+        }
+
         $validator = Validator::make($request->all(), [
             'email' => [
                 'required',
@@ -65,7 +85,7 @@ class RegisteredUserController extends Controller
 
         // Store the token securely in the database
         RegistrationToken::updateOrCreate(
-            ['email' => $request->email],
+            ['email' => $email],
             [
                 'token' => hash('sha256', $token),
                 'expires_at' => now()->addHour(),
@@ -74,7 +94,7 @@ class RegisteredUserController extends Controller
 
         try {
             // Send the verification email
-            Notification::route('mail', $request->email)
+            Notification::route('mail', $email)
                 ->notify(new RegistrationTokenNotification($token));
         } catch (\Exception $e) {
             return response()->json(
@@ -85,6 +105,8 @@ class RegisteredUserController extends Controller
             );
         }
 
+        RateLimiter::hit($throttleKey, 60);
+
         return response()->json(
             [
                 'message' => 'Registration initiated successfully.',
@@ -94,62 +116,59 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Resend the registration verification email.
+     * Resend the verification email containing the registration token.
+     *
+     * Allows users to resend the verification email. Rate limiting is applied to prevent abuse.
      *
      * @group Registration
      * @unauthenticated
      *
-     * @bodyParam email string required The user's email address.
+     * @bodyParam email string required The user's email address. Example: user@example.com
      *
      * @response 200 {
      *   "message": "Verification email resent successfully."
      * }
      *
-     * @response 404 {
-     *   "message": "Registration token not found."
+     * @response 422 {
+     *   "message": "Resend failed.",
+     *   "errors": {
+     *     "email": ["The email field is required."]
+     *   }
      * }
      *
      * @response 429 {
-     *   "message": "Too many resend attempts. Please try again later."
-     * }
-     *
-     * @response 500 {
-     *   "message": "Failed to resend verification email."
+     *   "message": "Too many attempts. Please try again in {retry_after} seconds.",
+     *   "retry_after": 60
      * }
      */
     public function resend(Request $request)
     {
         $email = $request->input('email');
 
+        $throttleKey = 'registration_resend:' . Str::lower($email) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json(
+                [
+                    'message' => 'Too many attempts. Please try again in ' . $seconds . ' seconds.',
+                    'retry_after' => $seconds,
+                ],
+                429
+            );
+        }
+
         $validator = Validator::make($request->all(), [
-            'email' => [
-                'required',
-                'email',
-                'string',
-                'max:255',
-            ],
+            'email' => ['required', 'string', 'email', 'max:255'],
         ]);
 
         if ($validator->fails()) {
             return response()->json(
                 [
-                    'message' => 'Invalid email address.',
+                    'message' => 'Resend failed.',
                     'errors' => $validator->errors(),
                 ],
                 422
-            );
-        }
-
-        $throttleKey = 'resend_verification_email:' . Str::lower($email) . '|' . $request->ip();
-
-        if (RateLimiter::tooManyAttempts($throttleKey, 3)) {
-            $seconds = RateLimiter::availableIn($throttleKey);
-            return response()->json(
-                [
-                    'message' => 'Too many resend attempts. Please try again in ' . $seconds . ' seconds.',
-                    'retry_after' => $seconds,
-                ],
-                429
             );
         }
 
@@ -158,25 +177,21 @@ class RegisteredUserController extends Controller
         if (!$registrationToken) {
             return response()->json(
                 [
-                    'message' => 'Registration token not found.',
+                    'message' => 'No registration token found for this email.',
                 ],
                 404
             );
         }
 
-        // Generate a new token
-        $token = Str::random(60);
-
         // Update the token's expiration time
         $registrationToken->update([
-            'token' => hash('sha256', $token),
             'expires_at' => now()->addHour(),
         ]);
 
         try {
-            // Send the verification email
+            // Resend the verification email
             Notification::route('mail', $email)
-                ->notify(new RegistrationTokenNotification($token));
+                ->notify(new RegistrationTokenNotification($registrationToken->token));
         } catch (\Exception $e) {
             return response()->json(
                 [
@@ -197,12 +212,14 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Validate the registration token.
+     * Validate the registration token and return its status.
+     *
+     * Checks if the provided token is valid or has expired, and returns the remaining time until expiration.
      *
      * @group Registration
      * @unauthenticated
      *
-     * @bodyParam token string required The registration token.
+     * @bodyParam token string required The registration token to validate.
      *
      * @response 200 {
      *   "message": "Token is valid.",
@@ -215,21 +232,32 @@ class RegisteredUserController extends Controller
      * @response 400 {
      *   "message": "Token is invalid or has expired.",
      *   "data": {
-     *     "status": "expired"
+     *     "status": "invalid"
      *   }
      * }
      *
      * @response 422 {
      *   "message": "Validation failed.",
      *   "errors": {
-     *     "token": [
-     *       "The token field is required."
-     *     ]
+     *     "token": ["The token field is required."]
      *   }
      * }
      */
     public function validateToken(Request $request)
     {
+        $throttleKey = 'validate_registration_token:' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json(
+                [
+                    'message' => 'Too many attempts. Please try again in ' . $seconds . ' seconds.',
+                    'retry_after' => $seconds,
+                ],
+                429
+            );
+        }
+
         $validator = Validator::make($request->all(), [
             'token' => ['required', 'string'],
         ]);
@@ -247,7 +275,8 @@ class RegisteredUserController extends Controller
         $hashedToken = hash('sha256', $request->token);
         $registrationToken = RegistrationToken::where('token', $hashedToken)->first();
 
-        if (!$registrationToken) {
+        if (!$registrationToken || $registrationToken->isExpired()) {
+            RateLimiter::hit($throttleKey, 60);
             return response()->json(
                 [
                     'message' => 'Token is invalid or has expired.',
@@ -257,17 +286,9 @@ class RegisteredUserController extends Controller
             );
         }
 
-        if ($registrationToken->isExpired()) {
-            return response()->json(
-                [
-                    'message' => 'Token is invalid or has expired.',
-                    'data' => ['status' => 'expired'],
-                ],
-                400
-            );
-        }
-
         $expiresIn = $registrationToken->timeUntilExpiration();
+
+        RateLimiter::hit($throttleKey, 60);
 
         return response()->json(
             [
@@ -282,15 +303,17 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Complete the user registration by providing name and password.
+     * Complete the registration by creating a new user account.
+     *
+     * Validates the registration token and creates a new user with the provided name and password.
      *
      * @group Registration
      * @unauthenticated
      *
-     * @bodyParam token string required The registration token.
-     * @bodyParam name string required The user's full name.
+     * @bodyParam token string required The registration token provided via email.
+     * @bodyParam name string required The user's full name. Example: John Doe
      * @bodyParam password string required The user's password.
-     * @bodyParam password_confirmation string required Confirmation of the user's password.
+     * @bodyParam password_confirmation string required Confirmation of the password.
      *
      * @response 201 {
      *   "message": "Registration completed successfully.",
@@ -298,8 +321,8 @@ class RegisteredUserController extends Controller
      *     "user": {
      *       "id": 1,
      *       "name": "John Doe",
-     *       "email": "john@example.com",
-     *       "email_verified_at": "2024-12-01T12:00:00.000000Z"
+     *       "email": "user@example.com",
+     *       "email_verified_at": "2024-12-02T12:00:00.000000Z"
      *     },
      *     "token": "example-token"
      *   }
@@ -312,17 +335,30 @@ class RegisteredUserController extends Controller
      * @response 422 {
      *   "message": "Registration failed.",
      *   "errors": {
-     *     "name": [
-     *       "The name field is required."
-     *     ],
-     *     "password": [
-     *       "The password must be at least 8 characters."
-     *     ]
+     *     "name": ["The name field is required."]
      *   }
+     * }
+     *
+     * @response 429 {
+     *   "message": "Too many attempts. Please try again in {retry_after} seconds.",
+     *   "retry_after": 60
      * }
      */
     public function store(Request $request)
     {
+        $throttleKey = 'complete_registration:' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json(
+                [
+                    'message' => 'Too many attempts. Please try again in ' . $seconds . ' seconds.',
+                    'retry_after' => $seconds,
+                ],
+                429
+            );
+        }
+
         $validator = Validator::make($request->all(), [
             'token' => ['required', 'string'],
             'name' => ['required', 'string', 'max:255'],
@@ -343,6 +379,7 @@ class RegisteredUserController extends Controller
         $registrationToken = RegistrationToken::where('token', $hashedToken)->first();
 
         if (!$registrationToken || $registrationToken->isExpired()) {
+            RateLimiter::hit($throttleKey, 60);
             return response()->json(
                 [
                     'message' => 'Invalid or expired registration token.',
@@ -352,6 +389,7 @@ class RegisteredUserController extends Controller
         }
 
         if (User::where('email', $registrationToken->email)->exists()) {
+            RateLimiter::hit($throttleKey, 60);
             return response()->json(
                 [
                     'message' => 'User already registered with this email.',
@@ -370,6 +408,8 @@ class RegisteredUserController extends Controller
         $registrationToken->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        RateLimiter::clear($throttleKey);
 
         return response()->json(
             [

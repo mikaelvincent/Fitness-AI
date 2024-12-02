@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "67540c5b-bd59-4e6b-9db0-857ab5a00cd9",
+        "_postman_id": "0c7bdf40-286e-4f12-a400-bb11c88ccff4",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -20,7 +20,7 @@
             "description": "",
             "item": [
                 {
-                    "name": "Handle an incoming login request.",
+                    "name": "Log in a user and issue an authentication token.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -41,9 +41,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"freddy.balistreri@example.org\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"two_factor_code\":\"voluptatum\"}"
+                            "raw": "{\"email\":\"user@example.com\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"two_factor_code\":\"voluptatum\"}"
                         },
-                        "description": "",
+                        "description": "Validates user credentials and issues a new API token. If two-factor authentication is enabled, a valid code is required.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -52,7 +52,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"email_verified_at\": \"2023-10-01T12:34:56.000000Z\"\n    },\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"user@example.com\",\n      \"email_verified_at\": \"2024-12-02T12:00:00.000000Z\"\n    },\n    \"token\": \"example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
@@ -63,14 +63,8 @@
                         },
                         {
                             "header": [],
-                            "code": 403,
-                            "body": "{\n  \"message\": \"Email address is not verified.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
                             "code": 422,
-                            "body": "{\n  \"message\": \"Invalid two-factor authentication code.\"\n}",
+                            "body": "{\n  \"message\": \"Invalid two-factor authentication code.\",\n  \"errors\": {\n    \"two_factor_code\": [\"The two_factor_code field is required.\"]\n  }\n}",
                             "name": ""
                         },
                         {
@@ -82,7 +76,7 @@
                     ]
                 },
                 {
-                    "name": "Handle an incoming logout request.",
+                    "name": "Log out the authenticated user.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -102,13 +96,19 @@
                             }
                         ],
                         "body": null,
-                        "description": ""
+                        "description": "Revokes the current access token, effectively logging out the user."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
                             "body": "{\n  \"message\": \"Logout successful.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\n  \"message\": \"Unauthenticated.\"\n}",
                             "name": ""
                         }
                     ]
@@ -134,7 +134,7 @@
                             }
                         ],
                         "body": null,
-                        "description": ""
+                        "description": "Revokes the current token and issues a new one."
                     },
                     "response": [
                         {
@@ -147,6 +147,118 @@
                             "header": [],
                             "code": 401,
                             "body": "{\n  \"message\": \"Unauthenticated.\"\n}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Password Management",
+            "description": "",
+            "item": [
+                {
+                    "name": "Send a password reset link to the user's email.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/forgot-password",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/forgot-password"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"email\":\"user@example.com\"}"
+                        },
+                        "description": "Initiates the password reset process by emailing a reset link to the user.\nA generic response is returned regardless of whether the email exists.\nAdditional rate limiting is applied to prevent abuse.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"If your email exists in our system, a password reset link has been sent.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"Unable to send password reset link.\",\n  \"errors\": {\n    \"email\": [\"The email field is required.\", \"The email must be a valid email address.\"]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Reset the user's password using the provided token.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/reset-password",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/reset-password"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"token\":\"voluptatum\",\"email\":\"user@example.com\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
+                        },
+                        "description": "Validates the token and updates the user's password. Rate limiting is applied to prevent abuse.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Password reset successful.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Invalid token or email.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"Unable to reset password.\",\n  \"errors\": {\n    \"email\": [\"The email field is required.\", \"The email must be a valid email address.\"],\n    \"password\": [\"The password must be at least 8 characters.\"]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -175,7 +287,7 @@
                             "mode": "raw",
                             "raw": "{\"current_password\":\"voluptatum\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
                         },
-                        "description": ""
+                        "description": "Validates the current password and updates it to the new password."
                     },
                     "response": [
                         {
@@ -193,218 +305,7 @@
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"password\": [\n      \"The password must be at least 8 characters.\"\n    ]\n  }\n}",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Email Verification",
-            "description": "",
-            "item": [
-                {
-                    "name": "Send a new email verification notification.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/email\/verification-notification",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/email\/verification-notification"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": ""
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\n  \"message\": \"Verification email sent.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Email address already verified.\"\n}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "Verify the user's email address.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/verify-email\/:id\/:hash",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/verify-email\/:id\/:hash",
-                            "variable": [
-                                {
-                                    "id": "id",
-                                    "key": "id",
-                                    "value": "10",
-                                    "description": "The user's ID."
-                                },
-                                {
-                                    "id": "hash",
-                                    "key": "hash",
-                                    "value": "voluptatum",
-                                    "description": "The email verification hash."
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\n  \"message\": \"Email verified successfully.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Invalid verification link.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Email address already verified.\"\n}",
-                            "name": ""
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Password Reset",
-            "description": "",
-            "item": [
-                {
-                    "name": "Send a password reset link to the user's email.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/forgot-password",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/forgot-password"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"email\":\"freddy.balistreri@example.org\"}"
-                        },
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\n  \"message\": \"Password reset link sent.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Unable to send password reset link.\",\n  \"errors\": {\n    \"email\": [\n      \"The email must be a valid email address.\"\n    ]\n  }\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 500,
-                            "body": "{\n  \"message\": \"Unable to send password reset link.\"\n}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "Reset the user's password.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/reset-password",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/reset-password"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"token\":\"voluptatum\",\"email\":\"freddy.balistreri@example.org\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
-                        },
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\n  \"message\": \"Password reset successful.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Invalid token or email.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Unable to reset password.\",\n  \"errors\": {\n    \"password\": [\n      \"The password must be at least 8 characters.\"\n    ]\n  }\n}",
+                            "body": "{\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"password\": [\"The password must be at least 8 characters.\"]\n  }\n}",
                             "name": ""
                         }
                     ]
@@ -416,7 +317,157 @@
             "description": "",
             "item": [
                 {
-                    "name": "Handle an incoming registration request.",
+                    "name": "Initiate the registration process by accepting the user's email.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/register\/initiate",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/register\/initiate"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"email\":\"user@example.com\"}"
+                        },
+                        "description": "Generates a registration token and sends a verification email containing the token.\nThe token is valid for 1 hour.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Registration initiated successfully.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"Registration initiation failed.\",\n  \"errors\": {\n    \"email\": [\"The email has already been taken.\"]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Resend the verification email containing the registration token.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/register\/resend",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/register\/resend"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"email\":\"user@example.com\"}"
+                        },
+                        "description": "Allows users to resend the verification email. Rate limiting is applied to prevent abuse.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Verification email resent successfully.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"Resend failed.\",\n  \"errors\": {\n    \"email\": [\"The email field is required.\"]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Validate the registration token and return its status.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/register\/validate-token",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/register\/validate-token"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"token\":\"voluptatum\"}"
+                        },
+                        "description": "Checks if the provided token is valid or has expired, and returns the remaining time until expiration.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\n  \"message\": \"Token is valid.\",\n  \"data\": {\n    \"status\": \"valid\",\n    \"expires_in\": 3600\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Token is invalid or has expired.\",\n  \"data\": {\n    \"status\": \"invalid\"\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"token\": [\"The token field is required.\"]\n  }\n}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Complete the registration by creating a new user account.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -437,9 +488,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"voluptatum\",\"email\":\"freddy.balistreri@example.org\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
+                            "raw": "{\"token\":\"voluptatum\",\"name\":\"John Doe\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
                         },
-                        "description": "",
+                        "description": "Validates the registration token and creates a new user with the provided name and password.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -448,13 +499,25 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\n  \"message\": \"Registration successful.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"john@example.com\",\n      \"created_at\": \"2023-10-01T12:34:56.000000Z\",\n      \"updated_at\": \"2023-10-01T12:34:56.000000Z\"\n    },\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Registration completed successfully.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"user@example.com\",\n      \"email_verified_at\": \"2024-12-02T12:00:00.000000Z\"\n    },\n    \"token\": \"example-token\"\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 400,
+                            "body": "{\n  \"message\": \"Invalid or expired registration token.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\n  \"message\": \"Registration failed.\",\n  \"errors\": {\n    \"email\": [\n      \"The email has already been taken.\"\n    ]\n  }\n}",
+                            "body": "{\n  \"message\": \"Registration failed.\",\n  \"errors\": {\n    \"name\": [\"The name field is required.\"]\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -486,7 +549,7 @@
                             }
                         ],
                         "body": null,
-                        "description": ""
+                        "description": "Generates a secret key and recovery codes for two-factor authentication."
                     },
                     "response": [
                         {
@@ -527,7 +590,7 @@
                             "mode": "raw",
                             "raw": "{\"code\":\"voluptatum\"}"
                         },
-                        "description": ""
+                        "description": "Validates the code from the authenticator app to confirm setup."
                     },
                     "response": [
                         {
@@ -571,7 +634,7 @@
                             }
                         ],
                         "body": null,
-                        "description": ""
+                        "description": "Removes two-factor authentication settings from the user's account."
                     },
                     "response": [
                         {
