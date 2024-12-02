@@ -9,12 +9,14 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import useFormStatus from "@/hooks/useFormStatus";
 import {initiateVerifyEmail} from "@/services/auth/initiateVerifyEmail.ts";
 import {z} from "zod";
+import {resendVerificationEmail} from "@/services/auth/resendVerificationEmail.ts";
 
 // Wrapper Component
 const VerifyEmail = () => {
     const {status, setLoading, setDone, setError} = useStatus();
     const [responseMessage, setResponseMessage] = useState<string>("");
     const formStatus = useFormStatus();
+    const [verificationEmailSent, setVerificationEmailSent] = useState<boolean>(false);
 
     const form = useForm({
         resolver: zodResolver(VerifyEmailSchema),
@@ -32,15 +34,15 @@ const VerifyEmail = () => {
         // Optional: Notify the user when cooldown ends
         toast({
             title: "Cooldown Ended",
-            description: "You can now enter the verification email.",
+            description: "You can now resend the verification email.",
         });
     }, "verifyEmailCooldown");
 
 
-    const handleInitiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema>) => {
+    const handleVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema>) => {
         setLoading();
         try {
-            const response = await initiateVerifyEmail(data);
+            const response = !verificationEmailSent ? await initiateVerifyEmail(data) : await resendVerificationEmail(data);
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
             if (!response?.success) {
@@ -62,6 +64,7 @@ const VerifyEmail = () => {
                     description: response?.message || "Registration Initiation successful. Please check your email.",
                 });
                 startCooldown(60);
+                setVerificationEmailSent(true);
             }
         } catch (error) {
             console.error("Error during Registration Initation", error);
@@ -73,7 +76,7 @@ const VerifyEmail = () => {
                 variant: "destructive",
             });
         } finally {
-            setLoading();
+            formStatus.endSubmission();
         }
     };
 
@@ -83,8 +86,9 @@ const VerifyEmail = () => {
             formMessage={responseMessage}
             form={form}
             formStatus={formStatus}
-            onSubmit={handleInitiateVerifyEmail}
+            onSubmit={handleVerifyEmail}
             cooldown={cooldown}
+            isResend={verificationEmailSent}
         />
     );
 };

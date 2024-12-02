@@ -23,6 +23,7 @@ interface VerifyEmailProps {
     form: UseFormReturn<z.infer<typeof VerifyEmailSchema>>;
     onSubmit: (data: z.infer<typeof VerifyEmailSchema>) => void | Promise<void>;
     cooldown: number;
+    isResend?: boolean;
 }
 
 const VerifyEmailForm = ({
@@ -32,6 +33,7 @@ const VerifyEmailForm = ({
                              form,
                              onSubmit,
                              cooldown,
+                             isResend,
                          }: VerifyEmailProps) => {
     return (
         <>
@@ -75,7 +77,7 @@ const VerifyEmailForm = ({
                             className="mb-4 w-full"
                             disabled={cooldown > 0 || formStatus.pending}
                         >
-                            {cooldown > 0 ? `Please Wait (${cooldown}s)` : status == "loading" ? "Sending" : "Send Email"}
+                            {cooldown > 0 ? `Please Wait (${cooldown}s)` : status == "loading" ? "Sending..." : isResend ? "Resend Email" : "Send Email"}
                         </Button>
                         {cooldown > 0 && (
                             <p className="text-sm text-muted-foreground">

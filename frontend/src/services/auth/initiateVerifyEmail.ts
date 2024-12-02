@@ -54,7 +54,7 @@ export const initiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema
 
         return {
             success: response.ok,
-            message: responseData.message,
+            message: responseData.message + " Please check your email.",
         };
     } catch (error) {
         console.error("Error during submission:", error);
