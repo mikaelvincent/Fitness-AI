@@ -1,8 +1,7 @@
 // frontend/src/components/ui/logo.tsx
-import logoLightWithText from "@/assets/images/logo_Light Mode.svg";
-import logoLightWithoutText from "@/assets/images/logo_Light Mode - No Text.svg";
-import logoDarkWithText from "@/assets/images/logo_Dark Mode.svg";
-import logoDarkWithoutText from "@/assets/images/logo_Dark Mode - No Text.svg";
+import logoNoText from "@/assets/images/no_text.svg";
+import logoLight from "@/assets/images/light_mode.svg";
+import logoDark from "@/assets/images/dark_mode.svg";
 import {useTheme} from "@/components/theme/theme-provider.tsx";
 
 interface LogoProps {
@@ -25,16 +24,14 @@ const Logo = ({
     const theme = toUseTheme || appliedTheme;
 
     if (theme === "light" && variant === "withText") {
-        logoSrc = logoLightWithText;
-    } else if (theme === "light" && variant === "withoutText") {
-        logoSrc = logoLightWithoutText;
+        logoSrc = logoLight;
+    } else if ((theme === "light" || theme === "dark") && variant === "withoutText") {
+        logoSrc = logoNoText;
     } else if (theme === "dark" && variant === "withText") {
-        logoSrc = logoDarkWithText;
-    } else if (theme === "dark" && variant === "withoutText") {
-        logoSrc = logoDarkWithoutText;
+        logoSrc = logoDark;
     } else {
         // Fallback to light with text if no matching condition
-        logoSrc = logoLightWithText;
+        logoSrc = logoNoText;
     }
 
     return <img src={logoSrc} alt={alt} className={className}/>;
