@@ -62,9 +62,6 @@ const VerifyEmailForm = ({
                                             />
                                         </FormControl>
                                         <FormMessage/>
-                                        {status == "error" && (
-                                            <AuthErrorMessage formMessage={formMessage}/>
-                                        )}
                                     </FormItem>
                                 )}
                             />
