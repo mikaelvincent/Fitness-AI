@@ -2,7 +2,7 @@
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import AuthLayout from './layout/AuthLayout';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Home.tsx';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Register from './pages/Register';
@@ -23,7 +23,7 @@ const App = () => {
                 {/*<Routes>*/}
                 {/*    /!* Main layout routes *!/*/}
                 {/*    <Route path="/" element={<ProtectedRoute><MainLayout/> </ProtectedRoute>}>*/}
-                {/*        <Route index element={<Dashboard/>}/>*/}
+                {/*        <Route index element={<Home/>}/>*/}
                 {/*    </Route>*/}
 
                 {/*    /!* Authentication layout routes *!/*/}
@@ -44,7 +44,7 @@ const App = () => {
                 <Routes>
                     {/* Main layout routes */}
                     <Route path="/" element={<MainLayout/>}>
-                        <Route index element={<Dashboard/>}/>
+                        <Route index element={<Home/>}/>
                     </Route>
 
                     {/* Authentication layout routes */}
