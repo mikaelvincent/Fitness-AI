@@ -2,7 +2,7 @@
 import {useEffect} from "react";
 import {Outlet} from "react-router-dom";
 import {useUser} from "@/hooks/context/UserContext";
-import {ResponsiveNav} from "@/components/main/responsive-nav";
+import {ResponsiveNav} from "@/components/navbar/responsive-nav.tsx";
 
 const MainLayout = () => {
     const {user} = useUser();
