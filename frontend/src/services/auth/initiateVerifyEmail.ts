@@ -2,7 +2,7 @@ import {ENV} from "@/utils/env";
 import {z} from "zod";
 import {VerifyEmailSchema} from "@/utils/schema/VerifyEmailSchema.ts";
 
-interface ResendVerificationEmailResponse {
+interface InitiateVerifyEmailResponse {
     success: boolean;
     message: string;
     status?: number;
@@ -10,13 +10,15 @@ interface ResendVerificationEmailResponse {
     retry_after?: number;
 }
 
-export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSchema>): Promise<ResendVerificationEmailResponse> => {
+
+export const initiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema>): Promise<InitiateVerifyEmailResponse> => {
     try {
-        const url = new URL("/api/register/resend", ENV.API_URL);
+        const url = new URL("/api/register/initiate", ENV.API_URL);
         const headers: HeadersInit = {
             "Content-Type": "application/json",
             Accept: "application/json",
         };
+
 
         const response = await fetch(url, {
             method: "POST",
@@ -35,7 +37,7 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
             return {
                 success: false,
                 message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "The email field is required.",
+                errors: responseData.errors[primaryErrorKey] || "Registration initiation failed. The email has already been taken",
                 status: response.status,
             };
         }
@@ -52,7 +54,7 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
 
         return {
             success: response.ok,
-            message: responseData.message || "Verification email resent successfully!",
+            message: responseData.message + " Please check your email.",
         };
     } catch (error) {
         console.error("Error during submission:", error);

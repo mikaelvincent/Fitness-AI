@@ -23,6 +23,7 @@ interface RegisterFormProps {
     formStatus: UseFormStatusReturn;
     form: UseFormReturn<z.infer<typeof RegisterSchema>>;
     onSubmit: (data: z.infer<typeof RegisterSchema>) => void | Promise<void>;
+    cooldown: number;
 }
 
 const RegisterForm = ({
@@ -32,6 +33,7 @@ const RegisterForm = ({
                           formStatus,
                           form,
                           onSubmit,
+                          cooldown,
                       }: RegisterFormProps) => {
     return (
         <>
@@ -57,26 +59,6 @@ const RegisterForm = ({
                                         </FormControl>
                                         <FormMessage/>
                                         {status == "error" && invalidInput == "name" && (
-                                            <AuthErrorMessage formMessage={formMessage}/>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="email"
-                                                placeholder="example@email.com"
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {status == "error" && invalidInput == "email" && (
                                             <AuthErrorMessage formMessage={formMessage}/>
                                         )}
                                     </FormItem>
@@ -117,11 +99,16 @@ const RegisterForm = ({
                         )}
                         <Button
                             type="submit"
-                            className="w-full"
-                            disabled={formStatus.pending}
+                            className="mb-4 w-full"
+                            disabled={cooldown > 0 || formStatus.pending}
                         >
-                            {status == "loading" ? "Creating Account..." : "Register"}
+                            {cooldown > 0 ? `Please Wait (${cooldown}s)` : status == "loading" ? "Registering..." : "Register"}
                         </Button>
+                        {cooldown > 0 && (
+                            <p className="text-sm text-muted-foreground">
+                                You can register in {cooldown} seconds.
+                            </p>
+                        )}
                     </form>
                 </Form>
             </CardWrapper>
