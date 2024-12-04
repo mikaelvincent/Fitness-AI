@@ -82,8 +82,23 @@ class TwoFactorController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Check if two-factor authentication is enabled
+        if (!$user->two_factor_secret) {
+            return response()->json([
+                'message' => 'Two-factor authentication is not enabled.',
+            ], 404);
+        }
+
         $google2fa = new Google2FA();
-        $secretKey = decrypt($user->two_factor_secret);
+
+        try {
+            $secretKey = decrypt($user->two_factor_secret);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return response()->json([
+                'message' => 'Invalid two-factor authentication secret.',
+            ], 500);
+        }
 
         if (!$google2fa->verifyKey($secretKey, $request->code)) {
             return response()->json([
