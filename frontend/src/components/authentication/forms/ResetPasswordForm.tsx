@@ -23,6 +23,7 @@ interface ResetPasswordFormProps {
     form: UseFormReturn<z.infer<typeof ResetPasswordSchema>>;
     onSubmit: (data: z.infer<typeof ResetPasswordSchema>) => void | Promise<void>;
     email: string;
+    cooldown: number;
 }
 
 const LoginForm = ({
@@ -32,6 +33,7 @@ const LoginForm = ({
                        form,
                        onSubmit,
                        email,
+                       cooldown,
                    }: ResetPasswordFormProps) => {
     // Determine the message to display
     const getMessage = () => {
@@ -109,10 +111,16 @@ const LoginForm = ({
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={formStatus.pending}
+                        disabled={formStatus.pending || cooldown > 0}
                     >
-                        {status === "loading" ? "Resetting..." : "Reset"}
+                        {formStatus.pending ? "Resetting..." : cooldown > 0 ? `Please wait (${cooldown}s)` : "Reset"}
                     </Button>
+
+                    {cooldown > 0 && (
+                        <FormDescription className="text-sm text-muted-foreground">
+                            You can request another password reset in {cooldown} seconds.
+                        </FormDescription>
+                    )}
                 </form>
             </Form>
         </CardWrapper>

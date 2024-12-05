@@ -52,6 +52,7 @@ const Login = () => {
             if (!response?.success && response?.status !== 429) {
                 setError();
                 setFormMessage(response?.message || "Login failed.");
+                return;
             }
 
             if (!response?.success && response?.status === 429) {
@@ -62,6 +63,7 @@ const Login = () => {
                 const retrySeconds = response?.retry_after || 60; // Default to 60 seconds if not provided
                 // Start the retry timer with the specified duration
                 startRetryTimer(retrySeconds);
+                return;
             }
 
             // Ensure response.success, response.token, and response.data are all present
@@ -73,6 +75,7 @@ const Login = () => {
 
                 // Navigate to the dashboard
                 navigate("/");
+                return;
             }
 
         } catch (error) {

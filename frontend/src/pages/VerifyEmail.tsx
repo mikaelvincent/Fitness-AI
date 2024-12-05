@@ -47,13 +47,15 @@ const VerifyEmail = () => {
 
             if (!response?.success) {
                 setError();
-                setResponseMessage(response?.errors || response?.message || "Registration Initiation failed.");
+                setResponseMessage(response?.message || "Registration Initiation failed.");
+                return;
             }
 
             if (!response?.success && response?.status === 429) {
                 setError();
                 setResponseMessage(response?.message || "Too many attempts. Please try again later.");
                 startCooldown(response?.retry_after || 60);
+                return;
             }
 
             if (response?.success) {
@@ -65,6 +67,7 @@ const VerifyEmail = () => {
                 });
                 startCooldown(60);
                 setVerificationEmailSent(true);
+                return;
             }
         } catch (error) {
             console.error("Error during Registration Initation", error);

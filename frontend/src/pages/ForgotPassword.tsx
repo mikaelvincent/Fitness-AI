@@ -36,7 +36,7 @@ const ForgotPassword = () => {
     });
 
     const onSubmit = async (data: z.infer<typeof ForgotPasswordSchema>) => {
-        formStatus.startSubmission(data, "post", "/api/forgot-password");
+        formStatus.startSubmission(data, "post", "/api/password/forgot");
         setLoading();
 
         try {
@@ -44,14 +44,16 @@ const ForgotPassword = () => {
             const response = await ForgotPasswordSendEmail(data);
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
+            if (!response?.success && response?.status === 429) {
+                setError();
+                setFormMessage(response?.message || "Please try again after a while.");
+                startCooldown(response.retry_after || 60);
+                return;
+            }
+
             if (!response?.success) {
                 setError();
-                setFormMessage(response?.errors || response?.message || "Failed to send password reset link.");
-                toast({
-                    title: "Error",
-                    description: response?.errors || response?.message || "Failed to send password reset link.",
-                    variant: "destructive",
-                });
+                setFormMessage(response?.message || "Failed to send password reset link.");
                 return;
             }
 
@@ -64,6 +66,7 @@ const ForgotPassword = () => {
                 });
                 // Start the cooldown timer
                 startCooldown(60);
+                return;
             }
 
         } catch (error) {

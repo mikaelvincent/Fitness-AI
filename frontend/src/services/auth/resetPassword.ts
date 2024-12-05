@@ -4,7 +4,7 @@ interface ResetPasswordResponse {
     success: boolean;
     message: string;
     status?: number;
-    errors?: string | null;
+    retry_after?: number;
 }
 
 interface ResetPasswordDataProps {
@@ -17,7 +17,7 @@ interface ResetPasswordDataProps {
 export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Promise<ResetPasswordResponse> => {
     console.log("SendResendPasswordRequest data:", data);
     try {
-        const url = new URL("/api/reset-password", ENV.API_URL);
+        const url = new URL("/api/password/reset", ENV.API_URL);
         const headers = {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -31,23 +31,23 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
 
         const responseData = await response.json();
 
+        console.log(response)
         console.log("Response data:", responseData);
 
-        if (!response.ok && response.status === 422) {
-            const errorKeys = Object.keys(responseData.errors);
-            const primaryErrorKey = errorKeys[0] || "others";
+        if (!response.ok && response.status === 429) {
             return {
                 success: response.ok,
-                message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "The password must be at least 8 characters.",
+                message: responseData.message || "Too many requests. Try again later.",
                 status: response.status,
+                retry_after: responseData.retry_after,
             };
         }
 
         if (!response.ok) {
+            console.log("test")
             return {
                 success: response.ok,
-                message: responseData.message || "Unable to reset password.",
+                message: responseData.message,
                 status: response.status,
             };
         }
@@ -60,7 +60,7 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
         };
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.log("Error during submission:", error);
         return {
             success: false,
             message: "An unexpected error occurred.",
