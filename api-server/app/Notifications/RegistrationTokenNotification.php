@@ -40,4 +40,12 @@ class RegistrationTokenNotification extends Notification
             ->action('Complete Registration', $frontendUrl)
             ->line('This link will expire in 1 hour.');
     }
+
+    /**
+     * Get the token value.
+     */
+    public function getToken(): string
+    {
+        return $this->token;
+    }
 }

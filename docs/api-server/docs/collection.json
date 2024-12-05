@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "0c7bdf40-286e-4f12-a400-bb11c88ccff4",
+        "_postman_id": "3b0fccd9-8549-4a88-97a9-0ffca8607a76",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -20,7 +20,7 @@
             "description": "",
             "item": [
                 {
-                    "name": "Log in a user and issue an authentication token.",
+                    "name": "Authenticate the user and issue a token.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -43,7 +43,7 @@
                             "mode": "raw",
                             "raw": "{\"email\":\"user@example.com\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"two_factor_code\":\"voluptatum\"}"
                         },
-                        "description": "Validates user credentials and issues a new API token. If two-factor authentication is enabled, a valid code is required.",
+                        "description": "Validates user credentials and issues a new API token. Requires a valid two-factor authentication code if enabled.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -52,31 +52,31 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"user@example.com\",\n      \"email_verified_at\": \"2024-12-02T12:00:00.000000Z\"\n    },\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Login successful. You are now authenticated.\",\n  \"data\": {\n    \"user\": {...},\n    \"token\": \"example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 401,
-                            "body": "{\n  \"message\": \"Invalid credentials.\"\n}",
+                            "body": "{\n  \"message\": \"Invalid email or password provided.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\n  \"message\": \"Invalid two-factor authentication code.\",\n  \"errors\": {\n    \"two_factor_code\": [\"The two_factor_code field is required.\"]\n  }\n}",
+                            "body": "{\n  \"message\": \"The two-factor authentication code is invalid.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"Too many login attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Log out the authenticated user.",
+                    "name": "Logout the authenticated user.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
@@ -96,31 +96,31 @@
                             }
                         ],
                         "body": null,
-                        "description": "Revokes the current access token, effectively logging out the user."
+                        "description": "Revokes the user's current authentication token."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Logout successful.\"\n}",
+                            "body": "{\n  \"message\": \"You have been successfully logged out.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
-                            "code": 401,
-                            "body": "{\n  \"message\": \"Unauthenticated.\"\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Refresh the user's authentication token.",
+                    "name": "Refresh the authentication token.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/refresh-token",
+                            "path": "api\/token\/refresh",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/refresh-token"
+                            "raw": "{{baseUrl}}\/api\/token\/refresh"
                         },
                         "method": "POST",
                         "header": [
@@ -140,13 +140,13 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Token refreshed successfully.\",\n  \"data\": {\n    \"token\": \"new-example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Your authentication token has been refreshed successfully.\",\n  \"data\": {\n    \"token\": \"new-example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
-                            "code": 401,
-                            "body": "{\n  \"message\": \"Unauthenticated.\"\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -162,9 +162,9 @@
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/forgot-password",
+                            "path": "api\/password\/forgot",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/forgot-password"
+                            "raw": "{{baseUrl}}\/api\/password\/forgot"
                         },
                         "method": "POST",
                         "header": [
@@ -179,9 +179,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"user@example.com\"}"
+                            "raw": "{\"email\":\"freddy.balistreri@example.org\"}"
                         },
-                        "description": "Initiates the password reset process by emailing a reset link to the user.\nA generic response is returned regardless of whether the email exists.\nAdditional rate limiting is applied to prevent abuse.",
+                        "description": "Initiates the password reset process by emailing a reset link to the user.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -190,31 +190,25 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"If your email exists in our system, a password reset link has been sent.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Unable to send password reset link.\",\n  \"errors\": {\n    \"email\": [\"The email field is required.\", \"The email must be a valid email address.\"]\n  }\n}",
+                            "body": "{\n  \"message\": \"Your request has been received. If your email is registered, you will receive a password reset link shortly.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Reset the user's password using the provided token.",
+                    "name": "Reset the user's password.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/reset-password",
+                            "path": "api\/password\/reset",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/reset-password"
+                            "raw": "{{baseUrl}}\/api\/password\/reset"
                         },
                         "method": "POST",
                         "header": [
@@ -229,9 +223,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"token\":\"voluptatum\",\"email\":\"user@example.com\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
+                            "raw": "{\"token\":\"voluptatum\",\"email\":\"freddy.balistreri@example.org\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
                         },
-                        "description": "Validates the token and updates the user's password. Rate limiting is applied to prevent abuse.",
+                        "description": "Validates the token and resets the user's password.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -240,37 +234,31 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Password reset successful.\"\n}",
+                            "body": "{\n  \"message\": \"Your password has been successfully reset.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 400,
-                            "body": "{\n  \"message\": \"Invalid token or email.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Unable to reset password.\",\n  \"errors\": {\n    \"email\": [\"The email field is required.\", \"The email must be a valid email address.\"],\n    \"password\": [\"The password must be at least 8 characters.\"]\n  }\n}",
+                            "body": "{\n  \"message\": \"The provided token or email is invalid or has expired.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Update the authenticated user's password.",
+                    "name": "Change the authenticated user's password.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/password\/update",
+                            "path": "api\/password\/change",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/password\/update"
+                            "raw": "{{baseUrl}}\/api\/password\/change"
                         },
                         "method": "POST",
                         "header": [
@@ -287,25 +275,25 @@
                             "mode": "raw",
                             "raw": "{\"current_password\":\"voluptatum\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
                         },
-                        "description": "Validates the current password and updates it to the new password."
+                        "description": "Updates the user's password after validating the current password."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Password updated successfully.\"\n}",
+                            "body": "{\n  \"message\": \"Your password has been updated successfully.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 400,
-                            "body": "{\n  \"message\": \"Current password does not match.\"\n}",
+                            "body": "{\n  \"message\": \"The current password you provided does not match our records.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"password\": [\"The password must be at least 8 characters.\"]\n  }\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -317,13 +305,13 @@
             "description": "",
             "item": [
                 {
-                    "name": "Initiate the registration process by accepting the user's email.",
+                    "name": "Initiate the registration process.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/register\/initiate",
+                            "path": "api\/registration\/initiate",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/register\/initiate"
+                            "raw": "{{baseUrl}}\/api\/registration\/initiate"
                         },
                         "method": "POST",
                         "header": [
@@ -338,9 +326,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"user@example.com\"}"
+                            "raw": "{\"email\":\"freddy.balistreri@example.org\"}"
                         },
-                        "description": "Generates a registration token and sends a verification email containing the token.\nThe token is valid for 1 hour.",
+                        "description": "Generates a registration token and sends a verification email.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -349,31 +337,25 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Registration initiated successfully.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Registration initiation failed.\",\n  \"errors\": {\n    \"email\": [\"The email has already been taken.\"]\n  }\n}",
+                            "body": "{\n  \"message\": \"Registration process has been initiated. Please check your email for further instructions.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Resend the verification email containing the registration token.",
+                    "name": "Resend the registration verification email.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/register\/resend",
+                            "path": "api\/registration\/resend",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/register\/resend"
+                            "raw": "{{baseUrl}}\/api\/registration\/resend"
                         },
                         "method": "POST",
                         "header": [
@@ -388,9 +370,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"user@example.com\"}"
+                            "raw": "{\"email\":\"freddy.balistreri@example.org\"}"
                         },
-                        "description": "Allows users to resend the verification email. Rate limiting is applied to prevent abuse.",
+                        "description": "",
                         "auth": {
                             "type": "noauth"
                         }
@@ -399,31 +381,25 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Verification email resent successfully.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Resend failed.\",\n  \"errors\": {\n    \"email\": [\"The email field is required.\"]\n  }\n}",
+                            "body": "{\n  \"message\": \"A new verification email has been sent to your address.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Validate the registration token and return its status.",
+                    "name": "Validate the registration token.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/register\/validate-token",
+                            "path": "api\/registration\/validate-token",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/register\/validate-token"
+                            "raw": "{{baseUrl}}\/api\/registration\/validate-token"
                         },
                         "method": "POST",
                         "header": [
@@ -440,7 +416,7 @@
                             "mode": "raw",
                             "raw": "{\"token\":\"voluptatum\"}"
                         },
-                        "description": "Checks if the provided token is valid or has expired, and returns the remaining time until expiration.",
+                        "description": "Checks if the provided token is valid or has expired.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -449,31 +425,31 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Token is valid.\",\n  \"data\": {\n    \"status\": \"valid\",\n    \"expires_in\": 3600\n  }\n}",
+                            "body": "{\n  \"message\": \"The registration token is valid.\",\n  \"data\": {\n    \"expires_in\": 3600\n  }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 400,
-                            "body": "{\n  \"message\": \"Token is invalid or has expired.\",\n  \"data\": {\n    \"status\": \"invalid\"\n  }\n}",
+                            "body": "{\n  \"message\": \"The registration token is invalid or has expired.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Validation failed.\",\n  \"errors\": {\n    \"token\": [\"The token field is required.\"]\n  }\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Complete the registration by creating a new user account.",
+                    "name": "Complete the registration by creating a new user.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/register",
+                            "path": "api\/registration\/complete",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/register"
+                            "raw": "{{baseUrl}}\/api\/registration\/complete"
                         },
                         "method": "POST",
                         "header": [
@@ -488,9 +464,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"token\":\"voluptatum\",\"name\":\"John Doe\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
+                            "raw": "{\"token\":\"voluptatum\",\"name\":\"voluptatum\",\"password\":\")B#Qz?{T8\\\"<Tx\",\"password_confirmation\":\"voluptatum\"}"
                         },
-                        "description": "Validates the registration token and creates a new user with the provided name and password.",
+                        "description": "",
                         "auth": {
                             "type": "noauth"
                         }
@@ -499,25 +475,19 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\n  \"message\": \"Registration completed successfully.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"name\": \"John Doe\",\n      \"email\": \"user@example.com\",\n      \"email_verified_at\": \"2024-12-02T12:00:00.000000Z\"\n    },\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Registration completed successfully. Welcome aboard!\",\n  \"data\": {\n    \"user\": {...},\n    \"token\": \"example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 400,
-                            "body": "{\n  \"message\": \"Invalid or expired registration token.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Registration failed.\",\n  \"errors\": {\n    \"name\": [\"The name field is required.\"]\n  }\n}",
+                            "body": "{\n  \"message\": \"The registration token provided is invalid or has expired.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"Too many attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -529,13 +499,13 @@
             "description": "",
             "item": [
                 {
-                    "name": "Enable two-factor authentication for the user.",
+                    "name": "Enable two-factor authentication.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/two-factor-authentication\/enable",
+                            "path": "api\/two-factor\/enable",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/two-factor-authentication\/enable"
+                            "raw": "{{baseUrl}}\/api\/two-factor\/enable"
                         },
                         "method": "POST",
                         "header": [
@@ -549,19 +519,19 @@
                             }
                         ],
                         "body": null,
-                        "description": "Generates a secret key and recovery codes for two-factor authentication."
+                        "description": "Generates a secret key and QR code URL."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Two-factor authentication enabled.\",\n  \"data\": {\n    \"qr_code_url\": \"otpauth:\/\/totp\/AppName:user@example.com?secret=ABCDEF...\",\n    \"recovery_codes\": [\n      \"code1\",\n      \"code2\",\n      \"...\",\n      \"code8\"\n    ]\n  }\n}",
+                            "body": "{\n  \"message\": \"Two-factor authentication enabled.\",\n  \"data\": {\n    \"qr_code_url\": \"otpauth:\/\/totp\/AppName:user@example.com?secret=ABCDEF...\",\n    \"recovery_codes\": [\"code1\", \"code2\", \"...\"]\n  }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Two-factor authentication is already enabled.\"\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -571,9 +541,9 @@
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/two-factor-authentication\/confirm",
+                            "path": "api\/two-factor\/confirm",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/two-factor-authentication\/confirm"
+                            "raw": "{{baseUrl}}\/api\/two-factor\/confirm"
                         },
                         "method": "POST",
                         "header": [
@@ -590,7 +560,7 @@
                             "mode": "raw",
                             "raw": "{\"code\":\"voluptatum\"}"
                         },
-                        "description": "Validates the code from the authenticator app to confirm setup."
+                        "description": "Validates the code from the authenticator app."
                     },
                     "response": [
                         {
@@ -601,26 +571,20 @@
                         },
                         {
                             "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Two-factor authentication is not enabled.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 422,
-                            "body": "{\n  \"message\": \"Invalid two-factor authentication code.\"\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
                 },
                 {
-                    "name": "Disable two-factor authentication for the user.",
+                    "name": "Disable two-factor authentication.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/two-factor-authentication\/disable",
+                            "path": "api\/two-factor\/disable",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/two-factor-authentication\/disable"
+                            "raw": "{{baseUrl}}\/api\/two-factor\/disable"
                         },
                         "method": "POST",
                         "header": [
@@ -645,8 +609,8 @@
                         },
                         {
                             "header": [],
-                            "code": 400,
-                            "body": "{\n  \"message\": \"Two-factor authentication is not enabled.\"\n}",
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
