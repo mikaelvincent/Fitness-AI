@@ -30,17 +30,6 @@ export const initiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema
 
         console.log("Response data:", responseData);
 
-        if (response.status === 422 && !response.ok) {
-            // Assuming the backend sends validation errors in a specific format
-            const errorKeys = Object.keys(responseData.errors);
-            const primaryErrorKey = errorKeys[0] || "others";
-            return {
-                success: false,
-                message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "Registration initiation failed. The email has already been taken",
-                status: response.status,
-            };
-        }
 
         if (response.status === 429 && !response.ok) {
             return {
@@ -51,10 +40,19 @@ export const initiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema
             };
         }
 
+        if (!response.ok) {
+            return {
+                success: false,
+                message: responseData.message || "Registration initiation failed.",
+                status: response.status,
+            };
+        }
+
 
         return {
             success: response.ok,
-            message: responseData.message + " Please check your email.",
+            message: responseData.message + " Please check your email",
+            status: response.status,
         };
     } catch (error) {
         console.error("Error during submission:", error);

@@ -12,7 +12,7 @@ interface ResendVerificationEmailResponse {
 
 export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSchema>): Promise<ResendVerificationEmailResponse> => {
     try {
-        const url = new URL("/api/register/resend", ENV.API_URL);
+        const url = new URL("/api/registration/resend", ENV.API_URL);
         const headers: HeadersInit = {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -28,17 +28,6 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
 
         console.log("Response data:", responseData);
 
-        if (response.status === 422 && !response.ok) {
-            // Assuming the backend sends validation errors in a specific format
-            const errorKeys = Object.keys(responseData.errors);
-            const primaryErrorKey = errorKeys[0] || "others";
-            return {
-                success: false,
-                message: responseData.message,
-                errors: responseData.errors[primaryErrorKey],
-                status: response.status,
-            };
-        }
 
         if (response.status === 429 && !response.ok) {
             return {
@@ -46,6 +35,14 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
                 message: responseData.message || "Too many requests. Please try again later.",
                 status: response.status,
                 retry_after: responseData.retry_after,
+            };
+        }
+
+        if (!response.ok) {
+            return {
+                success: false,
+                message: responseData.message || "Resend verification email failed.",
+                status: response.status,
             };
         }
 
