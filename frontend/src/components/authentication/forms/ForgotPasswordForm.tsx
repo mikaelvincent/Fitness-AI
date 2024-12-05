@@ -83,7 +83,7 @@ const ForgotPasswordForm = ({
 
                     {cooldown > 0 && (
                         <FormDescription className="text-sm text-muted-foreground">
-                            You can request another password reset in {cooldown} seconds.
+                            You can request another email in {cooldown} seconds.
                         </FormDescription>
                     )}
                 </form>
