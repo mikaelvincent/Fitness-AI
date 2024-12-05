@@ -23,7 +23,7 @@ interface RegisterDataProps {
 export const registerUser = async (data: RegisterDataProps): Promise<RegisterResponse> => {
     try {
         console.log("Registering user with data:", data);
-        const url = new URL("/api/register", ENV.API_URL);
+        const url = new URL("/api/registration/complete", ENV.API_URL);
         const headers = {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -37,9 +37,10 @@ export const registerUser = async (data: RegisterDataProps): Promise<RegisterRes
 
         const responseData = await response.json();
 
+        console.log("Response:", response);
         console.log("Registration Response data:", responseData);
 
-        if (!response.ok || response.status === 429) {
+        if (!response.ok && response.status === 429) {
             return {
                 success: !response.ok,
                 message: responseData.message,
@@ -53,17 +54,16 @@ export const registerUser = async (data: RegisterDataProps): Promise<RegisterRes
             const errorKeys = Object.keys(responseData.errors);
             const primaryErrorKey = errorKeys[0] || "others";
             return {
-                success: false,
-                message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "Registration failed. Please try again.",
+                success: response.ok,
+                message: responseData.message,
+                errors: responseData.errors[primaryErrorKey],
                 errorKey: primaryErrorKey,
                 status: response.status,
             };
         }
 
-
         return {
-            success: true,
+            success: response.ok,
             message: responseData.message || "Registration successful!",
             token: responseData.data.token,
             data: {name: responseData.data.user.name},
