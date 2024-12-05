@@ -4,7 +4,6 @@ interface ResetPasswordResponse {
     success: boolean;
     message: string;
     status?: number;
-    errors?: string | null;
     retry_after?: number;
 }
 
@@ -32,6 +31,7 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
 
         const responseData = await response.json();
 
+        console.log(response)
         console.log("Response data:", responseData);
 
         if (!response.ok && response.status === 429) {
@@ -44,12 +44,10 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
         }
 
         if (!response.ok) {
-            const errorKeys = Object.keys(responseData.errors);
-            const primaryErrorKey = errorKeys[0] || "others";
+            console.log("test")
             return {
                 success: response.ok,
                 message: responseData.message,
-                errors: responseData.errors[primaryErrorKey],
                 status: response.status,
             };
         }
@@ -62,7 +60,7 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
         };
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.log("Error during submission:", error);
         return {
             success: false,
             message: "An unexpected error occurred.",

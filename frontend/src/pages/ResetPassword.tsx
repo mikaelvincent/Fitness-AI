@@ -74,9 +74,20 @@ const ResetPassword = () => {
                 startCooldown(response.retry_after || 60);
             }
 
-            if (!response?.success) {
+            if (!response?.success && response?.status === 400) {
                 setError();
                 setFormMessage(response?.errors || response?.message || "The provided token or email is invalid or has expired.");
+                toast({
+                    title: "Error",
+                    description: response?.errors || response?.message || "The provided token or email is invalid or has expired. Please try again.",
+                    variant: "destructive",
+                });
+                navigate("/login");
+            }
+
+            if (!response?.success) {
+                setError();
+                setFormMessage(response?.errors || response?.message || "Error resetting password.");
             }
 
 
