@@ -45,8 +45,8 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
             const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
-                message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "Unable to send password reset link.",
+                message: responseData.message,
+                errors: responseData.errors[primaryErrorKey],
                 status: response.status,
             };
         }

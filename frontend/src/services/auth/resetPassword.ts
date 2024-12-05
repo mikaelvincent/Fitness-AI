@@ -48,7 +48,7 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
             const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
-                message: responseData.message || "The provided token or email is invalid or has expired.",
+                message: responseData.message,
                 errors: responseData.errors[primaryErrorKey],
                 status: response.status,
             };

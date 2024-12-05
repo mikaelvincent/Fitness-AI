@@ -34,8 +34,8 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
             const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: false,
-                message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "The email field is required.",
+                message: responseData.message,
+                errors: responseData.errors[primaryErrorKey],
                 status: response.status,
             };
         }
@@ -43,7 +43,7 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
         if (response.status === 429 && !response.ok) {
             return {
                 success: false,
-                message: responseData.message,
+                message: responseData.message || "Too many requests. Please try again later.",
                 status: response.status,
                 retry_after: responseData.retry_after,
             };

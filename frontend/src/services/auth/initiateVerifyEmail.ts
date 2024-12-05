@@ -13,7 +13,7 @@ interface InitiateVerifyEmailResponse {
 
 export const initiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema>): Promise<InitiateVerifyEmailResponse> => {
     try {
-        const url = new URL("/api/register/initiate", ENV.API_URL);
+        const url = new URL("/api/registration/initiate", ENV.API_URL);
         const headers: HeadersInit = {
             "Content-Type": "application/json",
             Accept: "application/json",
