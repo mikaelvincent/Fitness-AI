@@ -1,6 +1,5 @@
 import {ENV} from "@/utils/env";
-import {RegisterSchema} from "@/utils/schema/RegisterSchema";
-import {z} from "zod";
+import User from "@/hooks/context/UserContext.tsx";
 
 interface RegisterResponse {
     success: boolean;
@@ -8,10 +7,20 @@ interface RegisterResponse {
     status?: number;
     token?: string;
     errors?: string | null;
+    retry_after?: number;
+    errorKey?: string;
+    data?: User;
+}
+
+interface RegisterDataProps {
+    token: string;
+    name: string;
+    password: string;
+    password_confirmation: string;
 }
 
 
-export const registerUser = async (data: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
+export const registerUser = async (data: RegisterDataProps): Promise<RegisterResponse> => {
     try {
         console.log("Registering user with data:", data);
         const url = new URL("/api/register", ENV.API_URL);
@@ -30,7 +39,16 @@ export const registerUser = async (data: z.infer<typeof RegisterSchema>): Promis
 
         console.log("Registration Response data:", responseData);
 
-        if (response.status === 422 && !response.ok) {
+        if (!response.ok || response.status === 429) {
+            return {
+                success: !response.ok,
+                message: responseData.message,
+                status: response.status,
+                retry_after: responseData.retry_after,
+            };
+        }
+
+        if (!response.ok) {
             // Assuming the backend sends validation errors in a specific format
             const errorKeys = Object.keys(responseData.errors);
             const primaryErrorKey = errorKeys[0] || "others";
@@ -38,22 +56,17 @@ export const registerUser = async (data: z.infer<typeof RegisterSchema>): Promis
                 success: false,
                 message: primaryErrorKey,
                 errors: responseData.errors[primaryErrorKey] || "Registration failed. Please try again.",
+                errorKey: primaryErrorKey,
                 status: response.status,
             };
         }
 
-        if (!response.ok) {
-            return {
-                success: !response.ok,
-                message: responseData.message,
-                status: response.status,
-            };
-        }
 
         return {
             success: true,
             message: responseData.message || "Registration successful!",
             token: responseData.data.token,
+            data: {name: responseData.data.user.name},
         };
 
     } catch (error) {

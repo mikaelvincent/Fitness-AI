@@ -1,49 +1,91 @@
 import {Button} from "@/components/ui/button";
 import AuthErrorMessage from "../auth-ui/AuthErrorMessage";
-import CardWrapper from "@/components/authentication/auth-ui/CardWrapper.tsx"; // Import AuthErrorMessage if needed
+import CardWrapper from "@/components/authentication/auth-ui/CardWrapper.tsx";
+import {Input} from "@/components/ui/input.tsx"; // Import AuthErrorMessage if needed
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import {UseFormStatusReturn} from "@/hooks/useFormStatus.tsx";
+import {UseFormReturn} from "react-hook-form";
+import {z} from "zod";
+import {VerifyEmailSchema} from "@/utils/schema/VerifyEmailSchema.ts";
 
 interface VerifyEmailProps {
-    email: any;
-    handleSubmit: () => void;
-    responseMessage?: string;
+    status: string;
+    formMessage: string;
+    formStatus: UseFormStatusReturn;
+    form: UseFormReturn<z.infer<typeof VerifyEmailSchema>>;
+    onSubmit: (data: z.infer<typeof VerifyEmailSchema>) => void | Promise<void>;
     cooldown: number;
+    isResend?: boolean;
 }
 
-const VerifyEmailCard = ({
-                             email,
-                             handleSubmit,
-                             responseMessage,
+const VerifyEmailForm = ({
+                             status,
+                             formMessage,
+                             formStatus,
+                             form,
+                             onSubmit,
                              cooldown,
+                             isResend,
                          }: VerifyEmailProps) => {
     return (
         <>
-            <CardWrapper label="" title=" Verify your email address" backLabel="Did you already verify your email?"
-                         backButtonHref="/login"
-                         backButtonLabel="Login new Account"
-                         logo="verify-email">
-                <div className="flex flex-col items-center justify-center text-center">
-                    <p className="text-lg pb-6">
-                        We have sent an email verification to <strong>{email}</strong>
-                    </p>
-                    <p className="text-muted-foreground pb-10">
-                        Please check your inbox or spam folder
-                    </p>
-                    <Button
-                        onClick={handleSubmit}
-                        className="mb-4"
-                        disabled={cooldown > 0}
-                    >
-                        {cooldown > 0 ? `Resend Email (${cooldown}s)` : "Resend Email"}
-                    </Button>
-                    {cooldown > 0 && (
-                        <p className="text-sm text-muted-foreground">
-                            You can resend the verification email in {cooldown} seconds.
-                        </p>
-                    )}
-                </div>
+            <CardWrapper
+                label="Don't have an account?"
+                title="Enter your email for registration"
+                backLabel="Already have an account?"
+                backButtonHref="/login"
+                backButtonLabel="Login here"
+                logo="none"
+            >
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 " noValidate>
+                        <div className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="email"
+                                                placeholder="example@email.com"
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        {status == "error" && (
+                            <AuthErrorMessage formMessage={formMessage}/>
+                        )}
+                        <Button
+                            type="submit"
+                            className="mb-4 w-full"
+                            disabled={cooldown > 0 || formStatus.pending}
+                        >
+                            {cooldown > 0 ? `Please Wait (${cooldown}s)` : status == "loading" ? "Sending..." : isResend ? "Resend Email" : "Send Email"}
+                        </Button>
+                        {cooldown > 0 && (
+                            <p className="text-sm text-muted-foreground">
+                                You can resend the verification email in {cooldown} seconds.
+                            </p>
+                        )}
+                    </form>
+                </Form>
             </CardWrapper>
         </>
     );
 };
 
-export default VerifyEmailCard;
+export default VerifyEmailForm;

@@ -5,9 +5,6 @@ export const RegisterSchema = z
         name: z.string().min(1, {
             message: "Enter your full name",
         }),
-        email: z.string().email({
-            message: "Please enter a valid email address",
-        }),
         password: z.string().min(1, {message: "Enter a password"}),
         // .refine(
         //   (value) =>
