@@ -21,11 +21,8 @@ const ForgotPassword = () => {
         start: startCooldown,
         reset: resetCooldown,
     } = useTimer(0, () => {
-        // Optional: Notify the user when cooldown ends
-        toast({
-            title: "Cooldown Ended",
-            description: "You can now request another password reset.",
-        });
+        setFormMessage("");
+        setDone();
     }, "forgotPasswordCooldown");
 
     const form = useForm<z.infer<typeof ForgotPasswordSchema>>({

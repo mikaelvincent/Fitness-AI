@@ -49,7 +49,7 @@ export const initiateVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema
 
 
         return {
-            success: response.ok,
+            success: true,
             message: responseData.message + " Please check your email",
             status: response.status,
         };

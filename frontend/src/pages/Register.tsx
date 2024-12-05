@@ -82,11 +82,7 @@ const Register = () => {
         start: startCooldown,
         reset: resetCooldown,
     } = useTimer(0, () => {
-        // Optional: Notify the user when cooldown ends
-        toast({
-            title: "Cooldown Ended",
-            description: "You can now resend the verification email.",
-        });
+        setDone();
     }, "registerCooldown");
 
 
@@ -100,6 +96,7 @@ const Register = () => {
 
             console.log("tsx: ", response)
             if (!response?.success && response?.status === 429) {
+                setInvalidInput("others");
                 setError();
                 setResponseMessage(response?.message || "Too many attempts. Please try again later.");
                 startCooldown(response?.retry_after || 60);
@@ -107,11 +104,9 @@ const Register = () => {
             }
 
             if (!response?.success) {
-                console.log("Errors:", response.errorKey);
                 setInvalidInput(response.errorKey ? response.errorKey : "others");
                 setError();
                 setResponseMessage(response?.message || "Registration failed.");
-                console.log(response);
                 return;
             }
 
@@ -121,7 +116,7 @@ const Register = () => {
                 setResponseMessage(response?.message || "Registration successful!");
                 toast({
                     title: "Registration Successful",
-                    description: "You can are now registered.",
+                    description: "You are now registered.",
                 });
                 contextLoginUser(response.data, response.token);
                 navigate("/");

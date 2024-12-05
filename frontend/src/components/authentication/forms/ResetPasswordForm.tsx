@@ -10,11 +10,12 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-import {ResetPasswordSchema} from "@/utils/schema/ResetPasswordSchema.ts";
-import {UseFormStatusReturn} from "@/hooks/useFormStatus";
+import {ResetPasswordSchema} from "@/utils/schema/ResetPasswordSchema";
 import AuthErrorMessage from "../auth-ui/AuthErrorMessage";
 import {UseFormReturn} from "react-hook-form";
 import {z} from "zod";
+import {UseFormStatusReturn} from "@/hooks/useFormStatus";
+
 
 interface ResetPasswordFormProps {
     status: string;
@@ -26,22 +27,34 @@ interface ResetPasswordFormProps {
     cooldown: number;
 }
 
-const LoginForm = ({
-                       status,
-                       formMessage,
-                       formStatus,
-                       form,
-                       onSubmit,
-                       email,
-                       cooldown,
-                   }: ResetPasswordFormProps) => {
+const ResetPasswordForm = ({
+                               status,
+                               formMessage,
+                               formStatus,
+                               form,
+                               onSubmit,
+                               email,
+                               cooldown,
+                           }: ResetPasswordFormProps) => {
     // Determine the message to display
     const getMessage = () => {
-        return formMessage;
+        if (status === "error" && cooldown === 0) {
+            return formMessage;
+        }
+
+        if (cooldown > 0) {
+            return `Too many attempts. Please try again in ${cooldown} second${
+                cooldown !== 1 ? "s" : ""
+            }.`;
+        }
+
+        return "";
     };
 
     // Determine if there's a message to display
-    const displayMessage = (status === "error");
+    const displayMessage =
+        (status === "error" && cooldown === 0) ||
+        cooldown > 0;
 
     return (
         <CardWrapper
@@ -53,7 +66,7 @@ const LoginForm = ({
             logo="none"
         >
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 " noValidate>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" noValidate>
                     <div className="space-y-4">
                         <FormField
                             name="email_display"
@@ -98,7 +111,11 @@ const LoginForm = ({
                                 <FormItem>
                                     <FormLabel>Confirm Password</FormLabel>
                                     <FormControl>
-                                        <Input {...field} type="password" placeholder="******"/>
+                                        <Input
+                                            {...field}
+                                            type="password"
+                                            placeholder="******"
+                                        />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
@@ -113,18 +130,16 @@ const LoginForm = ({
                         className="w-full"
                         disabled={formStatus.pending || cooldown > 0}
                     >
-                        {formStatus.pending ? "Resetting..." : cooldown > 0 ? `Please wait (${cooldown}s)` : "Reset"}
+                        {formStatus.pending
+                            ? "Resetting..."
+                            : cooldown > 0
+                                ? `Please wait (${cooldown}s)`
+                                : "Reset"}
                     </Button>
-
-                    {cooldown > 0 && (
-                        <FormDescription className="text-sm text-muted-foreground">
-                            You can request another password reset in {cooldown} seconds.
-                        </FormDescription>
-                    )}
                 </form>
             </Form>
         </CardWrapper>
     );
 };
 
-export default LoginForm;
+export default ResetPasswordForm;

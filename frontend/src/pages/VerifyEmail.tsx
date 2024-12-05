@@ -31,11 +31,7 @@ const VerifyEmail = () => {
         start: startCooldown,
         reset: resetCooldown,
     } = useTimer(0, () => {
-        // Optional: Notify the user when cooldown ends
-        toast({
-            title: "Cooldown Ended",
-            description: "You can now resend the verification email.",
-        });
+        setDone();
     }, "verifyEmailCooldown");
 
 

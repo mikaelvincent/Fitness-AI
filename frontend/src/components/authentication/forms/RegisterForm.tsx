@@ -35,6 +35,27 @@ const RegisterForm = ({
                           onSubmit,
                           cooldown,
                       }: RegisterFormProps) => {
+
+    // Determine the message to display
+    const getMessage = () => {
+        if (status === "error" && cooldown <= 0) {
+            return formMessage;
+        }
+
+        if (cooldown > 0) {
+            return `Too many attempts. Please try again in ${cooldown} second${
+                cooldown !== 1 ? "s" : ""
+            }.`;
+        }
+
+        return "";
+    };
+
+    // Determine if there's a message to display
+    const displayMessage =
+        (status === "error" && cooldown <= 0) ||
+        cooldown > 0;
+
     return (
         <>
             <CardWrapper
@@ -58,8 +79,8 @@ const RegisterForm = ({
                                             <Input {...field} type="text" placeholder="John Doe"/>
                                         </FormControl>
                                         <FormMessage/>
-                                        {status == "error" && invalidInput == "name" && (
-                                            <AuthErrorMessage formMessage={formMessage}/>
+                                        {status === "error" && invalidInput === "name" && (
+                                            <AuthErrorMessage formMessage={getMessage()}/>
                                         )}
                                     </FormItem>
                                 )}
@@ -74,8 +95,8 @@ const RegisterForm = ({
                                             <Input {...field} type="password" placeholder="******"/>
                                         </FormControl>
                                         <FormMessage/>
-                                        {status == "error" && invalidInput == "password" && (
-                                            <AuthErrorMessage formMessage={formMessage}/>
+                                        {displayMessage && invalidInput === "password" && (
+                                            <AuthErrorMessage formMessage={getMessage()}/>
                                         )}
                                     </FormItem>
                                 )}
@@ -94,21 +115,20 @@ const RegisterForm = ({
                                 )}
                             />
                         </div>
-                        {status == "error" && invalidInput == "others" && (
-                            <AuthErrorMessage formMessage={formMessage}/>
+                        {displayMessage && invalidInput === "others" && (
+                            <AuthErrorMessage formMessage={getMessage()}/>
                         )}
                         <Button
                             type="submit"
                             className="mb-4 w-full"
                             disabled={cooldown > 0 || formStatus.pending}
                         >
-                            {cooldown > 0 ? `Please Wait (${cooldown}s)` : status == "loading" ? "Registering..." : "Register"}
+                            {cooldown > 0
+                                ? `Please Wait (${cooldown}s)`
+                                : status === "loading"
+                                    ? "Registering..."
+                                    : "Register"}
                         </Button>
-                        {cooldown > 0 && (
-                            <p className="text-sm text-muted-foreground">
-                                You can register in {cooldown} seconds.
-                            </p>
-                        )}
                     </form>
                 </Form>
             </CardWrapper>

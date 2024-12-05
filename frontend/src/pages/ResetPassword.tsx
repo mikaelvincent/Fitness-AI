@@ -27,12 +27,9 @@ const ResetPassword = () => {
         start: startCooldown,
         reset: resetCooldown,
     } = useTimer(0, () => {
-        // Optional: Notify the user when cooldown ends
-        toast({
-            title: "Cooldown Ended",
-            description: "You can now request another password reset.",
-        });
-    }, "forgotPasswordCooldown");
+        setFormMessage("");
+        setDone();
+    }, "resetPasswordCooldown");
 
     // Uncomment for development and comment for protected routes
     useEffect(() => {
@@ -88,6 +85,7 @@ const ResetPassword = () => {
             }
 
             if (!response?.success) {
+                console.log("test")
                 setError();
                 setFormMessage(response?.message || "Error resetting password.");
                 return;

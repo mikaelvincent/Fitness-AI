@@ -6,7 +6,7 @@ interface RegisterResponse {
     message: string;
     status?: number;
     token?: string;
-    errors?: string | null;
+    errors?: string;
     retry_after?: number;
     errorKey?: string;
     data?: User;
@@ -18,7 +18,6 @@ interface RegisterDataProps {
     password: string;
     password_confirmation: string;
 }
-
 
 export const registerUser = async (data: RegisterDataProps): Promise<RegisterResponse> => {
     try {
@@ -37,36 +36,39 @@ export const registerUser = async (data: RegisterDataProps): Promise<RegisterRes
 
         const responseData = await response.json();
 
-        console.log("Response:", response);
-        console.log("Registration Response data:", responseData);
+        console.log("Response Status:", response.status);
+        console.log("Registration Response Data:", responseData);
 
         if (!response.ok && response.status === 429) {
+            console.warn("Rate limit exceeded. Retry after:", responseData.retry_after);
             return {
-                success: !response.ok,
-                message: responseData.message,
+                success: false,
+                message: responseData.message || "Too many attempts. Please try again later.",
                 status: response.status,
-                retry_after: responseData.retry_after,
+                retry_after: Number(responseData.retry_after) || 60, // Ensure it's a number
             };
         }
 
         if (!response.ok) {
-            // Assuming the backend sends validation errors in a specific format
-            const errorKeys = Object.keys(responseData.errors);
+            console.error("Registration failed with errors:", responseData.errors);
+            const errorKeys = responseData.errors ? Object.keys(responseData.errors) : [];
             const primaryErrorKey = errorKeys[0] || "others";
             return {
-                success: response.ok,
-                message: responseData.message,
-                errors: responseData.errors[primaryErrorKey],
+                success: false,
+                message: responseData.message || "Registration failed.",
+                errors: responseData.errors ? responseData.errors[primaryErrorKey] : "An unexpected error occurred.",
                 errorKey: primaryErrorKey,
                 status: response.status,
             };
         }
 
+        console.log("Registration successful:", responseData);
         return {
-            success: response.ok,
+            success: true,
             message: responseData.message || "Registration successful!",
-            token: responseData.data.token,
-            data: {name: responseData.data.user.name},
+            token: responseData.data.token, // Adjust based on actual response structure
+            data: responseData.data.user.name, // Ensure this matches the User type
+            status: response.status,
         };
 
     } catch (error) {

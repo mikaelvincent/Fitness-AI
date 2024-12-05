@@ -47,7 +47,7 @@ export const resendVerificationEmail = async (data: z.infer<typeof VerifyEmailSc
 
 
         return {
-            success: response.ok,
+            success: true,
             message: responseData.message || "Verification email resent successfully!",
         };
     } catch (error) {

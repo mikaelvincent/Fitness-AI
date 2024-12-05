@@ -28,14 +28,14 @@ const Login = () => {
     const formStatus = useFormStatus();
 
     const {
-        timeLeft: retryAfter,
-        start: startRetryTimer,
-        reset: resetRetryTimer,
+        timeLeft: cooldown,
+        start: startCooldown,
+        reset: resetCooldown,
     } = useTimer(
         0,
         () => {
-            // Callback when timer expires
             setFormMessage("");
+            setDone();
         },
         "loginRetryTimer"
     );
@@ -62,7 +62,7 @@ const Login = () => {
                 );
                 const retrySeconds = response?.retry_after || 60; // Default to 60 seconds if not provided
                 // Start the retry timer with the specified duration
-                startRetryTimer(retrySeconds);
+                startCooldown(retrySeconds);
                 return;
             }
 
@@ -95,7 +95,7 @@ const Login = () => {
                 formStatus={formStatus}
                 form={form}
                 onSubmit={onSubmit}
-                retryAfter={retryAfter > 0 ? retryAfter : null}
+                cooldown={cooldown}
             />
         </>
     );
