@@ -47,11 +47,6 @@ const ForgotPassword = () => {
             if (!response?.success && response?.status === 429) {
                 setError();
                 setFormMessage(response?.message || "Please try again after a while.");
-                toast({
-                    title: "Error",
-                    description: response?.message || "Please try again after a while.",
-                    variant: "destructive",
-                });
                 startCooldown(response.retry_after || 60);
                 return;
             }
@@ -59,11 +54,6 @@ const ForgotPassword = () => {
             if (!response?.success) {
                 setError();
                 setFormMessage(response?.errors || response?.message || "Failed to send password reset link.");
-                toast({
-                    title: "Error",
-                    description: response?.errors || response?.message || "Failed to send password reset link.",
-                    variant: "destructive",
-                });
                 return;
             }
 
