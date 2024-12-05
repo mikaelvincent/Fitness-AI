@@ -36,13 +36,25 @@ const ForgotPassword = () => {
     });
 
     const onSubmit = async (data: z.infer<typeof ForgotPasswordSchema>) => {
-        formStatus.startSubmission(data, "post", "/api/forgot-password");
+        formStatus.startSubmission(data, "post", "/api/password/forgot");
         setLoading();
 
         try {
             // Await the ForgotPasswordSendEmail call
             const response = await ForgotPasswordSendEmail(data);
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
+
+            if (!response?.success && response?.status === 429) {
+                setError();
+                setFormMessage(response?.message || "Please try again after a while.");
+                toast({
+                    title: "Error",
+                    description: response?.message || "Please try again after a while.",
+                    variant: "destructive",
+                });
+                startCooldown(response.retry_after || 60);
+                return;
+            }
 
             if (!response?.success) {
                 setError();

@@ -7,12 +7,13 @@ interface ForgotPasswordResponse {
     message: string;
     status?: number;
     errors?: string | null;
+    retry_after?: number;
 }
 
 export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswordSchema>): Promise<ForgotPasswordResponse> => {
     console.log("ForgotPasswordSendEmail data:", data);
     try {
-        const url = new URL("/api/forgot-password", ENV.API_URL);
+        const url = new URL("/api/password/forgot", ENV.API_URL);
         const headers = {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -28,28 +29,31 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
 
         console.log("Response data:", responseData);
 
-        if (!response.ok && response.status === 422) {
+        if (!response.ok && response.status === 429) {
             const errorKeys = Object.keys(responseData.errors);
             const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
                 message: primaryErrorKey,
-                errors: responseData.errors[primaryErrorKey] || "The email must be a valid email address.",
                 status: response.status,
+                retry_after: responseData.retry_after || 60,
             };
         }
 
         if (!response.ok) {
+            const errorKeys = Object.keys(responseData.errors);
+            const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
-                message: responseData.message || "Unable to send password reset link.",
+                message: primaryErrorKey,
+                errors: responseData.errors[primaryErrorKey] || "Unable to send password reset link.",
                 status: response.status,
             };
         }
 
         return {
             success: true,
-            message: responseData.message || "Login successful!",
+            message: responseData.message || "Your request has been received. If your email is registered, you will receive a password reset link shortly.",
             status: response.status,
         };
 
