@@ -9,6 +9,8 @@ import {ResetPasswordSchema} from "@/utils/schema/ResetPasswordSchema.ts";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {SendResetPasswordRequest} from "@/services/auth/resetPassword.ts";
 import {toast} from "@/hooks/use-toast";
+import useTimer from "@/hooks/useTimer.tsx";
+
 
 const ResetPassword = () => {
     const location = useLocation();
@@ -18,6 +20,19 @@ const ResetPassword = () => {
     const formStatus = useFormStatus();
     const [email, setEmail] = useState<string>("");
     const [token, setToken] = useState<string>("");
+
+    // Initialize the timer with a 60-second cooldown
+    const {
+        timeLeft: cooldown,
+        start: startCooldown,
+        reset: resetCooldown,
+    } = useTimer(0, () => {
+        // Optional: Notify the user when cooldown ends
+        toast({
+            title: "Cooldown Ended",
+            description: "You can now request another password reset.",
+        });
+    }, "forgotPasswordCooldown");
 
     // Uncomment for development and comment for protected routes
     useEffect(() => {
@@ -43,7 +58,7 @@ const ResetPassword = () => {
     });
 
     const onSubmit = async (data: z.infer<typeof ResetPasswordSchema>) => {
-        formStatus.startSubmission(data, "post", "/api/reset-password");
+        formStatus.startSubmission(data, "post", "/api/password/reset");
         setLoading();
 
         try {
@@ -51,9 +66,17 @@ const ResetPassword = () => {
             const response = await SendResetPasswordRequest({...data, token, email});
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
+            console.log("Response data:", response);
+
+            if (!response?.success && response?.status === 429) {
+                setError();
+                setFormMessage(response?.message || "Too many requests. Try again later.");
+                startCooldown(response.retry_after || 60);
+            }
+
             if (!response?.success) {
                 setError();
-                setFormMessage(response?.errors || response?.message || "Reset password failed.");
+                setFormMessage(response?.errors || response?.message || "The provided token or email is invalid or has expired.");
             }
 
 
@@ -82,7 +105,7 @@ const ResetPassword = () => {
     return (
         <>
             <ResetPasswordForm form={form} onSubmit={onSubmit} formStatus={formStatus} formMessage={formMessage}
-                               status={status} email={email}/>
+                               status={status} email={email} cooldown={cooldown}/>
         </>
     );
 };
