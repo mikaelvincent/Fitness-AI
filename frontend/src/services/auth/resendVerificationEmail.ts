@@ -6,7 +6,6 @@ interface ResendVerificationEmailResponse {
     success: boolean;
     message: string;
     status?: number;
-    errors?: string | null;
     retry_after?: number;
 }
 
