@@ -82,11 +82,6 @@ const Register = () => {
         start: startCooldown,
         reset: resetCooldown,
     } = useTimer(0, () => {
-        // Optional: Notify the user when cooldown ends
-        toast({
-            title: "Cooldown Ended",
-            description: "You can now attempt to register again.",
-        });
         setDone();
     }, "registerCooldown");
 

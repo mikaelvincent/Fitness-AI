@@ -34,7 +34,6 @@ const Login = () => {
     } = useTimer(
         0,
         () => {
-            // Callback when timer expires
             setFormMessage("");
             setDone();
         },
