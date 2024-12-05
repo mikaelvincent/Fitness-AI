@@ -44,7 +44,7 @@ const ResetPassword = () => {
             setToken(tokenParam);
             setEmail(emailParam);
         } else {
-            // If token or email is missing, redirect to login
+            // If token or email is missing, redirect to log in
             navigate("/login", {replace: true});
         }
     }, [location.search, navigate]);
@@ -76,10 +76,10 @@ const ResetPassword = () => {
 
             if (!response?.success && response?.status === 400) {
                 setError();
-                setFormMessage(response?.errors || response?.message || "The provided token or email is invalid or has expired.");
+                setFormMessage(response?.message || "The provided token or email is invalid or has expired.");
                 toast({
                     title: "Error",
-                    description: response?.errors || response?.message || "The provided token or email is invalid or has expired. Please try again.",
+                    description: response?.message || "The provided token or email is invalid or has expired. Please try again.",
                     variant: "destructive",
                 });
                 navigate("/login");
@@ -87,7 +87,7 @@ const ResetPassword = () => {
 
             if (!response?.success) {
                 setError();
-                setFormMessage(response?.errors || response?.message || "Error resetting password.");
+                setFormMessage(response?.message || "Error resetting password.");
             }
 
 
