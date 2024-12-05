@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "29c434dd-bb3a-4f82-b9b4-b49b429632b4",
+        "_postman_id": "3b0fccd9-8549-4a88-97a9-0ffca8607a76",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -70,7 +70,7 @@
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"You have exceeded the maximum number of login attempts. Please try again in {retry_after} seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -104,6 +104,12 @@
                             "code": 200,
                             "body": "{\n  \"message\": \"You have been successfully logged out.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -135,6 +141,12 @@
                             "header": [],
                             "code": 200,
                             "body": "{\n  \"message\": \"Your authentication token has been refreshed successfully.\",\n  \"data\": {\n    \"token\": \"new-example-token\"\n  }\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -180,6 +192,12 @@
                             "code": 200,
                             "body": "{\n  \"message\": \"Your request has been received. If your email is registered, you will receive a password reset link shortly.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -224,6 +242,12 @@
                             "code": 400,
                             "body": "{\n  \"message\": \"The provided token or email is invalid or has expired.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -264,6 +288,12 @@
                             "header": [],
                             "code": 400,
                             "body": "{\n  \"message\": \"The current password you provided does not match our records.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -309,6 +339,12 @@
                             "code": 200,
                             "body": "{\n  \"message\": \"Registration process has been initiated. Please check your email for further instructions.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -346,6 +382,12 @@
                             "header": [],
                             "code": 200,
                             "body": "{\n  \"message\": \"A new verification email has been sent to your address.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -391,6 +433,12 @@
                             "code": 400,
                             "body": "{\n  \"message\": \"The registration token is invalid or has expired.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -435,6 +483,12 @@
                             "code": 400,
                             "body": "{\n  \"message\": \"The registration token provided is invalid or has expired.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 }
@@ -473,6 +527,12 @@
                             "code": 200,
                             "body": "{\n  \"message\": \"Two-factor authentication enabled.\",\n  \"data\": {\n    \"qr_code_url\": \"otpauth:\/\/totp\/AppName:user@example.com?secret=ABCDEF...\",\n    \"recovery_codes\": [\"code1\", \"code2\", \"...\"]\n  }\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -508,6 +568,12 @@
                             "code": 200,
                             "body": "{\n  \"message\": \"Two-factor authentication confirmed.\"\n}",
                             "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "name": ""
                         }
                     ]
                 },
@@ -539,6 +605,12 @@
                             "header": [],
                             "code": 200,
                             "body": "{\n  \"message\": \"Two-factor authentication disabled.\"\n}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]

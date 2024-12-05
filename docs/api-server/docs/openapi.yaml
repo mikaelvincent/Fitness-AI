@@ -52,12 +52,12 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'You have exceeded the maximum number of login attempts. Please try again in {retry_after} seconds.'
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
                   retry_after: 60
                 properties:
                   message:
                     type: string
-                    example: 'You have exceeded the maximum number of login attempts. Please try again in {retry_after} seconds.'
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
                   retry_after:
                     type: integer
                     example: 60
@@ -108,6 +108,22 @@ paths:
                   message:
                     type: string
                     example: 'You have been successfully logged out.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Authentication
   /api/token/refresh:
@@ -137,6 +153,22 @@ paths:
                       token:
                         type: string
                         example: new-example-token
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Authentication
   /api/password/forgot:
@@ -158,6 +190,22 @@ paths:
                   message:
                     type: string
                     example: 'Your request has been received. If your email is registered, you will receive a password reset link shortly.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - 'Password Management'
       requestBody:
@@ -206,6 +254,22 @@ paths:
                   message:
                     type: string
                     example: 'The provided token or email is invalid or has expired.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - 'Password Management'
       requestBody:
@@ -272,6 +336,22 @@ paths:
                   message:
                     type: string
                     example: 'The current password you provided does not match our records.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - 'Password Management'
       requestBody:
@@ -319,6 +399,22 @@ paths:
                   message:
                     type: string
                     example: 'Registration process has been initiated. Please check your email for further instructions.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Registration
       requestBody:
@@ -355,6 +451,22 @@ paths:
                   message:
                     type: string
                     example: 'A new verification email has been sent to your address.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Registration
       requestBody:
@@ -411,6 +523,22 @@ paths:
                   message:
                     type: string
                     example: 'The registration token is invalid or has expired.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Registration
       requestBody:
@@ -454,6 +582,22 @@ paths:
                   message:
                     type: string
                     example: 'The registration token provided is invalid or has expired.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - Registration
       requestBody:
@@ -528,6 +672,22 @@ paths:
                           - ...
                         items:
                           type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - 'Two-Factor Authentication'
   /api/two-factor/confirm:
@@ -549,6 +709,22 @@ paths:
                   message:
                     type: string
                     example: 'Two-factor authentication confirmed.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - 'Two-Factor Authentication'
       requestBody:
@@ -584,6 +760,22 @@ paths:
                   message:
                     type: string
                     example: 'Two-factor authentication disabled.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after: 60
+                properties:
+                  message:
+                    type: string
+                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
+                  retry_after:
+                    type: integer
+                    example: 60
       tags:
         - 'Two-Factor Authentication'
 tags:

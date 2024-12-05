@@ -26,6 +26,11 @@ class PasswordController extends Controller
      * @response 200 {
      *   "message": "Your request has been received. If your email is registered, you will receive a password reset link shortly."
      * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
+     * }
      */
     public function sendResetLink(Request $request)
     {
@@ -59,6 +64,11 @@ class PasswordController extends Controller
      *
      * @response 400 {
      *   "message": "The provided token or email is invalid or has expired."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function reset(Request $request)
@@ -109,6 +119,11 @@ class PasswordController extends Controller
      *
      * @response 400 {
      *   "message": "The current password you provided does not match our records."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function change(Request $request)

@@ -24,6 +24,11 @@ class TokenController extends Controller
      *     "token": "new-example-token"
      *   }
      * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
+     * }
      */
     public function refresh(Request $request)
     {

@@ -30,6 +30,11 @@ class RegistrationController extends Controller
      * @response 200 {
      *   "message": "Registration process has been initiated. Please check your email for further instructions."
      * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
+     * }
      */
     public function initiate(Request $request)
     {
@@ -65,6 +70,11 @@ class RegistrationController extends Controller
      *
      * @response 200 {
      *   "message": "A new verification email has been sent to your address."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function resend(Request $request)
@@ -106,6 +116,11 @@ class RegistrationController extends Controller
      *
      * @response 400 {
      *   "message": "The registration token is invalid or has expired."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function validateToken(Request $request)
@@ -152,6 +167,11 @@ class RegistrationController extends Controller
      *
      * @response 400 {
      *   "message": "The registration token provided is invalid or has expired."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function complete(Request $request)

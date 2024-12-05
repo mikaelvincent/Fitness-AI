@@ -295,7 +295,7 @@ response.json()</code></pre></div>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;You have exceeded the maximum number of login attempts. Please try again in {retry_after} seconds.&quot;,
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
     &quot;retry_after&quot;: 60
 }</code>
  </pre>
@@ -485,6 +485,16 @@ response.json()</code></pre></div>
     &quot;message&quot;: &quot;You have been successfully logged out.&quot;
 }</code>
  </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
     </span>
 <span id="execution-results-POSTapi-logout" hidden>
     <blockquote>Received response<span
@@ -649,6 +659,16 @@ response.json()</code></pre></div>
     &quot;data&quot;: {
         &quot;token&quot;: &quot;new-example-token&quot;
     }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -826,6 +846,16 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;Your request has been received. If your email is registered, you will receive a password reset link shortly.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -1021,6 +1051,16 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;The provided token or email is invalid or has expired.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -1252,6 +1292,16 @@ response.json()</code></pre></div>
     &quot;message&quot;: &quot;The current password you provided does not match our records.&quot;
 }</code>
  </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
     </span>
 <span id="execution-results-POSTapi-password-change" hidden>
     <blockquote>Received response<span
@@ -1463,6 +1513,16 @@ response.json()</code></pre></div>
     &quot;message&quot;: &quot;Registration process has been initiated. Please check your email for further instructions.&quot;
 }</code>
  </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
     </span>
 <span id="execution-results-POSTapi-registration-initiate" hidden>
     <blockquote>Received response<span
@@ -1635,6 +1695,16 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;A new verification email has been sent to your address.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -1821,6 +1891,16 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;The registration token is invalid or has expired.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -2020,6 +2100,16 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;The registration token provided is invalid or has expired.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>
@@ -2231,6 +2321,16 @@ response.json()</code></pre></div>
     }
 }</code>
  </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
     </span>
 <span id="execution-results-POSTapi-two-factor-enable" hidden>
     <blockquote>Received response<span
@@ -2409,6 +2509,16 @@ response.json()</code></pre></div>
     &quot;message&quot;: &quot;Two-factor authentication confirmed.&quot;
 }</code>
  </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
+}</code>
+ </pre>
     </span>
 <span id="execution-results-POSTapi-two-factor-confirm" hidden>
     <blockquote>Received response<span
@@ -2582,6 +2692,16 @@ response.json()</code></pre></div>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;Two-factor authentication disabled.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
+    &quot;retry_after&quot;: 60
 }</code>
  </pre>
     </span>

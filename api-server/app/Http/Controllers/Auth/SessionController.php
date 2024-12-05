@@ -39,9 +39,9 @@ class SessionController extends Controller
      * @response 422 {
      *   "message": "The two-factor authentication code is invalid."
      * }
-     *
+     * 
      * @response 429 {
-     *   "message": "You have exceeded the maximum number of login attempts. Please try again in {retry_after} seconds.",
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
      *   "retry_after": 60
      * }
      */
@@ -99,6 +99,11 @@ class SessionController extends Controller
      *
      * @response 200 {
      *   "message": "You have been successfully logged out."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function logout(Request $request)

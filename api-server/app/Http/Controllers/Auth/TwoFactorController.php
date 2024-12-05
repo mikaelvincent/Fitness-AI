@@ -27,6 +27,11 @@ class TwoFactorController extends Controller
      *     "recovery_codes": ["code1", "code2", "..."]
      *   }
      * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
+     * }
      */
     public function enable(Request $request)
     {
@@ -73,6 +78,11 @@ class TwoFactorController extends Controller
      *
      * @response 200 {
      *   "message": "Two-factor authentication confirmed."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function confirm(Request $request)
@@ -125,6 +135,11 @@ class TwoFactorController extends Controller
      *
      * @response 200 {
      *   "message": "Two-factor authentication disabled."
+     * }
+     * 
+     * @response 429 {
+     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *   "retry_after": 60
      * }
      */
     public function disable(Request $request)
