@@ -47,7 +47,7 @@ const VerifyEmail = () => {
 
             if (!response?.success) {
                 setError();
-                setResponseMessage(response?.errors || response?.message || "Registration Initiation failed.");
+                setResponseMessage(response?.message || "Registration Initiation failed.");
             }
 
             if (!response?.success && response?.status === 429) {
