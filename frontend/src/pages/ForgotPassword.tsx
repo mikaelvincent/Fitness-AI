@@ -66,6 +66,7 @@ const ForgotPassword = () => {
                 });
                 // Start the cooldown timer
                 startCooldown(60);
+                return;
             }
 
         } catch (error) {

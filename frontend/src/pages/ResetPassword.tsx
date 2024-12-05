@@ -72,6 +72,7 @@ const ResetPassword = () => {
                 setError();
                 setFormMessage(response?.message || "Too many requests. Try again later.");
                 startCooldown(response.retry_after || 60);
+                return;
             }
 
             if (!response?.success && response?.status === 400) {
@@ -83,11 +84,13 @@ const ResetPassword = () => {
                     variant: "destructive",
                 });
                 navigate("/login");
+                return;
             }
 
             if (!response?.success) {
                 setError();
                 setFormMessage(response?.message || "Error resetting password.");
+                return;
             }
 
 
@@ -101,6 +104,7 @@ const ResetPassword = () => {
                     description: "Your password has been reset. Please log in with your new password.",
                 });
                 navigate("/login");
+                return;
             }
 
         } catch (error) {
