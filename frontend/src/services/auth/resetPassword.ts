@@ -44,7 +44,6 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
         }
 
         if (!response.ok) {
-            console.log("test")
             return {
                 success: response.ok,
                 message: responseData.message,

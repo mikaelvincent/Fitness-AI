@@ -32,6 +32,7 @@ const ResetPassword = () => {
             title: "Cooldown Ended",
             description: "You can now request another password reset.",
         });
+        setDone();
     }, "resetPasswordCooldown");
 
     // Uncomment for development and comment for protected routes
@@ -88,6 +89,7 @@ const ResetPassword = () => {
             }
 
             if (!response?.success) {
+                console.log("test")
                 setError();
                 setFormMessage(response?.message || "Error resetting password.");
                 return;
