@@ -41,7 +41,7 @@ export const loginUser = async (data: z.infer<typeof LoginSchema>): Promise<Logi
 
         if (!response.ok) {
             return {
-                success: response.ok,
+                success: false,
                 message: responseData.message,
                 status: response.status,
             };

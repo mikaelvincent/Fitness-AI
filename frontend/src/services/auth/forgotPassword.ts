@@ -30,7 +30,7 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
 
         if (!response.ok && response.status === 429) {
             return {
-                success: response.ok,
+                success: false,
                 message: responseData.message || "Please try again after a while.",
                 status: response.status,
                 retry_after: responseData.retry_after || 60,
@@ -39,7 +39,7 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
 
         if (!response.ok) {
             return {
-                success: response.ok,
+                success: false,
                 message: responseData.message || "Failed to send password reset link.",
                 status: response.status,
             };

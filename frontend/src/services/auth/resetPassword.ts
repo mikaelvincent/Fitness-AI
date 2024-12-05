@@ -36,7 +36,7 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
 
         if (!response.ok && response.status === 429) {
             return {
-                success: response.ok,
+                success: false,
                 message: responseData.message || "Too many requests. Try again later.",
                 status: response.status,
                 retry_after: responseData.retry_after,
@@ -45,7 +45,7 @@ export const SendResetPasswordRequest = async (data: ResetPasswordDataProps): Pr
 
         if (!response.ok) {
             return {
-                success: response.ok,
+                success: false,
                 message: responseData.message,
                 status: response.status,
             };
