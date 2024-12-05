@@ -23,7 +23,7 @@ interface LoginFormProps {
     formStatus: UseFormStatusReturn;
     form: UseFormReturn<z.infer<typeof LoginSchema>>;
     onSubmit: (data: z.infer<typeof LoginSchema>) => void | Promise<void>;
-    retryAfter: number | null;
+    cooldown: number;
 }
 
 const LoginForm = ({
@@ -32,17 +32,17 @@ const LoginForm = ({
                        formStatus,
                        form,
                        onSubmit,
-                       retryAfter,
+                       cooldown,
                    }: LoginFormProps) => {
     // Determine the message to display
     const getMessage = () => {
-        if (status === "error" && retryAfter === null) {
+        if (status === "error" && cooldown === 0) {
             return formMessage;
         }
 
-        if (retryAfter !== null && retryAfter > 0) {
-            return `Too many attempts. Please try again in ${retryAfter} second${
-                retryAfter !== 1 ? "s" : ""
+        if (cooldown > 0) {
+            return `Too many attempts. Please try again in ${cooldown} second${
+                cooldown !== 1 ? "s" : ""
             }.`;
         }
 
@@ -51,8 +51,9 @@ const LoginForm = ({
 
     // Determine if there's a message to display
     const displayMessage =
-        (status === "error" && retryAfter === null) ||
-        (retryAfter !== null && retryAfter > 0);
+        (status === "error" && cooldown === 0) ||
+        cooldown > 0;
+
 
     return (
         <CardWrapper
@@ -117,9 +118,9 @@ const LoginForm = ({
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={formStatus.pending || !!retryAfter}
+                        disabled={formStatus.pending || cooldown > 0}
                     >
-                        {status === "loading" ? "Logging in..." : "Login"}
+                        {formStatus.pending ? "Logging in..." : cooldown > 0 ? `Please wait (${cooldown}s)` : "Login"}
                     </Button>
                 </form>
             </Form>
