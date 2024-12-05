@@ -32,7 +32,7 @@ const ResetPassword = () => {
             title: "Cooldown Ended",
             description: "You can now request another password reset.",
         });
-    }, "forgotPasswordCooldown");
+    }, "resetPasswordCooldown");
 
     // Uncomment for development and comment for protected routes
     useEffect(() => {
