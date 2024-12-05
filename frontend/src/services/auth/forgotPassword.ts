@@ -41,7 +41,7 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
         }
 
         if (!response.ok) {
-            const errorKeys = Object.keys(responseData.errors);
+            const errorKeys = Object.keys(responseData.errors) || null;
             const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
@@ -58,7 +58,7 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
         };
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.log("Error during submission:", error);
         return {
             success: false,
             message: "An unexpected error occurred.",
