@@ -27,7 +27,7 @@ const AuthLayout = () => {
                     <ModeToggle/>
                 </div>)}
                 <Logo
-                    className="w-28 lg:w-60"
+                    className="w-60 lg:w-96"
                     alt="Company Logo"
                     toUseTheme={logoTheme}
                     variant="withText"

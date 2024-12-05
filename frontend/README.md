@@ -1,6 +1,7 @@
 # React Application
 
-This project is a React-based web application that includes a structured layout with separate components for `Dashboard`, `Login`, and `NotFound` pages. The root (`/`) page is set to display the `Dashboard` by default.
+This project is a React-based web application that includes a structured layout with separate components for `Home`,
+`Login`, and `NotFound` pages. The root (`/`) page is set to display the `Home` by default.
 
 ## 🚀 Getting Started
 
@@ -39,7 +40,8 @@ To start the development server, run:
 npm run dev
 ```
 
-This will launch the application, and you can access it at [http://localhost:5173](http://localhost:5173) (if using Vite).
+This will launch the application, and you can access it at [http://localhost:5173](http://localhost:5173) (if using
+Vite).
 
 ## Core Folder Structure
 

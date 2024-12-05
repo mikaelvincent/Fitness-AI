@@ -2,12 +2,15 @@
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import AuthLayout from './layout/AuthLayout';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Home.tsx';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import VerifyEmail from './pages/VerifyEmail';
+import Progress from './pages/Progress';
+import Chat from './pages/Chat';
+import Profile from './pages/Profile';
 import {ThemeProvider} from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
@@ -23,7 +26,10 @@ const App = () => {
                 {/*<Routes>*/}
                 {/*    /!* Main layout routes *!/*/}
                 {/*    <Route path="/" element={<ProtectedRoute><MainLayout/> </ProtectedRoute>}>*/}
-                {/*        <Route index element={<Dashboard/>}/>*/}
+                {/*        <Route index element={<Home/>}/>*/}
+                {/*<Route path="progress" element={<Progress/>}/>*/}
+                {/*<Route path="chat" element={<Chat/>}/>*/}
+                {/*<Route path="profile" element={<Profile/>}/>*/}
                 {/*    </Route>*/}
 
                 {/*    /!* Authentication layout routes *!/*/}
@@ -44,7 +50,10 @@ const App = () => {
                 <Routes>
                     {/* Main layout routes */}
                     <Route path="/" element={<MainLayout/>}>
-                        <Route index element={<Dashboard/>}/>
+                        <Route index element={<Home/>}/>
+                        <Route path="progress" element={<Progress/>}/>
+                        <Route path="chat" element={<Chat/>}/>
+                        <Route path="profile" element={<Profile/>}/>
                     </Route>
 
                     {/* Authentication layout routes */}
