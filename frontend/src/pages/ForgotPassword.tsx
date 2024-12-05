@@ -53,7 +53,7 @@ const ForgotPassword = () => {
 
             if (!response?.success) {
                 setError();
-                setFormMessage(response?.errors || response?.message || "Failed to send password reset link.");
+                setFormMessage(response?.message || "Failed to send password reset link.");
                 return;
             }
 

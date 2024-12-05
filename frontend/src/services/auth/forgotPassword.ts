@@ -6,7 +6,6 @@ interface ForgotPasswordResponse {
     success: boolean;
     message: string;
     status?: number;
-    errors?: string | null;
     retry_after?: number;
 }
 
@@ -30,23 +29,18 @@ export const ForgotPasswordSendEmail = async (data: z.infer<typeof ForgotPasswor
         console.log("Response data:", responseData);
 
         if (!response.ok && response.status === 429) {
-            const errorKeys = Object.keys(responseData.errors);
-            const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
-                message: primaryErrorKey,
+                message: responseData.message || "Please try again after a while.",
                 status: response.status,
                 retry_after: responseData.retry_after || 60,
             };
         }
 
         if (!response.ok) {
-            const errorKeys = Object.keys(responseData.errors) || null;
-            const primaryErrorKey = errorKeys[0] || "others";
             return {
                 success: response.ok,
-                message: responseData.message,
-                errors: responseData.errors[primaryErrorKey],
+                message: responseData.message || "Failed to send password reset link.",
                 status: response.status,
             };
         }
