@@ -1,20 +1,20 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import MainLayout from './layout/MainLayout.tsx';
-import AuthLayout from './layout/AuthLayout.tsx';
-import Home from './pages/Home.tsx';
-import Login from './pages/Login.tsx';
-import NotFound from './pages/NotFound.tsx';
-import Register from './pages/Register.tsx';
-import ForgotPassword from './pages/ForgotPassword.tsx';
-import VerifyEmail from './pages/VerifyEmail.tsx';
-import Progress from './pages/Progress.tsx';
-import Chat from './pages/Chat.tsx';
-import Profile from './pages/Profile.tsx';
+import MainLayout from './layout/MainLayout';
+import AuthLayout from './layout/AuthLayout';
+import Home from './pages/Main/Home.tsx';
+import Login from './pages/Auth/Login.tsx';
+import NotFound from './pages/Main/NotFound.tsx';
+import Register from './pages/Auth/Register.tsx';
+import ForgotPassword from './pages/Auth/ForgotPassword.tsx';
+import VerifyEmail from './pages/Auth/VerifyEmail.tsx';
+import Progress from './pages/Main/Progress.tsx';
+import Chat from './pages/Main/Chat.tsx';
+import Profile from './pages/Main/Profile.tsx';
 import { ThemeProvider } from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
-import ResetPassword from "@/pages/ResetPassword.tsx";
+import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
 import { Toaster } from "@/components/ui/toaster";
 
 import SetupLayout from './layout/SetupLayout.tsx';
