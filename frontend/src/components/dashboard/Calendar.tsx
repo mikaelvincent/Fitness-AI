@@ -112,7 +112,7 @@ const Calendar = () => {
     }
 
     return (
-        <div className="flex flex-col h-full bg-background">
+        <div className="flex flex-col h-full">
             <div className="flex items-center py-6 mx-2 sm:mx-8">
                 <Button
                     variant="ghost"
