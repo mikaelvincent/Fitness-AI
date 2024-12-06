@@ -118,12 +118,12 @@ const Calendar = () => {
                     variant="ghost"
                     size="icon"
                     aria-label="Month View"
-                    className="text-primary on-hover:bg-none"
+                    className="dark:text-primary on-hover:bg-none"
                     asChild
                 >
                     <ChevronLeft className="h-8 w-8 sm:14 sm:14"/>
                 </Button>
-                <h2 className="text-2xl font-semibold text-primary">
+                <h2 className="text-lg sm:text-2xl font-semibold dark:text-primary">
                     {formatMonthYear(currentDate)}
                 </h2></div>
 
@@ -131,7 +131,7 @@ const Calendar = () => {
             ">
                 {/* Navigation Buttons with Swipeable Week Header */}
                 <WeekHeaderNavigation onNavigateWeek={navigateWeek}>
-                    <div className="relative overflow-hidden h-12">
+                    <div className="relative overflow-hidden h-10 sm:h-14">
                         <AnimatePresence
                             initial={false}
                             custom={weekTransitionDirection}
