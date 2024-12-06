@@ -1,5 +1,5 @@
 // src/App.jsx
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import AuthLayout from './layout/AuthLayout';
 import Home from './pages/Home.tsx';
@@ -11,17 +11,18 @@ import VerifyEmail from './pages/VerifyEmail';
 import Progress from './pages/Progress';
 import Chat from './pages/Chat';
 import Profile from './pages/Profile';
-import {ThemeProvider} from './components/theme/theme-provider.tsx';
+import { ThemeProvider } from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 import ResetPassword from "@/pages/ResetPassword.tsx";
-import {Toaster} from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
+import SetupLayout from './layout/SetupLayout.tsx';
 
 const App = () => {
     return (
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
             <Router>
-                <Toaster/>
+                <Toaster />
                 {/*Uncomment for protected routes*/}
                 {/*<Routes>*/}
                 {/*    /!* Main layout routes *!/*/}
@@ -49,24 +50,27 @@ const App = () => {
 
                 <Routes>
                     {/* Main layout routes */}
-                    <Route path="/" element={<MainLayout/>}>
-                        <Route index element={<Home/>}/>
-                        <Route path="progress" element={<Progress/>}/>
-                        <Route path="chat" element={<Chat/>}/>
-                        <Route path="profile" element={<Profile/>}/>
+                    <Route path="/" element={<MainLayout />}>
+                        <Route index element={<Home />} />
+                        <Route path="progress" element={<Progress />} />
+                        <Route path="chat" element={<Chat />} />
+                        <Route path="profile" element={<Profile />} />
+                    </Route>
+
+                    <Route path="/" element={<SetupLayout />}>
                     </Route>
 
                     {/* Authentication layout routes */}
-                    <Route path="/" element={<AuthLayout/>}>
-                        <Route path="login" element={<Login/>}/>
-                        <Route path="complete-registration" element={<Register/>}/>
-                        <Route path="verify-email" element={<VerifyEmail/>}/>
-                        <Route path="forgot-password" element={<ForgotPassword/>}/>
-                        <Route path="reset-password" element={<ResetPassword/>}/>
+                    <Route path="/" element={<AuthLayout />}>
+                        <Route path="login" element={<Login />} />
+                        <Route path="complete-registration" element={<Register />} />
+                        <Route path="verify-email" element={<VerifyEmail />} />
+                        <Route path="forgot-password" element={<ForgotPassword />} />
+                        <Route path="reset-password" element={<ResetPassword />} />
                     </Route>
 
                     {/* Catch-all route for 404 */}
-                    <Route path="*" element={<NotFound/>}/>
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
 
             </Router>
