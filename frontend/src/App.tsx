@@ -21,7 +21,7 @@ import SetupLayout from './layout/SetupLayout.tsx';
 import { SetupProvider } from './pages/setup/SetupContext.tsx';
 import GenderStep from './pages/setup/GenderStep.tsx';
 import BirthdateStep from './pages/setup/BirthdateStep.tsx';
-// import WeightStep from './pages/setup/WeightStep.tsx';
+import WeightStep from './pages/setup/WeightStep.tsx';
 // import HeightStep from './pages/setup/HeightStep.tsx';
 // import ActivityStep from './pages/setup/ActivityStep.tsx';
 // import UsernameStep from './pages/setup/UsernameStep.tsx';
@@ -78,8 +78,8 @@ const App = () => {
                     >
                         <Route index element={<GenderStep />} />
                         <Route path="birthdate" element={<BirthdateStep />} />
-                        {/* <Route path="weight" element={<WeightStep />} />
-                        <Route path="height" element={<HeightStep />} />
+                        <Route path="weight" element={<WeightStep />} />
+                        {/* <Route path="height" element={<HeightStep />} />
                         <Route path="activity" element={<ActivityStep />} />
                         <Route path="username" element={<UsernameStep />} />
                         <Route path="summary" element={<SummaryStep />} />  */}
