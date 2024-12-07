@@ -9,7 +9,7 @@ import {ResetPasswordSchema} from "@/utils/schema/ResetPasswordSchema.ts";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {SendResetPasswordRequest} from "@/services/auth/resetPassword.ts";
 import {toast} from "@/hooks/use-toast";
-import useTimer from "@/hooks/useTimer.tsx";
+import useTimer from "@/hooks/useTimer";
 
 
 const ResetPassword = () => {

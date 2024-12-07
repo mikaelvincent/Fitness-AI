@@ -2,19 +2,19 @@
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import AuthLayout from './layout/AuthLayout';
-import Home from './pages/Home.tsx';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import VerifyEmail from './pages/VerifyEmail';
-import Progress from './pages/Progress';
-import Chat from './pages/Chat';
-import Profile from './pages/Profile';
+import Home from './pages/Main/Home.tsx';
+import Login from './pages/Auth/Login.tsx';
+import NotFound from './pages/Main/NotFound.tsx';
+import Register from './pages/Auth/Register.tsx';
+import ForgotPassword from './pages/Auth/ForgotPassword.tsx';
+import VerifyEmail from './pages/Auth/VerifyEmail.tsx';
+import Progress from './pages/Main/Progress.tsx';
+import Chat from './pages/Main/Chat.tsx';
+import Profile from './pages/Main/Profile.tsx';
 import {ThemeProvider} from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
-import ResetPassword from "@/pages/ResetPassword.tsx";
+import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
 import {Toaster} from "@/components/ui/toaster";
 
 const App = () => {
