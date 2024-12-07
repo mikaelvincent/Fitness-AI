@@ -5,6 +5,7 @@ import {ExerciseSet} from "@/components/dashboard/ExerciseSet.tsx";
 import {Exercise, Set} from "@/types/exerciseTypes.ts";
 
 const Home = () => {
+    const [currentDate, setCurrentDate] = useState(new Date())
     const [exercises, setExercises] = useState<Exercise[]>([
         {
             id: 1,
@@ -108,7 +109,7 @@ const Home = () => {
 
     return (
         <div className="flex flex-col w-full h-full space-y-8 xl:px-24 2xl:px-32 border-r-2">
-            <Calendar>
+            <Calendar returnCurrentDate={setCurrentDate}>
                 <div className="space-y-4">
                     {exercises.map(exercise => (
                         <ExerciseSet

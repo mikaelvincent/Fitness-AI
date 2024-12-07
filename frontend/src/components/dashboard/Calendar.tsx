@@ -1,20 +1,19 @@
 // components/Calendar.tsx
 import {useState, useMemo} from 'react'
 import {AnimatePresence} from 'framer-motion'
-import SwipableWeekHeader from './SwipableWeekHeader'
-import WeekHeaderContent from "@/components/dashboard/WeekHeaderContent.tsx";
-import WeekHeaderNavigation from './WeekHeaderNavigation'
+import SwipableWeekHeader from './calendarHeader/SwipableWeekHeader'
+import WeekHeaderContent from "./calendarHeader/WeekHeaderContent.tsx";
+import WeekHeaderNavigation from './calendarHeader/WeekHeaderNavigation'
 import SwipableDayView from './SwipableDayView'
 import {isSameWeek} from '@/utils/dateUtils';
-import {Button} from "@/components/ui/button.tsx";
-import {ChevronLeft} from "lucide-react"; //
 import {ReactNode} from 'react'
 
 interface CalendarProps {
     children: ReactNode
+    returnCurrentDate: (date: Date) => void
 }
 
-const Calendar = ({children}: CalendarProps) => {
+const Calendar = ({children, returnCurrentDate}: CalendarProps) => {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [dayTransitionDirection, setDayTransitionDirection] = useState<'next' | 'prev' | null>(null)
     const [weekTransitionDirection, setWeekTransitionDirection] = useState<'next' | 'prev' | null>(null)
@@ -55,6 +54,7 @@ const Calendar = ({children}: CalendarProps) => {
         }
 
         setCurrentDate(date);
+        returnCurrentDate(date);
     };
 
     const navigateWeek = (direction: 'prev' | 'next') => {
@@ -119,21 +119,11 @@ const Calendar = ({children}: CalendarProps) => {
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center py-6 mx-2 sm:mx-8">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Month View"
-                    className="dark:text-primary on-hover:bg-none"
-                    asChild
-                >
-                    <ChevronLeft className="h-8 w-8 sm:14 sm:14"/>
-                </Button>
                 <h2 className="text-lg sm:text-2xl font-semibold dark:text-primary">
                     {formatMonthYear(currentDate)}
                 </h2></div>
 
-            <div className="bg-muted rounded-lg py-4 sm:mx-8
-            ">
+            <div className="bg-muted rounded-lg py-4 sm:mx-8">
                 {/* Navigation Buttons with Swipeable Week Header */}
                 <WeekHeaderNavigation onNavigateWeek={navigateWeek}>
                     <div className="relative overflow-hidden h-10 sm:h-14">
@@ -175,6 +165,7 @@ const Calendar = ({children}: CalendarProps) => {
                     </SwipableDayView>
                 </AnimatePresence>
             </div>
+            s
         </div>
     )
 }
