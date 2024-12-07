@@ -1,16 +1,11 @@
 import {createContext, useContext, useState, ReactNode} from "react";
 import Cookies from "js-cookie";
 
-// Define the User interface
-export default interface User {
-    name: string;
-}
 
 // Define the context type
 interface UserContextType {
-    user: User | null;
     token: string | null;
-    loginUser: (userData: User, token: string) => void;
+    loginUser: (token: string) => void;
     logoutUser: () => void;
     // fetchUser: () => void;
 }
@@ -34,26 +29,18 @@ interface UserProviderProps {
 
 // UserProvider component
 export const UserProvider = ({children}: UserProviderProps) => {
-    const [user, setUser] = useState<User | null>(() => {
-        // Retrieve user data from cookies if available
-        const savedUser = Cookies.get("user");
-        return savedUser ? (JSON.parse(savedUser) as User) : null;
-    });
 
     const [token, setToken] = useState<string | null>(() => {
         return Cookies.get("token") || null;
     });
 
-    const loginUser = (userData: User, userToken: string) => {
-        setUser(userData);
+    const loginUser = (userToken: string) => {
         setToken(userToken);
-        Cookies.set("user", JSON.stringify(userData), {expires: 1});
         Cookies.set("token", userToken, {expires: 1, secure: true, sameSite: "strict"});
     };
 
     //adjust logout
     const logoutUser = () => {
-        setUser(null);
         setToken(null);
         Cookies.remove("user");
         Cookies.remove("token");
@@ -89,7 +76,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
     // };
 
     return (
-        <UserContext.Provider value={{user, token, loginUser, logoutUser}}>
+        <UserContext.Provider value={{token, loginUser, logoutUser}}>
             {children}
         </UserContext.Provider>
     );
