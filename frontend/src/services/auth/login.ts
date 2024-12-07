@@ -1,13 +1,11 @@
 import {ENV} from "@/utils/env";
 import {LoginSchema} from "@/utils/schema/LoginSchema";
 import {z} from "zod";
-import User from "@/hooks/context/UserContext";
 
 interface LoginResponse {
     success: boolean;
     message: string;
     status?: number;
-    data?: User;
     token?: string;
     retry_after?: number;
 }
@@ -50,7 +48,6 @@ export const loginUser = async (data: z.infer<typeof LoginSchema>): Promise<Logi
         return {
             success: true,
             message: responseData.message || "Login successful!",
-            data: {name: responseData.data.user.name},
             token: responseData.data.token,
         };
 
