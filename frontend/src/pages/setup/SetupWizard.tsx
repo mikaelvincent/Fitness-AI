@@ -22,8 +22,6 @@ const SetupWizard = () => {
     const navigate = useNavigate();
 
     const step = steps[currentStepIndex];
-    const isLastStep = currentStepIndex === steps.length - 1;
-    const isFirstStep = currentStepIndex === 0;
 
     const nextStep = () => setCurrentStepIndex((i) => i + 1);
     const prevStep = () => setCurrentStepIndex((i) => i - 1);
