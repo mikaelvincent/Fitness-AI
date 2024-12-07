@@ -111,7 +111,7 @@ const Register = () => {
             }
 
 
-            if (response?.success && response?.token && response.data) {
+            if (response?.success && response?.token) {
                 setDone();
                 setResponseMessage(response?.message || "Registration successful!");
                 toast({

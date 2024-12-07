@@ -67,7 +67,7 @@ const Login = () => {
             }
 
             // Ensure response.success, response.token, and response.data are all present
-            if (response?.success && response?.token && response.data) {
+            if (response?.success && response?.token) {
                 setDone();
                 setFormMessage(response?.message || "Login successful!");
                 // Set user data and token in UserContext
