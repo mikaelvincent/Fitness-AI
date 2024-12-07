@@ -32,7 +32,6 @@ class SessionControllerTest extends TestCase
                  ->assertJsonStructure([
                      'message',
                      'data' => [
-                         'user' => ['id', 'name', 'email', 'email_verified_at'],
                          'token',
                      ],
                  ]);
@@ -106,7 +105,6 @@ class SessionControllerTest extends TestCase
                  ->assertJsonStructure([
                      'message',
                      'data' => [
-                         'user' => ['id', 'name', 'email', 'email_verified_at'],
                          'token',
                      ],
                  ]);

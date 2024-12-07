@@ -222,7 +222,6 @@ class RegistrationControllerTest extends TestCase
                  ])
                  ->assertJsonStructure([
                      'data' => [
-                         'user' => ['id', 'name', 'email', 'email_verified_at'],
                          'token',
                      ],
                  ]);

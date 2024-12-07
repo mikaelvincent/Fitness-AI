@@ -111,14 +111,14 @@ const Register = () => {
             }
 
 
-            if (response?.success && response?.token && response.data) {
+            if (response?.success && response?.token) {
                 setDone();
                 setResponseMessage(response?.message || "Registration successful!");
                 toast({
                     title: "Registration Successful",
                     description: "You are now registered.",
                 });
-                contextLoginUser(response.data, response.token);
+                contextLoginUser(response.token);
                 navigate("/");
                 return;
             }
