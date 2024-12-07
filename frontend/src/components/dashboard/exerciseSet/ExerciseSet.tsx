@@ -100,7 +100,7 @@ export function ExerciseSet({
     };
 
     return (
-        <div className="p-4 rounded-lg border-b-2 border-b-primary">
+        <div className="p-4 border-b-2 border-b-primary">
             <div className="flex items-center gap-3 mb-2" onClick={() => setIsExpanded(!isExpanded)}>
                 <Button
                     variant="ghost"
