@@ -118,7 +118,7 @@ const Register = () => {
                     title: "Registration Successful",
                     description: "You are now registered.",
                 });
-                contextLoginUser(response.data, response.token);
+                contextLoginUser(response.token);
                 navigate("/");
                 return;
             }
