@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const steps = [
     { id: "gender", title: "What's your gender?" },
-    { id: "birthdate", title: "What's your birthdate?" },
+    { id: "birthdate", title: "When's your birthdate?" },
     { id: "weight", title: "What's your weight?" },
     { id: "height", title: "What's your height?" },
     { id: "activity", title: "What's your level of physical activity?" },
@@ -48,7 +48,7 @@ const SetupWizard = () => {
     const handleChange = (key: string, value: any) => updateData({ [key]: value });
 
     return (
-        <div className="relative w-full max-w-lg mx-auto">
+        <div className="w-full h-full mx-auto">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={step.id}
