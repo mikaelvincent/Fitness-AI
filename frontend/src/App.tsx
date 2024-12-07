@@ -1,26 +1,36 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import MainLayout from './layout/MainLayout';
-import AuthLayout from './layout/AuthLayout';
+import MainLayout from './layout/MainLayout.tsx';
+import AuthLayout from './layout/AuthLayout.tsx';
 import Home from './pages/Home.tsx';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import VerifyEmail from './pages/VerifyEmail';
-import Progress from './pages/Progress';
-import Chat from './pages/Chat';
-import Profile from './pages/Profile';
+import Login from './pages/Login.tsx';
+import NotFound from './pages/NotFound.tsx';
+import Register from './pages/Register.tsx';
+import ForgotPassword from './pages/ForgotPassword.tsx';
+import VerifyEmail from './pages/VerifyEmail.tsx';
+import Progress from './pages/Progress.tsx';
+import Chat from './pages/Chat.tsx';
+import Profile from './pages/Profile.tsx';
 import { ThemeProvider } from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 import ResetPassword from "@/pages/ResetPassword.tsx";
 import { Toaster } from "@/components/ui/toaster";
+
 import SetupLayout from './layout/SetupLayout.tsx';
+import { SetupProvider } from './pages/setup/SetupContext.tsx';
+// import GenderStep from './pages/setup/GenderStep.tsx';
+// import BirthdateStep from './pages/setup/BirthdateStep.tsx';
+// import WeightStep from './pages/setup/WeightStep.tsx';
+// import HeightStep from './pages/setup/HeightStep.tsx';
+// import ActivityStep from './pages/setup/ActivityStep.tsx';
+// import UsernameStep from './pages/setup/UsernameStep.tsx';
+// import SummaryStep from './pages/setup/SummaryStep.tsx';
 
 const App = () => {
     return (
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
+
             <Router>
                 <Toaster />
                 {/*Uncomment for protected routes*/}
@@ -57,7 +67,22 @@ const App = () => {
                         <Route path="profile" element={<Profile />} />
                     </Route>
 
-                    <Route path="/" element={<SetupLayout />}>
+                    {/* Setup process with its own context and layout */}
+                    <Route
+                        path="/setup/*"
+                        element={
+                            <SetupProvider>
+                                <SetupLayout />
+                            </SetupProvider>
+                        }
+                    >
+                        {/* <Route index element={<GenderStep />} />
+                        <Route path="birthdate" element={<BirthdateStep />} />
+                        <Route path="weight" element={<WeightStep />} />
+                        <Route path="height" element={<HeightStep />} />
+                        <Route path="activity" element={<ActivityStep />} />
+                        <Route path="username" element={<UsernameStep />} />
+                        <Route path="summary" element={<SummaryStep />} /> */}
                     </Route>
 
                     {/* Authentication layout routes */}
