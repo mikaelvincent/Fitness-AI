@@ -1,107 +1,75 @@
-import {WeightTrainingData, CardioData, RestDayData} from "@/types/exercise/exerciseTypes.ts";
+// frontend/src/utils/exerciseListSample.ts
+import {Exercise} from '../types/exerciseTypes';
 
-// Sample Weight Training Data
-const weightTrainingSample: WeightTrainingData = {
-    userId: 101,
-    date: "2024-12-08",
-    restDay: false,
-    isWeightTraining: true,
-    exercises: [
-        {
-            id: 1,
-            name: "Bench Press",
-            type: "weight_training",
-            isWeightTraining: true,
-            numSets: 4,
-            sets: [
-                {setNumber: 1, reps: 8, weightKg: 60},
-                {setNumber: 2, reps: 8, weightKg: 60},
-                {setNumber: 3, reps: 8, weightKg: 60},
-                {setNumber: 4, reps: 8, weightKg: 60},
-            ],
-            isCompleted: true,
-            notes: "Increase weight next session",
-        },
-        {
-            id: 2,
-            name: "Deadlift",
-            type: "weight_training",
-            isWeightTraining: true,
-            numSets: 5,
-            sets: [
-                {setNumber: 1, reps: 5, weightKg: 100},
-                {setNumber: 2, reps: 5, weightKg: 100},
-                {setNumber: 3, reps: 5, weightKg: 100},
-                {setNumber: 4, reps: 5, weightKg: 100},
-                {setNumber: 5, reps: 5, weightKg: 100},
-            ],
-            isCompleted: true,
-            notes: "Form was good",
-        },
-        {
-            id: 3,
-            name: "Squats",
-            type: "weight_training",
-            isWeightTraining: true,
-            numSets: 3,
-            sets: [
-                {setNumber: 1, reps: 10, weightKg: 80},
-                {setNumber: 2, reps: 10, weightKg: 80},
-                {setNumber: 3, reps: 10, weightKg: 80},
-            ],
-            isCompleted: false,
-            notes: "Felt heavy on the last set",
-        },
-    ],
-};
-
-// Sample Cardio Data
-const cardioSample: CardioData = {
-    userId: 101,
-    date: "2024-12-09",
-    restDay: false,
-    isWeightTraining: false,
-    isCardio: true,
-    exercises: [
-        {
-            id: 1,
-            name: "Running",
-            type: "cardio",
-            isCompleted: true,
-            notes: "Maintained a steady pace",
-            isCardio: true,
-            distanceKm: 10,
-            timeSeconds: 3030,
-        },
-        {
-            id: 2,
-            name: "Cycling",
-            type: "cardio",
-            isCompleted: false,
-            notes: "Felt fatigued towards the end",
-            isCardio: true,
-            distanceKm: 20,
-            timeSeconds: 2700,
-        },
-        {
-            id: 3,
-            name: "Jump Rope",
-            type: "cardio",
-            isCompleted: true,
-            notes: "Improved endurance",
-            isCardio: true,
-            timeSeconds: 600,
-            // distanceKm is optional and omitted here
-        },
-    ],
-};
-
-// Sample Rest Day Data
-const restDaySample: RestDayData = {
-    userId: 101,
-    date: "2024-12-07",
-    restDay: true,
-    isWeightTraining: false,
-    isCardio: false,
-    exercises: [], // No exercises scheduled
-};
+// Sample list of exercises
+export const sampleExercises: Exercise[] = [
+    {
+        id: 1,
+        name: 'Bench Press',
+        isCompleted: false,
+        notes: 'Focus on form and controlled movements.',
+        isWeightTraining: true,
+        numSets: 4,
+        sets: [
+            {setNumber: 1, reps: 10, weightKg: 60},
+            {setNumber: 2, reps: 8, weightKg: 65},
+            {setNumber: 3, reps: 6, weightKg: 70},
+            {setNumber: 4, reps: 4, weightKg: 75},
+        ],
+    },
+    {
+        id: 2,
+        name: 'Running',
+        isCompleted: true,
+        notes: 'Morning jog around the park.',
+        isWeightTraining: false,
+        distanceKm: 5,
+        timeSeconds: 1500, // 25 minutes
+    },
+    {
+        id: 3,
+        name: 'Squats',
+        isCompleted: false,
+        notes: 'Keep back straight and knees aligned.',
+        isWeightTraining: true,
+        numSets: 3,
+        sets: [
+            {setNumber: 1, reps: 12, weightKg: 80},
+            {setNumber: 2, reps: 10, weightKg: 85},
+            {setNumber: 3, reps: 8, weightKg: 90},
+        ],
+    },
+    {
+        id: 4,
+        name: 'Cycling',
+        isCompleted: true,
+        notes: 'Stationary bike session.',
+        isWeightTraining: false,
+        distanceKm: 4,
+        timeSeconds: 3600, // 60 minutes
+    },
+    {
+        id: 5,
+        name: 'Deadlift',
+        isCompleted: false,
+        notes: 'Warm up properly before lifting heavy.',
+        isWeightTraining: true,
+        numSets: 5,
+        sets: [
+            {setNumber: 1, reps: 5, weightKg: 100},
+            {setNumber: 2, reps: 5, weightKg: 110},
+            {setNumber: 3, reps: 5, weightKg: 120},
+            {setNumber: 4, reps: 5, weightKg: 130},
+            {setNumber: 5, reps: 3, weightKg: 140},
+        ],
+    },
+    {
+        id: 6,
+        name: 'Swimming',
+        isCompleted: false,
+        notes: 'Freestyle laps.',
+        isWeightTraining: false,
+        distanceKm: 2,
+        timeSeconds: 1200, // 20 minutes
+    },
+];
