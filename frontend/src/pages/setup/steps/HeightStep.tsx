@@ -1,5 +1,4 @@
-import React from "react";
-import { Label } from "@/components/ui/label";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 interface HeightStepProps {
@@ -9,65 +8,104 @@ interface HeightStepProps {
 }
 
 export const HeightStep: React.FC<HeightStepProps> = ({ height, heightUnit, onChange }) => {
-    const minCm = 100;
-    const maxCm = 220;
-    const minIn = 39; // ~100cm
-    const maxIn = 87; // ~220cm
+    const minHeightCm = 100;
+    const maxHeightCm = 220;
+    const stepCm = 1;
 
-    const displayedValue = heightUnit === "cm" ? height : Math.round(height / 2.54);
+    const toInches = (cm: number) => Math.round(cm / 2.54);
+    const toCm = (inches: number) => Math.round(inches * 2.54);
 
-    const handleSliderChange = (val: number) => {
-        if (heightUnit === "cm") {
-            onChange("height", val);
-        } else {
-            // convert inches back to cm
-            onChange("height", Math.round(val * 2.54));
-        }
+    const [currentHeightCm, setCurrentHeightCm] = useState(() =>
+        heightUnit === "cm" ? height : toCm(height)
+    );
+
+    const getDisplayHeight = (heightInCm: number) => {
+        return heightUnit === "cm" ? heightInCm : toInches(heightInCm);
     };
 
-    const handleUnitToggle = (unit: "cm" | "in") => {
-        if (unit === "cm" && heightUnit !== "cm") {
-            // Convert from inches to cm
-            onChange("height", Math.round(height * 2.54));
-            onChange("heightUnit", "cm");
-        } else if (unit === "in" && heightUnit !== "in") {
-            // Convert from cm to inches
-            onChange("height", Math.round(height / 2.54));
-            onChange("heightUnit", "in");
-        }
+    useEffect(() => {
+        onChange("height", getDisplayHeight(currentHeightCm));
+    }, [currentHeightCm, heightUnit]);
+
+    const changeHeightBy = (amount: number) => {
+        setCurrentHeightCm((current) => {
+            const newVal = current + amount;
+            return Math.min(Math.max(newVal, minHeightCm), maxHeightCm);
+        });
     };
 
-    const sliderMin = heightUnit === "cm" ? minCm : minIn;
-    const sliderMax = heightUnit === "cm" ? maxCm : maxIn;
+    const handleUnitChange = (unit: "cm" | "in") => {
+        if (unit !== heightUnit) {
+            onChange("heightUnit", unit);
+        }
+    };
 
     return (
-        <div className="space-y-4">
-            <Label>Enter your height</Label>
-            <div className="flex gap-2">
+        <div className="flex flex-col items-center space-y-4">
+            {/* Unit Selection */}
+            <div className="flex gap-4 mb-4">
                 <Button
                     variant={heightUnit === "cm" ? "default" : "outline"}
-                    onClick={() => handleUnitToggle("cm")}
+                    onClick={() => handleUnitChange("cm")}
                 >
-                    cm
+                    CM
                 </Button>
                 <Button
                     variant={heightUnit === "in" ? "default" : "outline"}
-                    onClick={() => handleUnitToggle("in")}
+                    onClick={() => handleUnitChange("in")}
                 >
-                    in
+                    IN
                 </Button>
             </div>
-            <div className="flex flex-col items-center space-y-2 h-64 justify-center">
-                <input
-                    type="range"
-                    min={sliderMin}
-                    max={sliderMax}
-                    value={displayedValue}
-                    onChange={(e) => handleSliderChange(Number(e.target.value))}
-                    className="h-48 w-8 rotate-90 origin-center"
-                    style={{ writingMode: "vertical-rl" }}
-                />
-                <span className="text-xl font-semibold">{displayedValue} {heightUnit}</span>
+
+            {/* Increment/Decrement Section */}
+            <div className="flex items-center space-x-4">
+                {/* Double decrement by 10 */}
+                <Button
+                    onClick={() => changeHeightBy(-10 * stepCm)}
+                    variant="ghost"
+                    className="text-3xl text-gray-400 hover:text-orange-500"
+                >
+                    &#171;
+                </Button>
+                {/* Single decrement by 1 */}
+                <Button
+                    onClick={() => changeHeightBy(-1 * stepCm)}
+                    variant="ghost"
+                    className="text-3xl text-gray-400 hover:text-orange-500"
+                >
+                    &#8249;
+                </Button>
+
+                {/* Display Heights */}
+                <div className="flex items-center space-x-6">
+                    <div className="text-gray-400 text-2xl">
+                        {getDisplayHeight(currentHeightCm - 1)}
+                    </div>
+                    <div className="text-6xl font-bold text-orange-500 scale-110">
+                        {getDisplayHeight(currentHeightCm)}
+                    </div>
+                    <div className="text-gray-400 text-2xl">
+                        {getDisplayHeight(currentHeightCm + 1)}
+                    </div>
+                </div>
+
+                {/* Single increment by 1 */}
+                <Button
+                    onClick={() => changeHeightBy(1 * stepCm)}
+                    variant="ghost"
+                    className="text-3xl text-gray-400 hover:text-orange-500"
+                >
+                    &#8250;
+                </Button>
+                {/* Double increment by 10 */}
+                <Button
+                    onClick={() => changeHeightBy(10 * stepCm)}
+                    variant="ghost"
+                    className="text-3xl text-gray-400 hover:text-orange-500"
+                >
+                    &#187;
+                </Button>
             </div>
         </div>
     );
