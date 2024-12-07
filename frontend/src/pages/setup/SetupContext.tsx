@@ -1,18 +1,18 @@
 import React, { createContext, useContext, useState } from "react";
 
-type SetupData = {
+export interface SetupData {
     gender: string;
     birthdate: string;
-    weight: number | '';
-    height: number | '';
+    weight: number | string;
+    height: number | string;
     activity: string;
     username: string;
-};
+}
 
-type SetupContextType = {
+interface SetupContextType {
     data: SetupData;
     updateData: (partial: Partial<SetupData>) => void;
-};
+}
 
 const SetupContext = createContext<SetupContextType | undefined>(undefined);
 
@@ -37,7 +37,7 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
 };
 
-export const useSetupData = () => {
+export const useSetupData = (): SetupContextType => {
     const context = useContext(SetupContext);
     if (!context) throw new Error("useSetupData must be used within a SetupProvider");
     return context;
