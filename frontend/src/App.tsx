@@ -24,7 +24,7 @@ import BirthdateStep from './pages/setup/BirthdateStep.tsx';
 import WeightStep from './pages/setup/WeightStep.tsx';
 import HeightStep from './pages/setup/HeightStep.tsx';
 import ActivityStep from './pages/setup/ActivityStep.tsx';
-// import UsernameStep from './pages/setup/UsernameStep.tsx';
+import UsernameStep from './pages/setup/UsernameStep.tsx';
 // import SummaryStep from './pages/setup/SummaryStep.tsx';
 
 const App = () => {
@@ -81,8 +81,8 @@ const App = () => {
                         <Route path="weight" element={<WeightStep />} />
                         <Route path="height" element={<HeightStep />} />
                         <Route path="activity" element={<ActivityStep />} />
-                        {/* <Route path="username" element={<UsernameStep />} />
-                        <Route path="summary" element={<SummaryStep />} />  */}
+                        <Route path="username" element={<UsernameStep />} />
+                        {/* <Route path="summary" element={<SummaryStep />} />  */}
                     </Route>
 
                     {/* Authentication layout routes */}
