@@ -138,8 +138,10 @@ export function ExerciseSet({
                             }}
                             className="text-primary hover:text-orange-400 transition-colors"
                             aria-label={isEditingNotes ? "Save notes" : "Edit notes"}
+                            size="icon"
+
                         >
-                            {isEditingNotes ? <Save className="h-5 w-5"/> : <Edit className="h-5 w-5"/>}
+                            {isEditingNotes ? <Save/> : <Edit/>}
                         </Button>
                         {isEditingNotes && (
                             <Button
@@ -150,8 +152,9 @@ export function ExerciseSet({
                                 }}
                                 className="text-red-500 hover:text-red-700 transition-colors ml-2"
                                 aria-label="Cancel editing notes"
+                                size="icon"
                             >
-                                <X className="h-5 w-5"/>
+                                <X/>
                             </Button>
                         )}
                     </div>
@@ -159,7 +162,7 @@ export function ExerciseSet({
                         {sets.map((set) => (
                             <div
                                 key={set.number}
-                                className="flex items-center justify-between text-sm cursor-pointer hover:bg-muted p-2 rounded"
+                                className="flex items-center justify-between text-sm cursor-pointer hover:bg-muted rounded"
                                 onClick={editingSet ? () => {
                                 } : () => handleSetClick(set.number, set.reps, set.weight)}
                             >
@@ -190,10 +193,11 @@ export function ExerciseSet({
                                                 e.stopPropagation();
                                                 handleSaveSet(set.number)
                                             }}
-                                            className="text-primary hover:text-orange-400 transition-colors ml-2"
+                                            className="text-primary hover:text-orange-400 transition-colors"
                                             aria-label="Save set"
+                                            size="icon"
                                         >
-                                            <Save className="h-4 w-4"/>
+                                            <Save/>
                                         </Button>
                                         <Button
                                             variant="ghost"
@@ -201,10 +205,11 @@ export function ExerciseSet({
                                                 e.stopPropagation();
                                                 onDeleteSet(set.number)
                                             }}
-                                            className="text-red-500 hover:text-red-700 transition-colors ml-2"
+                                            className="text-red-500 hover:text-red-700 transition-colors"
                                             aria-label="Delete set"
+                                            size="icon"
                                         >
-                                            <X className="h-4 w-4"/>
+                                            <X/>
                                         </Button>
                                     </div>
                                 ) : (
