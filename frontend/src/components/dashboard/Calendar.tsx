@@ -165,7 +165,6 @@ const Calendar = ({children, returnCurrentDate}: CalendarProps) => {
                     </SwipableDayView>
                 </AnimatePresence>
             </div>
-            s
         </div>
     )
 }
