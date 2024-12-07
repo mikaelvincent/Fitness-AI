@@ -1,4 +1,4 @@
-import {WeightTrainingData, CardioData, RestDayData} from "@/types/exercise/exerciseList.ts";
+import {WeightTrainingData, CardioData, RestDayData} from "@/types/exercise/exerciseTypes.ts";
 
 // Sample Weight Training Data
 const weightTrainingSample: WeightTrainingData = {
