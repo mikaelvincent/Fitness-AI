@@ -2,7 +2,7 @@
 
 import Calendar from "@/components/dashboard/Calendar";
 import {useState} from "react";
-import {ExerciseSet} from "@/components/dashboard/ExerciseSet";
+import {ExerciseSet} from "@/components/dashboard/exerciseSet/ExerciseSet.tsx";
 import {Exercise, Set} from "@/types/exerciseTypes";
 import {sampleExercises} from "@/utils/exerciseListSample";
 

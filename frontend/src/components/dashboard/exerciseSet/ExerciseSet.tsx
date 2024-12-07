@@ -2,9 +2,9 @@
 
 import {useEffect, useState} from "react";
 import {ChevronDown, ChevronUp, Edit, Save, X, Plus, Check} from 'lucide-react';
-import {Button} from "@/components/ui/button";
+import {Button} from "@/components/ui/button.tsx";
 import {motion} from 'framer-motion';
-import {Exercise, Set} from "@/types/exerciseTypes";
+import {Exercise, Set} from "@/types/exerciseTypes.ts";
 
 interface ExerciseSetProps {
     exercise: Exercise;

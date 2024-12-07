@@ -4,7 +4,7 @@ import {AnimatePresence} from 'framer-motion'
 import SwipableWeekHeader from './calendarHeader/SwipableWeekHeader'
 import WeekHeaderContent from "./calendarHeader/WeekHeaderContent.tsx";
 import WeekHeaderNavigation from './calendarHeader/WeekHeaderNavigation'
-import SwipableDayView from './SwipableDayView'
+import SwipableDayView from './exerciseSet/SwipableDayView.tsx'
 import {isSameWeek} from '@/utils/dateUtils';
 import {ReactNode} from 'react'
 
