@@ -15,7 +15,7 @@ const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => 
         case "gender":
             return (
                 <div className="space-y-6">
-                    <p className="text-center text-xl font-semibold text-gray-200">Select Your Gender</p>
+                    <Label htmlFor="Gender">Select your gender</Label>
                     <div className="flex justify-center gap-6">
                         {/* Male Button */}
                         <button
