@@ -1,24 +1,18 @@
 import { Outlet } from "react-router-dom";
 import Logo from "@/components/ui/logo";
-import { ModeToggle } from "@/components/theme/ModeToggle.tsx";
-import { useTheme } from "@/components/theme/theme-provider.tsx";
-import useIsLargeScreen from "@/hooks/useIsLargeScreen.tsx";
-
+import { ModeToggle } from "@/components/theme/ModeToggle";
+import { useTheme } from "@/components/theme/theme-provider";
+import useIsLargeScreen from "@/hooks/useIsLargeScreen";
 
 const SetupLayout = () => {
     const { appliedTheme } = useTheme();
-    const isLargeScreen = useIsLargeScreen(1024); // Adjusted breakpoint for consistency
+    const isLargeScreen = useIsLargeScreen(1024);
 
-    // Determine the theme to use for the Logo
     const logoTheme = isLargeScreen ? "dark" : appliedTheme;
 
     return (
-        <div
-            className={`min-h-screen flex text-foreground flex-col gap-10 md:gap-40 lg:gap-0`}>
-            {/* Header for the authentication layout */}
-            <header
-                className={`flex-none flex justify-between p-6 w-full h-20 bg-background`}
-            >
+        <div className="min-h-screen flex text-foreground flex-col gap-10 md:gap-40 lg:gap-0">
+            <header className="flex-none flex justify-between p-6 w-full h-20 bg-background">
                 <Logo
                     className="w-14 lg:w-20"
                     alt="Company Logo"
@@ -28,9 +22,8 @@ const SetupLayout = () => {
                 <ModeToggle />
             </header>
 
-            {/* Main content area */}
-            <main className="flex-auto flex w-full items-start justify-center lg:items-start lg:flex-col ">
-                <div className="flex-1 flex items-center w-full justify-center h-full">
+            <main className="flex-auto flex w-full items-center justify-center lg:items-start lg:flex-col">
+                <div className="flex-1 flex items-center w-full justify-center h-full p-8">
                     <Outlet />
                 </div>
             </main>
