@@ -27,7 +27,6 @@ class SessionController extends Controller
      * @response 200 {
      *   "message": "Login successful. You are now authenticated.",
      *   "data": {
-     *     "user": {...},
      *     "token": "example-token"
      *   }
      * }
@@ -83,7 +82,6 @@ class SessionController extends Controller
         return response()->json([
             'message' => 'Login successful. You are now authenticated.',
             'data' => [
-                'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
                 'token' => $token,
             ],
         ], 200);
