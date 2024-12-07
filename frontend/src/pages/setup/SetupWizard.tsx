@@ -48,7 +48,7 @@ const SetupWizard = () => {
     const handleChange = (key: string, value: any) => updateData({ [key]: value });
 
     return (
-        <div className="w-full h-full mx-auto">
+        <div className="w-full max-w-lg mx-auto">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={step.id}
