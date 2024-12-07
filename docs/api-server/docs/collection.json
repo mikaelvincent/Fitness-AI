@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "3b0fccd9-8549-4a88-97a9-0ffca8607a76",
+        "_postman_id": "b8c450db-744b-4a9b-a58e-cb3be92a6d94",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -52,7 +52,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Login successful. You are now authenticated.\",\n  \"data\": {\n    \"user\": {...},\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Login successful. You are now authenticated.\",\n  \"data\": {\n    \"token\": \"example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
@@ -475,7 +475,7 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\n  \"message\": \"Registration completed successfully. Welcome aboard!\",\n  \"data\": {\n    \"user\": {...},\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n  \"message\": \"Registration completed successfully. Welcome aboard!\",\n  \"data\": {\n    \"token\": \"example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
