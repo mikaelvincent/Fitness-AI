@@ -195,7 +195,6 @@ class RegistrationController extends Controller
             'name' => $request->name,
             'email' => $registrationToken->email,
             'password' => Hash::make($request->password),
-            'email_verified_at' => now(),
         ]);
 
         $registrationToken->delete();
