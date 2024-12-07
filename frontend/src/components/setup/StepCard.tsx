@@ -24,23 +24,23 @@ export const StepCard: React.FC<StepCardProps> = ({
     isFirstStep = false,
 }) => {
     return (
-        <Card className="w-full mx-auto border-0 relative">
+        <Card className="w-full mx-auto border-0 h-full">
             {/* Header */}
             <CardHeader className="flex justify-center">
                 {/* Back Button in Header */}
                 <div className="flex items-center justify-start">
-                    {!isFirstStep && (
-                        <button
-                            onClick={onPrev}
-                            className="flex items-center text-gray-500 hover:text-gray-700"
-                        >
-                            <MdArrowBack size={24} className="mr-1" />
-                            <span className="text-sm font-medium">Back</span>
-                        </button>
-                    )}
+                    <button
+                        onClick={onPrev}
+                        className={`flex items-center text-gray-500 hover:text-gray-700 ${isFirstStep ? "invisible" : ""
+                            }`}
+                    >
+                        <MdArrowBack size={24} className="mr-1" />
+                        <span className="text-sm font-medium">Back</span>
+                    </button>
                 </div>
                 <CardTitle className="text-3xl lg:text-5xl text-center">{title}</CardTitle>
             </CardHeader>
+
             {/* Content */}
             <CardContent className="space-y-6">
                 {children}

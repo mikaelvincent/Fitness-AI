@@ -12,18 +12,20 @@ const SetupLayout = () => {
 
     return (
         <div className="min-h-screen flex text-foreground flex-col gap-10 md:gap-40 lg:gap-0">
-            <header className="flex-none flex justify-between p-6 w-full h-20 bg-background">
+            <header className="flex-none flex flex-col-reverse justify-center items-center lg:flex-row lg:justify-between pt-6 w-full bg-background">
                 <Logo
-                    className="w-14 lg:w-20"
+                    className={isLargeScreen ? "w-14 lg:w-20" : "w-60 lg:w-96"}
                     alt="Company Logo"
                     toUseTheme={logoTheme}
-                    variant="withoutText"
+                    variant={isLargeScreen ? "withoutText" : "withText"}
                 />
-                <ModeToggle />
+                <div className="flex-none flex pr-2 w-full justify-end">
+                    <ModeToggle />
+                </div>
             </header>
 
-            <main className="flex-auto flex w-full justify-center items-start pt-20 lg:flex-col">
-                <div className="flex-1 flex items-start w-full justify-center h-full p-8">
+            <main className="flex-auto flex w-full items-start justify-center lg:items-start lg:flex-col">
+                <div className="flex-1 items-start w-full justify-center h-full p-8">
                     <Outlet />
                 </div>
             </main>
