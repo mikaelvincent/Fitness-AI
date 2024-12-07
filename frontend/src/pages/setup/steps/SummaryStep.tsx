@@ -6,14 +6,37 @@ interface SummaryStepProps {
 }
 
 export const SummaryStep: React.FC<SummaryStepProps> = ({ data }) => {
+    // Convert birthdate fields into a proper date format
+    const { birthdateDay, birthdateMonth, birthdateYear, weight, weightUnit, height, heightUnit } = data;
+    const birthdateString = `${birthdateYear}-${birthdateMonth.padStart(2, "0")}-${birthdateDay.padStart(2, "0")}`;
+
+    // Convert units if needed for display
+    const displayedWeight = `${weight}${weightUnit}`;
+    const displayedHeight = `${height}${heightUnit}`;
+
     return (
         <div className="space-y-4">
-            <p><strong>Gender:</strong> {data.gender}</p>
-            <p><strong>Birthdate:</strong> {data.birthdate}</p>
-            <p><strong>Weight:</strong> {data.weight} kg</p>
-            <p><strong>Height:</strong> {data.height} cm</p>
-            <p><strong>Activity Level:</strong> {data.activity}</p>
-            <p><strong>Username:</strong> {data.username}</p>
+            <h2 className="text-xl font-semibold text-center mb-4">Review Your Information</h2>
+            <div className="grid gap-4">
+                <div className="p-4 border rounded-lg">
+                    <strong>Gender:</strong> {data.gender}
+                </div>
+                <div className="p-4 border rounded-lg">
+                    <strong>Birthdate:</strong> {birthdateString}
+                </div>
+                <div className="p-4 border rounded-lg">
+                    <strong>Weight:</strong> {displayedWeight}
+                </div>
+                <div className="p-4 border rounded-lg">
+                    <strong>Height:</strong> {displayedHeight}
+                </div>
+                <div className="p-4 border rounded-lg">
+                    <strong>Activity Level:</strong> {data.activity}
+                </div>
+                <div className="p-4 border rounded-lg">
+                    <strong>Username:</strong> {data.username}
+                </div>
+            </div>
         </div>
     );
 };

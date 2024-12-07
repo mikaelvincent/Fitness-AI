@@ -2,9 +2,13 @@ import React, { createContext, useContext, useState } from "react";
 
 export interface SetupData {
     gender: string;
-    birthdate: string;
-    weight: number | string;
-    height: number | string;
+    birthdateDay: string;
+    birthdateMonth: string;
+    birthdateYear: string;
+    weight: number; // We'll store in a base unit, e.g. kg if metric chosen, else lbs.
+    weightUnit: "kg" | "lbs";
+    height: number; // Store in a base unit, e.g. cm if metric chosen, else inches.
+    heightUnit: "cm" | "in";
     activity: string;
     username: string;
 }
@@ -19,9 +23,13 @@ const SetupContext = createContext<SetupContextType | undefined>(undefined);
 export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [data, setData] = useState<SetupData>({
         gender: "",
-        birthdate: "",
-        weight: "",
-        height: "",
+        birthdateDay: "",
+        birthdateMonth: "",
+        birthdateYear: "",
+        weight: 70, // default weight in kg
+        weightUnit: "kg",
+        height: 170, // default height in cm
+        heightUnit: "cm",
         activity: "",
         username: "",
     });

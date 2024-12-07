@@ -31,17 +31,48 @@ const SetupWizard = () => {
         navigate("/");
     };
 
-    const canGoNext = () => {
+    const isAtLeast13 = (): boolean => {
+        const { birthdateDay, birthdateMonth, birthdateYear } = data;
+        if (!birthdateDay || !birthdateMonth || !birthdateYear) return false;
+
+        const birthDate = new Date(
+            Number(birthdateYear),
+            Number(birthdateMonth) - 1,
+            Number(birthdateDay)
+        );
+        if (isNaN(birthDate.getTime())) return false; // Invalid date check
+
+        const today = new Date();
+        const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
+
+        return birthDate <= thirteenYearsAgo;
+    };
+
+
+    const canGoNext = (): boolean => {
         switch (step.id) {
-            case "gender": return data.gender !== "";
-            case "birthdate": return data.birthdate !== "";
-            case "weight": return data.weight !== "";
-            case "height": return data.height !== "";
-            case "activity": return data.activity !== "";
-            case "username": return data.username !== "";
-            default: return true;
+            case "gender":
+                return data.gender.trim() !== ""; // Check if gender is non-empty
+            case "birthdate":
+                return (
+                    data.birthdateDay.trim() !== "" &&
+                    data.birthdateMonth.trim() !== "" &&
+                    data.birthdateYear.trim() !== "" &&
+                    isAtLeast13() // Ensure the user is at least 13
+                );
+            case "weight":
+                return data.weight > 0; // Ensure weight is a positive number
+            case "height":
+                return data.height > 0; // Ensure height is a positive number
+            case "activity":
+                return data.activity.trim() !== ""; // Check if activity is non-empty
+            case "username":
+                return data.username.trim() !== ""; // Check if username is non-empty
+            default:
+                return true;
         }
     };
+
 
     const handleChange = (key: string, value: any) => updateData({ [key]: value });
 
