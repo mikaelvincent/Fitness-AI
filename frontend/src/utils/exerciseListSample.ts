@@ -1,5 +1,5 @@
 // frontend/src/utils/exerciseListSample.ts
-import {Exercise} from '../types/exerciseTypes';
+import {Exercise} from '@/types/exerciseTypes';
 
 // Sample list of exercises
 export const sampleExercises: Exercise[] = [
