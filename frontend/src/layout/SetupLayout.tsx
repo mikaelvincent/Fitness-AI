@@ -22,8 +22,8 @@ const SetupLayout = () => {
                 <ModeToggle />
             </header>
 
-            <main className="flex-auto flex w-full items-center justify-center lg:items-start lg:flex-col">
-                <div className="flex-1 flex items-center w-full justify-center h-full p-8">
+            <main className="flex-auto flex w-full justify-center items-start pt-20 lg:flex-col">
+                <div className="flex-1 flex items-start w-full justify-center h-full p-8">
                     <Outlet />
                 </div>
             </main>
