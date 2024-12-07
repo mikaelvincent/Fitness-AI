@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
-import {Circle, ChevronDown, ChevronUp, Edit, Save, X, Plus} from 'lucide-react'
+import {ChevronDown, ChevronUp, Edit, Save, X, Plus, Check} from 'lucide-react'
 import {Button} from "@/components/ui/button"
-
+import {motion} from 'framer-motion'
 
 interface Set {
     number: number
@@ -85,13 +85,26 @@ export function ExerciseSet({
                         e.stopPropagation();
                         onToggle();
                     }}
-                    size="default"
-                    className="text-primary hover:text-orange-400 rounded-full transition-colors h-9 w-6"
-                    aria-label={isCompleted ? "Mark exercise as incomplete" : "Mark exercise as complete"}
-                >
-                    <Circle
-                        className={`h-9 w-6 ${isCompleted ? "fill-primary" : ""}`}
-                    />
+                    size="icon"
+                    className={`text-primary hover:bg-primary rounded-full border-2 border-primary h-8 w-8 ${isCompleted ? "bg-primary" : ""}`}
+                    aria-label={isCompleted ? "Mark exercise as incomplete" : "Mark exercise as complete"}>
+                    <motion.span
+                        key={isCompleted ? "completed" : "incomplete"}
+                        initial={{
+                            rotate: isCompleted ? 0 : 180,
+                            scale: isCompleted ? 1 : 0.8,
+                            opacity: isCompleted ? 1 : 0
+                        }}
+                        animate={{
+                            rotate: isCompleted ? 0 : 180,
+                            scale: isCompleted ? 1 : 0.8,
+                            opacity: isCompleted ? 1 : 0
+                        }}
+                        transition={{type: "spring", stiffness: 300, damping: 20}}
+                        className="inline-block"
+                    >
+                        <Check size={20} strokeWidth={3} className="text-background"/>
+                    </motion.span>
                 </Button>
                 <h3 className="text-xl font-semibold flex-grow">{title}</h3>
                 <div
