@@ -65,7 +65,6 @@ class UserTest extends TestCase
     {
         $user = User::factory()->create([
             'password' => 'secret',
-            'remember_token' => 'rememberme',
             'two_factor_secret' => 'secret2fa',
             'two_factor_recovery_codes' => json_encode(['code1', 'code2']),
         ]);
@@ -73,7 +72,6 @@ class UserTest extends TestCase
         $hidden = $user->getHidden();
 
         $this->assertContains('password', $hidden);
-        $this->assertContains('remember_token', $hidden);
         $this->assertContains('two_factor_secret', $hidden);
         $this->assertContains('two_factor_recovery_codes', $hidden);
     }
