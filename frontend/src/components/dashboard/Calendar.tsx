@@ -7,6 +7,7 @@ import WeekHeaderNavigation from './calendarHeader/WeekHeaderNavigation'
 import SwipableDayView from './exerciseSet/SwipableDayView.tsx'
 import {isSameWeek} from '@/utils/dateUtils';
 import {ReactNode} from 'react'
+import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
 
 interface CalendarProps {
     children: ReactNode
@@ -147,22 +148,25 @@ const Calendar = ({children, returnCurrentDate}: CalendarProps) => {
                     </div>
                 </WeekHeaderNavigation>
             </div>
-            <div className="relative flex-1 overflow-x-hidden overflow-y-visible mt-4">
-                <AnimatePresence
-                    initial={false}
-                    custom={dayTransitionDirection}
-                    onExitComplete={() => setDayTransitionDirection(null)}
-                >
-                    <SwipableDayView
-                        key={currentDate.getTime()}
-                        direction={dayTransitionDirection}
-                        onNavigateDay={navigateDay}
-                        variants={variants}
+            <ScrollArea className="w-full h-full">
+                <div className="relative flex-1 mt-4">
+                    <AnimatePresence
+                        initial={false}
+                        custom={dayTransitionDirection}
+                        onExitComplete={() => setDayTransitionDirection(null)}
                     >
-                        {children}
-                    </SwipableDayView>
-                </AnimatePresence>
-            </div>
+                        <SwipableDayView
+                            key={currentDate.getTime()}
+                            direction={dayTransitionDirection}
+                            onNavigateDay={navigateDay}
+                            variants={variants}
+                        >
+                            {children}
+                        </SwipableDayView>
+                    </AnimatePresence>
+                </div>
+                <ScrollBar orientation="horizontal"/>
+            </ScrollArea>
         </div>
     )
 }
