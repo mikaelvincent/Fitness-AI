@@ -2,6 +2,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FaMars, FaVenus, FaGenderless } from "react-icons/fa";
 
 type StepContentProps = {
     stepId: string;
@@ -13,18 +14,39 @@ const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => 
     switch (stepId) {
         case "gender":
             return (
-                <div className="space-y-2">
-                    <Label htmlFor="gender">Select your gender</Label>
-                    <Select onValueChange={(val) => onChange("gender", val)} defaultValue={data.gender}>
-                        <SelectTrigger id="gender">
-                            <SelectValue placeholder="Select..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="space-y-6">
+                    <p className="text-center text-xl font-semibold text-gray-200">Select Your Gender</p>
+                    <div className="flex justify-center gap-6">
+                        {/* Male Button */}
+                        <button
+                            className={`flex flex-col items-center justify-center p-4 rounded-full w-24 h-24 border-2 transition-all ${data.gender === "male" ? "bg-orange-500 border-orange-600 text-white" : "border-gray-600 text-gray-400"
+                                }`}
+                            onClick={() => onChange("gender", "male")}
+                        >
+                            <FaMars size={30} />
+                            <span className="mt-2 text-sm font-medium">Male</span>
+                        </button>
+
+                        {/* Female Button */}
+                        <button
+                            className={`flex flex-col items-center justify-center p-4 rounded-full w-24 h-24 border-2 transition-all ${data.gender === "female" ? "bg-orange-500 border-orange-600 text-white" : "border-gray-600 text-gray-400"
+                                }`}
+                            onClick={() => onChange("gender", "female")}
+                        >
+                            <FaVenus size={30} />
+                            <span className="mt-2 text-sm font-medium">Female</span>
+                        </button>
+
+                        {/* Other Button
+                        <button
+                            className={`flex flex-col items-center justify-center p-4 rounded-full w-24 h-24 border-2 transition-all ${data.gender === "other" ? "bg-orange-500 border-orange-600 text-white" : "border-gray-600 text-gray-400"
+                                }`}
+                            onClick={() => onChange("gender", "other")}
+                        >
+                            <FaGenderless size={30} />
+                            <span className="mt-2 text-sm font-medium">Other</span>
+                        </button> */}
+                    </div>
                 </div>
             );
 
