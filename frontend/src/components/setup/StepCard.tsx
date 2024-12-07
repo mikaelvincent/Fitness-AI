@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MdArrowBack } from "react-icons/md";
@@ -24,29 +25,26 @@ export const StepCard: React.FC<StepCardProps> = ({
     isFirstStep = false,
 }) => {
     return (
-        <Card className="w-full mx-auto border-0 h-full">
-            {/* Header */}
+        <Card className="w-full mx-auto border-0">
             <CardHeader className="flex justify-center">
-                {/* Back Button in Header */}
-                <div className="flex items-center justify-start">
-                    <button
-                        onClick={onPrev}
-                        className={`flex items-center text-gray-500 hover:text-gray-700 ${isFirstStep ? "invisible" : ""
-                            }`}
-                    >
-                        <MdArrowBack size={24} className="mr-1" />
-                        <span className="text-sm font-medium">Back</span>
-                    </button>
+                <div className="flex items-cente justify-start">
+                    {!isFirstStep && (
+                        <button
+                            onClick={onPrev}
+                            className="flex items-center text-gray-500 hover:text-gray-700"
+                        >
+                            <MdArrowBack size={24} className="mr-1" />
+                            <span className="text-sm font-medium">Back</span>
+                        </button>
+                    )}
                 </div>
-                <CardTitle className="text-3xl lg:text-5xl text-center">{title}</CardTitle>
+                <CardTitle className="text-3xl lg:text-5xl text-center w-full">{title}</CardTitle>
             </CardHeader>
 
-            {/* Content */}
             <CardContent className="space-y-6">
                 {children}
             </CardContent>
 
-            {/* Footer */}
             <CardFooter className="flex justify-center space-x-2">
                 {!isLastStep && (
                     <Button onClick={onNext} disabled={!canGoNext}>
