@@ -76,7 +76,7 @@ const App = () => {
                             </SetupProvider>
                         }
                     >
-                        <Route index element={<GenderStep />} />
+                        <Route path="gender" element={<GenderStep />} />
                         <Route path="birthdate" element={<BirthdateStep />} />
                         <Route path="weight" element={<WeightStep />} />
                         <Route path="height" element={<HeightStep />} />

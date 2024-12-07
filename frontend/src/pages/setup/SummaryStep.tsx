@@ -10,8 +10,7 @@ const SummaryStep = () => {
     const handleFinish = () => {
         // Submit data to server or finalize setup
         console.log("User data:", data);
-        // Navigate to dashboard or another page
-        navigate("/dashboard");
+        navigate("/");
     };
 
     return (
