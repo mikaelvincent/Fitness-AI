@@ -119,23 +119,21 @@ const Home = () => {
     };
 
     return (
-        <div className="flex flex-col w-full h-full space-y-8 xl:px-24 2xl:px-32 border-r-2">
+        <div className="flex flex-col w-full h-full xl:px-24 2xl:px-32">
             <Calendar returnCurrentDate={setCurrentDate}>
-                <div className="space-y-4">
-                    {exercises.map(exercise => (
-                        <ExerciseSet
-                            key={exercise.id}
-                            exercise={exercise}  // Pass the entire exercise object
-                            onToggle={() => toggleExerciseCompletion(exercise.id)}
-                            onUpdateSet={(setNumber, updatedSet) => updateExerciseSet(exercise.id, setNumber, updatedSet)}
-                            onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
-                            onAddSet={() => addExerciseSet(exercise.id)}
-                            onDeleteSet={(setNumber) => deleteExerciseSet(exercise.id, setNumber)}
-                            onUpdateCardioDistance={(distanceKm) => updateCardioDistance(exercise.id, distanceKm ? distanceKm : 0)}
-                            onUpdateCardioTime={(timeSeconds) => updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)}
-                        />
-                    ))}
-                </div>
+                {exercises.map(exercise => (
+                    <ExerciseSet
+                        key={exercise.id}
+                        exercise={exercise}  // Pass the entire exercise object
+                        onToggle={() => toggleExerciseCompletion(exercise.id)}
+                        onUpdateSet={(setNumber, updatedSet) => updateExerciseSet(exercise.id, setNumber, updatedSet)}
+                        onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
+                        onAddSet={() => addExerciseSet(exercise.id)}
+                        onDeleteSet={(setNumber) => deleteExerciseSet(exercise.id, setNumber)}
+                        onUpdateCardioDistance={(distanceKm) => updateCardioDistance(exercise.id, distanceKm ? distanceKm : 0)}
+                        onUpdateCardioTime={(timeSeconds) => updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)}
+                    />
+                ))}
             </Calendar>
         </div>
     );

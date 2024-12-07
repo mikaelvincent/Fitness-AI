@@ -147,7 +147,7 @@ const Calendar = ({children, returnCurrentDate}: CalendarProps) => {
                     </div>
                 </WeekHeaderNavigation>
             </div>
-            <div className="relative flex-1 overflow-hidden mt-4">
+            <div className="relative flex-1 overflow-x-hidden overflow-y-visible mt-4">
                 <AnimatePresence
                     initial={false}
                     custom={dayTransitionDirection}
@@ -159,9 +159,7 @@ const Calendar = ({children, returnCurrentDate}: CalendarProps) => {
                         onNavigateDay={navigateDay}
                         variants={variants}
                     >
-                        <div className="flex-1 overflow-y-auto p-4">
-                            {children}
-                        </div>
+                        {children}
                     </SwipableDayView>
                 </AnimatePresence>
             </div>
