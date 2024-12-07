@@ -160,7 +160,6 @@ class RegistrationController extends Controller
      * @response 201 {
      *   "message": "Registration completed successfully. Welcome aboard!",
      *   "data": {
-     *     "user": {...},
      *     "token": "example-token"
      *   }
      * }
@@ -204,7 +203,6 @@ class RegistrationController extends Controller
         return response()->json([
             'message' => 'Registration completed successfully. Welcome aboard!',
             'data' => [
-                'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
                 'token' => $token,
             ],
         ], 201);
