@@ -8,127 +8,17 @@ import SwipableDayView from './SwipableDayView'
 import {isSameWeek} from '@/utils/dateUtils';
 import {Button} from "@/components/ui/button.tsx";
 import {ChevronLeft} from "lucide-react"; //
-import {ExerciseSet} from './ExerciseSet'
+import {ReactNode} from 'react'
 
-interface Set {
-    number: number
-    reps: number
-    weight: number
+interface CalendarProps {
+    children: ReactNode
 }
 
-interface Exercise {
-    id: number
-    title: string
-    sets: Set[]
-    notes: string
-    isCompleted: boolean
-}
-
-const Calendar = () => {
+const Calendar = ({children}: CalendarProps) => {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [dayTransitionDirection, setDayTransitionDirection] = useState<'next' | 'prev' | null>(null)
     const [weekTransitionDirection, setWeekTransitionDirection] = useState<'next' | 'prev' | null>(null)
 
-    const [exercises, setExercises] = useState<Exercise[]>([
-        {
-            id: 1,
-            title: "Pull Ups",
-            notes: "Use a wide grip",
-            sets: [
-                {number: 1, reps: 10, weight: 10},
-                {number: 2, reps: 10, weight: 15},
-                {number: 3, reps: 8, weight: 20},
-            ],
-            isCompleted: false
-        },
-        {
-            id: 2,
-            title: "Push Ups",
-            notes: "1 arm",
-            sets: [
-                {number: 1, reps: 12, weight: 0},
-                {number: 2, reps: 12, weight: 0},
-                {number: 3, reps: 10, weight: 0},
-            ],
-            isCompleted: true
-        },
-        {
-            id: 3,
-            title: "Squats",
-            notes: "",
-            sets: [
-                {number: 1, reps: 15, weight: 50},
-                {number: 2, reps: 12, weight: 60},
-                {number: 3, reps: 10, weight: 70},
-            ],
-            isCompleted: false
-        }
-    ])
-
-    const toggleExerciseCompletion = (id: number) => {
-        setExercises(prevExercises =>
-            prevExercises.map(exercise =>
-                exercise.id === id
-                    ? {...exercise, isCompleted: !exercise.isCompleted}
-                    : exercise
-            )
-        )
-    }
-
-    const updateExerciseSet = (exerciseId: number, setNumber: number, updatedSet: Set) => {
-        setExercises(prevExercises =>
-            prevExercises.map(exercise =>
-                exercise.id === exerciseId
-                    ? {
-                        ...exercise,
-                        sets: exercise.sets.map(set =>
-                            set.number === setNumber ? updatedSet : set
-                        )
-                    }
-                    : exercise
-            )
-        )
-    }
-
-    const addExerciseSet = (exerciseId: number) => {
-        setExercises(prevExercises =>
-            prevExercises.map(exercise => {
-                if (exercise.id === exerciseId) {
-                    const nextSetNumber = exercise.sets.length > 0 ? Math.max(...exercise.sets.map(s => s.number)) + 1 : 1
-                    const newSet: Set = {
-                        number: nextSetNumber,
-                        reps: 0, // Default reps
-                        weight: 0 // Default weight
-                    }
-                    return {
-                        ...exercise,
-                        sets: [...exercise.sets, newSet]
-                    }
-                }
-                return exercise
-            })
-        )
-    }
-
-    const deleteExerciseSet = (exerciseId: number, setNumber: number) => {
-        setExercises(prevExercises =>
-            prevExercises.map(exercise => {
-                if (exercise.id === exerciseId) {
-                    const updatedSets = exercise.sets.filter(set => set.number !== setNumber)
-                    // Optionally, re-number the remaining sets to maintain order
-                    const renumberedSets = updatedSets.map((set, index) => ({
-                        ...set,
-                        number: index + 1
-                    }))
-                    return {
-                        ...exercise,
-                        sets: renumberedSets
-                    }
-                }
-                return exercise
-            })
-        )
-    }
 
     const weekDates = useMemo(() => {
         const dates = []
@@ -280,30 +170,7 @@ const Calendar = () => {
                         variants={variants}
                     >
                         <div className="flex-1 overflow-y-auto p-4">
-                            <div className="space-y-4">
-                                {exercises.map(exercise => (
-                                    <ExerciseSet
-                                        key={exercise.id}
-                                        title={exercise.title}
-                                        sets={exercise.sets}
-                                        isCompleted={exercise.isCompleted}
-                                        onToggle={() => toggleExerciseCompletion(exercise.id)}
-                                        onUpdateSet={(setNumber, updatedSet) => updateExerciseSet(exercise.id, setNumber, updatedSet)}
-                                        notes={exercise.notes}
-                                        onUpdateNotes={(notes) => {
-                                            setExercises(prevExercises =>
-                                                prevExercises.map(ex =>
-                                                    ex.id === exercise.id
-                                                        ? {...ex, notes}
-                                                        : ex
-                                                )
-                                            )
-                                        }}
-                                        onAddSet={() => addExerciseSet(exercise.id)}
-                                        onDeleteSet={(setNumber) => deleteExerciseSet(exercise.id, setNumber)}
-                                    />
-                                ))}
-                            </div>
+                            {children}
                         </div>
                     </SwipableDayView>
                 </AnimatePresence>
