@@ -18,14 +18,8 @@ import ResetPassword from "@/pages/ResetPassword.tsx";
 import { Toaster } from "@/components/ui/toaster";
 
 import SetupLayout from './layout/SetupLayout.tsx';
-import { SetupProvider } from './pages/setup/SetupContext.tsx';
-import GenderStep from './pages/setup/GenderStep.tsx';
-import BirthdateStep from './pages/setup/BirthdateStep.tsx';
-import WeightStep from './pages/setup/WeightStep.tsx';
-import HeightStep from './pages/setup/HeightStep.tsx';
-import ActivityStep from './pages/setup/ActivityStep.tsx';
-import UsernameStep from './pages/setup/UsernameStep.tsx';
-import SummaryStep from './pages/setup/SummaryStep.tsx';
+import { SetupProvider } from './pages/setup/SetupContext';
+import SetupWizard from './pages/setup/SetupWizard';
 
 const App = () => {
     return (
@@ -68,21 +62,16 @@ const App = () => {
                     </Route>
 
                     {/* Setup process with its own context and layout */}
+                    {/* Single route for setup wizard */}
                     <Route
-                        path="/setup/*"
+                        path="/setup"
                         element={
                             <SetupProvider>
                                 <SetupLayout />
                             </SetupProvider>
                         }
                     >
-                        <Route path="gender" element={<GenderStep />} />
-                        <Route path="birthdate" element={<BirthdateStep />} />
-                        <Route path="weight" element={<WeightStep />} />
-                        <Route path="height" element={<HeightStep />} />
-                        <Route path="activity" element={<ActivityStep />} />
-                        <Route path="username" element={<UsernameStep />} />
-                        <Route path="summary" element={<SummaryStep />} />
+                        <Route index element={<SetupWizard />} />
                     </Route>
 
                     {/* Authentication layout routes */}

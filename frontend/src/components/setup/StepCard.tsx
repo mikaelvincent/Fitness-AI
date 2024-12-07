@@ -1,12 +1,12 @@
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
-interface StepProps {
+interface StepCardProps {
     title: string;
     children: React.ReactNode;
     footer?: React.ReactNode;
 }
 
-export const StepCard: React.FC<StepProps> = ({ title, children, footer }) => {
+export const StepCard: React.FC<StepCardProps> = ({ title, children, footer }) => {
     return (
         <Card className="w-full max-w-md mx-auto">
             <CardHeader>
