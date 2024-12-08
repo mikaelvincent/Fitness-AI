@@ -2,15 +2,7 @@ import {Button} from "@/components/ui/button";
 import AuthErrorMessage from "../auth-ui/AuthErrorMessage";
 import CardWrapper from "@/components/authentication/auth-ui/CardWrapper.tsx";
 import {Input} from "@/components/ui/input.tsx"; // Import AuthErrorMessage if needed
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
 import {UseFormStatusReturn} from "@/hooks/useFormStatus.tsx";
 import {UseFormReturn} from "react-hook-form";
 import {z} from "zod";

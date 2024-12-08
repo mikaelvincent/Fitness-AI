@@ -7,9 +7,9 @@ interface PublicRouteProps {
 }
 
 const PublicRoute = ({children}: PublicRouteProps) => {
-    const {user} = useUser();
+    const {token} = useUser();
 
-    if (user) {
+    if (token) {
         // If user is authenticated, redirect to dashboard
         return <Navigate to="/" replace/>;
     }
