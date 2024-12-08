@@ -1,12 +1,11 @@
 // components/Calendar.tsx
-import {useState, useMemo} from 'react'
+import {ReactNode, useMemo, useState} from 'react'
 import {AnimatePresence} from 'framer-motion'
 import SwipableWeekHeader from './calendarHeader/SwipableWeekHeader'
 import WeekHeaderContent from "./calendarHeader/WeekHeaderContent.tsx";
 import WeekHeaderNavigation from './calendarHeader/WeekHeaderNavigation'
 import SwipableDayView from './exerciseSet/SwipableDayView.tsx'
 import {isSameWeek} from '@/utils/dateUtils';
-import {ReactNode} from 'react'
 import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area"
 
 interface CalendarProps {

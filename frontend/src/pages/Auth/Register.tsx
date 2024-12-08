@@ -1,5 +1,5 @@
 import RegisterForm from "@/components/authentication/forms/RegisterForm";
-import {useState, useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {RegisterSchema} from "@/utils/schema/RegisterSchema";
 import {useForm} from "react-hook-form";
@@ -63,7 +63,7 @@ const Register = () => {
 
     useEffect(() => {
         if (token) {
-            validateToken();
+            validateToken().then(r => r);
         }
     }, [token, navigate]);
 

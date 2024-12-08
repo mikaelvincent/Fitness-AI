@@ -1,6 +1,6 @@
 // components/SwipableWeekHeader.tsx
 
-import {motion, useMotionValue, animate} from 'framer-motion'
+import {animate, motion, useMotionValue} from 'framer-motion'
 import {useSwipeable} from 'react-swipeable'
 import {ReactNode} from 'react'
 
