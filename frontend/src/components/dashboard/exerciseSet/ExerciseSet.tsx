@@ -23,6 +23,7 @@ interface ExerciseSetProps {
   onDeleteSet: (setNumber: number) => void;
   onUpdateCardioDistance?: (distanceKm: number | undefined) => void;
   onUpdateCardioTime?: (timeSeconds: number | undefined) => void;
+  totalSets: number;
 }
 
 export function ExerciseSet({
@@ -34,6 +35,7 @@ export function ExerciseSet({
   onDeleteSet,
   onUpdateCardioDistance,
   onUpdateCardioTime,
+  totalSets,
 }: ExerciseSetProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [editingSet, setEditingSet] = useState<number | null>(null);
@@ -220,12 +222,12 @@ export function ExerciseSet({
           {exercise.isWeightTraining && (
             <div className="space-y-2">
               <h4 className="font-semibold">Sets:</h4>
-              {exercise.sets?.map((set) => (
+              {exercise.sets?.map((set, index) => (
                 <div
                   key={set.setNumber}
                   className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
                 >
-                  <span>Set {set.setNumber}</span>
+                  <span>Set {index + 1}</span>
                   {editingSet === set.setNumber ? (
                     <div className="flex items-center gap-2">
                       <input
@@ -401,9 +403,12 @@ export function ExerciseSet({
                         e.stopPropagation();
                         handleTimeCancel();
                       }}
-                      className="ml-2 text-red-500 transition-colors hover:text-red-700"
+                      className={`text-red-500 transition-colors hover:text-red-700 ${
+                        totalSets <= 1 ? "cursor-not-allowed opacity-50" : ""
+                      }`}
                       aria-label="Cancel editing time"
                       size="icon"
+                      disabled={totalSets <= 1}
                     >
                       <X />
                     </Button>

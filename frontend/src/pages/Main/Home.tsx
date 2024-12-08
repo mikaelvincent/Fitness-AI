@@ -1,7 +1,7 @@
 // frontend/src/pages/Home.tsx
 
 import Calendar from "@/components/dashboard/Calendar";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet.tsx";
 import { Exercise, Set } from "@/types/exerciseTypes";
 import { sampleExercises } from "@/utils/exerciseListSample";
@@ -18,6 +18,38 @@ const Home = () => {
     type: "weight" | "cardio";
     name: string;
   } | null>(null);
+
+  // Refs for handling focus and click outside
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Effect to handle clicks outside the input container to cancel adding a new exercise
+  useEffect(() => {
+    if (!newExercise) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        handleCancelNewExercise();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup the event listener on unmount or when newExercise changes
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [newExercise]);
+
+  // Effect to focus the input when a new exercise is being added
+  useEffect(() => {
+    if (newExercise && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [newExercise]);
 
   // Toggle completion status for any exercise
   const toggleExerciseCompletion = (id: number) => {
@@ -84,15 +116,14 @@ const Home = () => {
           const updatedSets = exercise.sets?.filter(
             (set) => set.setNumber !== setNumber,
           );
-          // Re-number the remaining sets to maintain order
-          const renumberedSets = updatedSets?.map((set, index) => ({
-            ...set,
-            setNumber: index + 1,
-          }));
+          // Ensure at least one set remains
+          if (updatedSets && updatedSets.length === 0) {
+            return exercise; // Do not delete the last set
+          }
           return {
             ...exercise,
-            sets: renumberedSets,
-            numSets: renumberedSets?.length,
+            sets: updatedSets,
+            numSets: updatedSets?.length,
           };
         }
         return exercise;
@@ -215,41 +246,48 @@ const Home = () => {
             onUpdateCardioTime={(timeSeconds) =>
               updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)
             }
+            totalSets={exercise.sets ? exercise.sets.length : 0}
           />
         ))}
 
         {/* Render input box for new exercise if exists */}
         {newExercise && (
-          <div className="mt-4 rounded border-b-2 border-b-primary p-4">
+          <div
+            className="flex gap-2 rounded border-b-2 border-b-primary p-4"
+            ref={containerRef}
+            onClick={(e) => e.stopPropagation()}
+          >
             <input
               type="text"
               value={newExercise.name}
               onChange={(e) => handleNewExerciseNameChange(e.target.value)}
-              placeholder={
-                newExercise.type === "weight"
-                  ? "Enter weight training exercise"
-                  : "Enter cardio exercise"
-              }
+              placeholder="Enter workout name..."
               className="mb-2 w-full rounded bg-zinc-700 px-2 py-1 text-sm"
+              ref={inputRef}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSaveNewExercise();
+                } else if (e.key === "Escape") {
+                  handleCancelNewExercise();
+                }
+              }}
             />
-            <div className="flex justify-end gap-2">
-              <Button
-                onClick={handleSaveNewExercise}
-                className="text-primary hover:text-orange-400"
-                disabled={newExercise.name.trim() === ""}
-                variant="ghost"
-                size="sm"
-              >
-                <Save />
-              </Button>
-              <Button
-                onClick={handleCancelNewExercise}
-                variant="ghost"
-                className="text-red-500 hover:text-red-700"
-              >
-                <X />
-              </Button>
-            </div>
+            <Button
+              onClick={handleSaveNewExercise}
+              className="text-primary hover:text-orange-400"
+              disabled={newExercise.name.trim() === ""}
+              variant="ghost"
+              size="sm"
+            >
+              <Save />
+            </Button>
+            <Button
+              onClick={handleCancelNewExercise}
+              variant="ghost"
+              className="text-red-500 hover:text-red-700"
+            >
+              <X />
+            </Button>
           </div>
         )}
       </Calendar>
