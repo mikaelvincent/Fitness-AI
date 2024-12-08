@@ -6,7 +6,7 @@ use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TokenController;
 use App\Http\Controllers\Auth\TwoFactorController;
-use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\Profile\ProfileController;
 
 // Registration Routes
 Route::group([], function () {
@@ -23,6 +23,8 @@ Route::group([], function () {
 // Authentication Routes
 Route::post('/login', [SessionController::class, 'login'])
     ->middleware('custom.rate_limiter:authentication');
+Route::post('/token/refresh', [TokenController::class, 'refresh'])
+    ->middleware('auth:sanctum');
 Route::post('/logout', [SessionController::class, 'logout'])
     ->middleware('auth:sanctum');
 
@@ -34,19 +36,12 @@ Route::post('/password/reset', [PasswordController::class, 'reset'])
 Route::post('/password/change', [PasswordController::class, 'change'])
     ->middleware('auth:sanctum');
 
-// Token Refresh Route
-Route::post('/token/refresh', [TokenController::class, 'refresh'])
-    ->middleware('auth:sanctum');
-
 // Two-Factor Authentication Routes
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/two-factor/enable', [TwoFactorController::class, 'enable']);
     Route::post('/two-factor/confirm', [TwoFactorController::class, 'confirm']);
     Route::post('/two-factor/disable', [TwoFactorController::class, 'disable']);
-});
 
-// Profile Routes
-// Route::middleware(['auth:sanctum'])->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'show']);
-//     Route::put('/profile', [ProfileController::class, 'update']);
-// });
+// Profile Retrieval Route
+Route::get('/profile', [ProfileController::class, 'show']);
+});
