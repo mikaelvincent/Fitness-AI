@@ -78,14 +78,8 @@ export const WeightStep: React.FC<WeightStepProps> = ({ weight, weightUnit, onCh
                     &#8249;
                 </Button>
                 <div className="flex items-center space-x-6">
-                    <div className="text-gray-400 text-2xl">
-                        {getDisplayWeight(currentWeightKg - 1)}
-                    </div>
                     <div className="text-6xl font-bold text-orange-500 scale-110">
                         {getDisplayWeight(currentWeightKg)}
-                    </div>
-                    <div className="text-gray-400 text-2xl">
-                        {getDisplayWeight(currentWeightKg + 1)}
                     </div>
                 </div>
                 {/* Single increment by 1 */}

@@ -59,7 +59,7 @@ export const HeightStep: React.FC<HeightStepProps> = ({ height, heightUnit, onCh
             </div>
 
             {/* Increment/Decrement Section */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
                 {/* Double decrement by 10 */}
                 <Button
                     onClick={() => changeHeightBy(-10 * stepCm)}
@@ -79,14 +79,8 @@ export const HeightStep: React.FC<HeightStepProps> = ({ height, heightUnit, onCh
 
                 {/* Display Heights */}
                 <div className="flex items-center space-x-6">
-                    <div className="text-gray-400 text-2xl">
-                        {getDisplayHeight(currentHeightCm - 1)}
-                    </div>
                     <div className="text-6xl font-bold text-orange-500 scale-110">
                         {getDisplayHeight(currentHeightCm)}
-                    </div>
-                    <div className="text-gray-400 text-2xl">
-                        {getDisplayHeight(currentHeightCm + 1)}
                     </div>
                 </div>
 
