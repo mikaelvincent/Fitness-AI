@@ -64,4 +64,51 @@ class ProfileController extends Controller
             'message' => 'Profile updated successfully.',
         ], 200);
     }
+
+    /**
+     * Retrieve the authenticated user's profile and optional filtered attributes.
+     *
+     * @group Profile Management
+     * @authenticated
+     *
+     * @queryParam attributes string Optional comma-separated list of attribute keys to retrieve. Example: key1,key2
+     *
+     * @response 200 {
+     *   "user_id": 1,
+     *   "attributes": {
+     *     "key1": "value1",
+     *     "key2": "value2"
+     *   }
+     * }
+     *
+     * @response 401 {
+     *   "message": "User not authenticated."
+     * }
+     */
+    public function show(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not authenticated.'
+            ], 401);
+        }
+
+        // Retrieve all attributes
+        $allAttributes = $this->attributesRepository->getAttributesForUser($user->id);
+
+        // If 'attributes' query parameter present, filter the attributes
+        $requestedKeys = $request->query('attributes');
+        if ($requestedKeys !== null) {
+            $keys = array_filter(array_map('trim', explode(',', $requestedKeys)));
+            $filtered = $allAttributes->only($keys);
+        } else {
+            $filtered = $allAttributes;
+        }
+
+        return response()->json([
+            'user_id' => $user->id,
+            'attributes' => $filtered
+        ], 200);
+    }
 }
