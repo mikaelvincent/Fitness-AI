@@ -11,12 +11,15 @@ export const UsernameStep: React.FC<UsernameStepProps> = ({ username, onChange }
     return (
         <div className="space-y-2">
             <Label htmlFor="username">Enter your preferred username</Label>
-            <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => onChange("username", e.target.value)}
-            />
+            <div className="flex justify-center">
+                <Input
+                    className="w-3/4"
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => onChange("username", e.target.value)}
+                />
+            </div>
         </div>
     );
 };
