@@ -31,7 +31,7 @@ const SetupWizard = () => {
         navigate("/");
     };
 
-    const isAtLeast13 = (): boolean => {
+    const isAtLeast13AtMost100 = (): boolean => {
         const { birthdateDay, birthdateMonth, birthdateYear } = data;
         if (!birthdateDay || !birthdateMonth || !birthdateYear) return false;
 
@@ -44,8 +44,9 @@ const SetupWizard = () => {
 
         const today = new Date();
         const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
+        const hundredYearsAgo = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
 
-        return birthDate <= thirteenYearsAgo;
+        return birthDate <= thirteenYearsAgo && birthDate >= hundredYearsAgo;
     };
 
 
@@ -58,7 +59,7 @@ const SetupWizard = () => {
                     data.birthdateDay.trim() !== "" &&
                     data.birthdateMonth.trim() !== "" &&
                     data.birthdateYear.trim() !== "" &&
-                    isAtLeast13() // Ensure the user is at least 13
+                    isAtLeast13AtMost100() // Ensure the user is at least 13
                 );
             case "weight":
                 return data.weight > 0; // Ensure weight is a positive number
