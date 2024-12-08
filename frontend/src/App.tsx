@@ -11,12 +11,13 @@ import VerifyEmail from './pages/Auth/VerifyEmail.tsx';
 import Progress from './pages/Main/Progress.tsx';
 import Chat from './pages/Main/Chat.tsx';
 import Profile from './pages/Main/Profile.tsx';
-import { ThemeProvider } from './components/theme/theme-provider.tsx';
+
+import {ThemeProvider} from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
-import { Toaster } from "@/components/ui/toaster";
-
+import {Toaster} from "@/components/ui/toaster";
+        
 import SetupLayout from './layout/SetupLayout.tsx';
 import { SetupProvider } from './pages/setup/SetupContext';
 import SetupWizard from './pages/setup/SetupWizard';
