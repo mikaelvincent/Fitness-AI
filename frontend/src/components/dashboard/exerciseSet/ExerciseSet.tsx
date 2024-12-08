@@ -17,27 +17,30 @@ import { Exercise, Set } from "@/types/exerciseTypes.ts";
 interface ExerciseSetProps {
   exercise: Exercise;
   onToggle: () => void;
+  isExpanded: boolean;
+  onExpandToggle: () => void;
+  totalSets: number;
   onUpdateSet: (setNumber: number, updatedSet: Set) => void;
   onUpdateNotes: (newNotes: string) => void;
   onAddSet: () => void;
   onDeleteSet: (setNumber: number) => void;
   onUpdateCardioDistance?: (distanceKm: number | undefined) => void;
   onUpdateCardioTime?: (timeSeconds: number | undefined) => void;
-  totalSets: number;
 }
 
 export function ExerciseSet({
   exercise,
   onToggle,
+  isExpanded,
+  onExpandToggle,
+  totalSets,
   onUpdateSet,
   onUpdateNotes,
   onAddSet,
   onDeleteSet,
   onUpdateCardioDistance,
   onUpdateCardioTime,
-  totalSets,
 }: ExerciseSetProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [editingSet, setEditingSet] = useState<number | null>(null);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [tempNotes, setTempNotes] = useState(exercise.notes);
@@ -119,10 +122,7 @@ export function ExerciseSet({
 
   return (
     <div className="border-b-2 border-b-primary p-4">
-      <div
-        className="mb-2 flex items-center gap-3"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
+      <div className="mb-2 flex items-center gap-3" onClick={onExpandToggle}>
         <Button
           variant="ghost"
           onClick={(e) => {

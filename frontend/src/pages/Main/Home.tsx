@@ -13,11 +13,13 @@ const Home = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [exercises, setExercises] = useState<Exercise[]>(sampleExercises);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
   const [newExercise, setNewExercise] = useState<{
     type: "weight" | "cardio";
     name: string;
   } | null>(null);
+  const [expandedExerciseId, setExpandedExerciseId] = useState<number | null>(
+    null,
+  );
 
   // Refs for handling focus and click outside
   const inputRef = useRef<HTMLInputElement>(null);
@@ -59,6 +61,13 @@ const Home = () => {
           ? { ...exercise, isCompleted: !exercise.isCompleted }
           : exercise,
       ),
+    );
+  };
+
+  // Function to handle expanding/collapsing exercises
+  const handleExpandToggle = (exerciseId: number) => {
+    setExpandedExerciseId((prevId) =>
+      prevId === exerciseId ? null : exerciseId,
     );
   };
 
@@ -230,8 +239,11 @@ const Home = () => {
         {exercises.map((exercise) => (
           <ExerciseSet
             key={exercise.id}
-            exercise={exercise} // Pass the entire exercise object
+            exercise={exercise}
             onToggle={() => toggleExerciseCompletion(exercise.id)}
+            isExpanded={exercise.id === expandedExerciseId}
+            onExpandToggle={() => handleExpandToggle(exercise.id)}
+            totalSets={exercise.sets ? exercise.sets.length : 0}
             onUpdateSet={(setNumber, updatedSet) =>
               updateExerciseSet(exercise.id, setNumber, updatedSet)
             }
@@ -246,7 +258,6 @@ const Home = () => {
             onUpdateCardioTime={(timeSeconds) =>
               updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)
             }
-            totalSets={exercise.sets ? exercise.sets.length : 0}
           />
         ))}
 
