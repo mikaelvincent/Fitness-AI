@@ -12,15 +12,17 @@ import Progress from './pages/Main/Progress.tsx';
 import Chat from './pages/Main/Chat.tsx';
 import Profile from './pages/Main/Profile.tsx';
 
-import {ThemeProvider} from './components/theme/theme-provider.tsx';
+import { ThemeProvider } from './components/theme/theme-provider.tsx';
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute.tsx";
 import PublicRoute from "@/components/protected-routes/PublicRoute.tsx";
 import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
-import {Toaster} from "@/components/ui/toaster";
-        
+import { Toaster } from "@/components/ui/toaster";
+
 import SetupLayout from './layout/SetupLayout.tsx';
 import { SetupProvider } from './pages/setup/SetupContext';
 import SetupWizard from './pages/setup/SetupWizard';
+
+import ChatPage from './pages/ChatPage.tsx';
 
 const App = () => {
     return (
@@ -53,6 +55,7 @@ const App = () => {
 
                 {/*For development to remove protected routes*/}
 
+
                 <Routes>
                     {/* Main layout routes */}
                     <Route path="/" element={<MainLayout />}>
@@ -74,6 +77,8 @@ const App = () => {
                     >
                         <Route index element={<SetupWizard />} />
                     </Route>
+
+                    <Route path="/initial-chat" element={<ChatPage />} />
 
                     {/* Authentication layout routes */}
                     <Route path="/" element={<AuthLayout />}>
