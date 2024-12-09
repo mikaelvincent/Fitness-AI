@@ -8,6 +8,7 @@ import {
   Edit,
   Plus,
   Save,
+  Trash2,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
@@ -26,6 +27,7 @@ interface ExerciseSetProps {
   onDeleteSet: (setNumber: number) => void;
   onUpdateCardioDistance?: (distanceKm: number | undefined) => void;
   onUpdateCardioTime?: (timeSeconds: number | undefined) => void;
+  onDeleteExercise: () => void;
 }
 
 export function ExerciseSet({
@@ -40,6 +42,7 @@ export function ExerciseSet({
   onDeleteSet,
   onUpdateCardioDistance,
   onUpdateCardioTime,
+  onDeleteExercise,
 }: ExerciseSetProps) {
   const [editingSet, setEditingSet] = useState<number | null>(null);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -274,7 +277,7 @@ export function ExerciseSet({
                         aria-label="Delete set"
                         size="icon"
                       >
-                        <X />
+                        <Trash2 />
                       </Button>
                     </div>
                   ) : (
@@ -288,20 +291,6 @@ export function ExerciseSet({
                   )}
                 </div>
               ))}
-              <div className="flex w-full justify-end">
-                <Button
-                  variant="link"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddSet();
-                  }}
-                  className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
-                  aria-label="Add new set"
-                >
-                  <Plus strokeWidth={2.75} />
-                  Add Set
-                </Button>
-              </div>
             </div>
           )}
 
@@ -438,6 +427,36 @@ export function ExerciseSet({
               </div>
             </div>
           )}
+          <div
+            className={`flex w-full ${exercise.isWeightTraining ? "justify-between" : "justify-start"}`}
+          >
+            <Button
+              variant="destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteExercise();
+              }}
+              className="mt-2 flex items-center rounded p-2"
+              aria-label="Add new set"
+            >
+              <Trash2 strokeWidth={2.75} />
+              Exercise
+            </Button>
+            {exercise.isWeightTraining && (
+              <Button
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddSet();
+                }}
+                className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
+                aria-label="Add new set"
+              >
+                <Plus strokeWidth={2.75} />
+                Set
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </div>

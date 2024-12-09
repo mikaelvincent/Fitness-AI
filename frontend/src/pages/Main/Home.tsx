@@ -225,6 +225,13 @@ const Home = () => {
     setNewExercise(null);
   };
 
+  // Function to delete an exercise
+  const deleteExercise = (exerciseId: number) => {
+    setExercises((prevExercises) =>
+      prevExercises.filter((exercise) => exercise.id !== exerciseId),
+    );
+  };
+
   return (
     <div className="flex h-full w-full flex-col lg:px-16 xl:px-24 2xl:px-32">
       {/* **Backdrop Rendering** */}
@@ -257,6 +264,7 @@ const Home = () => {
             onUpdateCardioTime={(timeSeconds) =>
               updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)
             }
+            onDeleteExercise={() => deleteExercise(exercise.id)}
           />
         ))}
 
