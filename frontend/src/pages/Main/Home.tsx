@@ -6,8 +6,7 @@ import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet.tsx"
 import { Exercise, Set } from "@/types/exerciseTypes";
 import { sampleExercises } from "@/utils/exerciseListSample";
 import AddWorkoutButton from "@/components/dashboard/AddWorkoutButton.tsx";
-import { Button } from "@/components/ui/button";
-import { Save, X } from "lucide-react";
+import NewExercise from "@/components/dashboard/NewExercise.tsx";
 
 const Home = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -261,45 +260,17 @@ const Home = () => {
           />
         ))}
 
-        {/* Render input box for new exercise if exists */}
+        {/* Render the NewExercise component if newExercise exists */}
         {newExercise && (
-          <div
-            className="flex gap-2 rounded border-b-2 border-b-primary p-4"
-            ref={containerRef}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <input
-              type="text"
-              value={newExercise.name}
-              onChange={(e) => handleNewExerciseNameChange(e.target.value)}
-              placeholder="Enter workout name..."
-              className="mb-2 w-full rounded bg-zinc-700 px-2 py-1 text-sm"
-              ref={inputRef}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSaveNewExercise();
-                } else if (e.key === "Escape") {
-                  handleCancelNewExercise();
-                }
-              }}
-            />
-            <Button
-              onClick={handleSaveNewExercise}
-              className="text-primary hover:text-orange-400"
-              disabled={newExercise.name.trim() === ""}
-              variant="ghost"
-              size="sm"
-            >
-              <Save />
-            </Button>
-            <Button
-              onClick={handleCancelNewExercise}
-              variant="ghost"
-              className="text-red-500 hover:text-red-700"
-            >
-              <X />
-            </Button>
-          </div>
+          <NewExercise
+            type={newExercise.type}
+            name={newExercise.name}
+            onNameChange={handleNewExerciseNameChange}
+            onSave={handleSaveNewExercise}
+            onCancel={handleCancelNewExercise}
+            containerRef={containerRef}
+            inputRef={inputRef}
+          />
         )}
       </Calendar>
       <AddWorkoutButton
