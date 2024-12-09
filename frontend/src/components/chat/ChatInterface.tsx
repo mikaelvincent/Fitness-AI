@@ -24,7 +24,7 @@ const ChatInterface: React.FC = () => {
                 { sender: "ai", message: "This is a mock response. How can I help you?" },
             ]);
             setIsLoading(false);
-        }, 100);
+        }, 2000);
     };
 
     useEffect(() => {
@@ -45,7 +45,7 @@ const ChatInterface: React.FC = () => {
                 <div>
                     <button
                         onClick={handleBack}
-                        className="flex items-center text-gray-500 hover:text-gray-100"
+                        className="flex items-center text-gray-500"
                     >
                         <MdArrowBack size={24} />
                         <span className="ml-1 text-sm font-medium">Back</span>
@@ -61,11 +61,12 @@ const ChatInterface: React.FC = () => {
                 <div className="flex justify-center mt-4">
                     <button
                         onClick={() => console.log("Generate workout clicked")}
-                        className="flex items-center text-primary hover:text-gray-100"
+                        className="flex items-center text-primary hover:text-white transition-colors rounded-lg px-3 py-2"
                     >
                         <RiAiGenerate size={24} />
                         <span className="ml-1 text-sm font-medium">Generate Workout</span>
                     </button>
+
                 </div>
 
             </header>
@@ -79,14 +80,13 @@ const ChatInterface: React.FC = () => {
                             ))}
                             <div ref={chatEndRef} />
                         </div>
-
-                        {isLoading && (
-                            <div className="text-lg text-center animate-pulse mt-4">
-                                Genie is thinking...
-                            </div>
-                        )}
                     </div>
                 </div>
+                {isLoading && (
+                    <div className="text-xl text-center animate-pulse mt-4">
+                        Genie is thinking...
+                    </div>
+                )}
                 <ChatInput onSend={sendMessage} isLoading={isLoading} />
             </main>
         </div>
