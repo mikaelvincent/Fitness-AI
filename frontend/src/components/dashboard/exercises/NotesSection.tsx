@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Edit, Save, X } from "lucide-react";
 import { Exercise } from "@/types/exerciseTypes";
+import { Textarea } from "@/components/ui/textarea.tsx";
 
 interface NotesSectionProps {
   exercise: Exercise;
@@ -24,11 +25,11 @@ export function NotesSection({
   return (
     <div className="flex items-center justify-between">
       {isEditingNotes ? (
-        <div className="mr-2 flex-grow">
-          <textarea
+        <div className="flex-grow px-2">
+          <Textarea
             value={tempNotes}
             onChange={(e) => onTempNotesChange(e.target.value)}
-            className="w-full rounded bg-zinc-700 px-2 py-1 text-sm"
+            className="w-full rounded px-4 py-1 text-sm"
             placeholder="Add notes..."
             rows={3}
           />
