@@ -242,43 +242,45 @@ const Home = () => {
         />
       )}
       <Calendar returnCurrentDate={setCurrentDate}>
-        {exercises.map((exercise) => (
-          <Exercises
-            key={exercise.id}
-            exercise={exercise}
-            onToggle={() => toggleExerciseCompletion(exercise.id)}
-            isExpanded={exercise.id === expandedExerciseId}
-            onExpandToggle={() => handleExpandToggle(exercise.id)}
-            totalSets={exercise.sets ? exercise.sets.length : 0}
-            onUpdateSet={(setNumber, updatedSet) =>
-              updateExerciseSet(exercise.id, setNumber, updatedSet)
-            }
-            onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
-            onAddSet={() => addExerciseSet(exercise.id)}
-            onDeleteSet={(setNumber) =>
-              deleteExerciseSet(exercise.id, setNumber)
-            }
-            onUpdateCardioDistance={(distanceKm) =>
-              updateCardioDistance(exercise.id, distanceKm ? distanceKm : 0)
-            }
-            onUpdateCardioTime={(timeSeconds) =>
-              updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)
-            }
-            onDeleteExercise={() => deleteExercise(exercise.id)}
-          />
-        ))}
-
-        {/* Render the NewExercise component if newExercise exists */}
-        {newExercise && (
-          <NewExercise
-            name={newExercise.name}
-            onNameChange={handleNewExerciseNameChange}
-            onSave={handleSaveNewExercise}
-            onCancel={handleCancelNewExercise}
-            containerRef={containerRef}
-            inputRef={inputRef}
-          />
-        )}
+        <div className="px-4">
+          {" "}
+          {exercises.map((exercise) => (
+            <Exercises
+              key={exercise.id}
+              exercise={exercise}
+              onToggle={() => toggleExerciseCompletion(exercise.id)}
+              isExpanded={exercise.id === expandedExerciseId}
+              onExpandToggle={() => handleExpandToggle(exercise.id)}
+              totalSets={exercise.sets ? exercise.sets.length : 0}
+              onUpdateSet={(setNumber, updatedSet) =>
+                updateExerciseSet(exercise.id, setNumber, updatedSet)
+              }
+              onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
+              onAddSet={() => addExerciseSet(exercise.id)}
+              onDeleteSet={(setNumber) =>
+                deleteExerciseSet(exercise.id, setNumber)
+              }
+              onUpdateCardioDistance={(distanceKm) =>
+                updateCardioDistance(exercise.id, distanceKm ? distanceKm : 0)
+              }
+              onUpdateCardioTime={(timeSeconds) =>
+                updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)
+              }
+              onDeleteExercise={() => deleteExercise(exercise.id)}
+            />
+          ))}
+          {/* Render the NewExercise component if newExercise exists */}
+          {newExercise && (
+            <NewExercise
+              name={newExercise.name}
+              onNameChange={handleNewExerciseNameChange}
+              onSave={handleSaveNewExercise}
+              onCancel={handleCancelNewExercise}
+              containerRef={containerRef}
+              inputRef={inputRef}
+            />
+          )}
+        </div>
       </Calendar>
       <AddWorkoutButton
         isOpen={isPopoverOpen}

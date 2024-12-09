@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Edit, Save, X } from "lucide-react";
 import { Exercise } from "@/types/exerciseTypes";
+import { Input } from "@/components/ui/input.tsx";
 
 interface CardioSectionProps {
   exercise: Exercise;
@@ -16,7 +17,6 @@ interface CardioSectionProps {
   onDistanceCancel: () => void;
   onTimeSave: () => void;
   onTimeCancel: () => void;
-  totalSets: number;
 }
 
 export function CardioSection({
@@ -33,7 +33,6 @@ export function CardioSection({
   onDistanceCancel,
   onTimeSave,
   onTimeCancel,
-  totalSets,
 }: CardioSectionProps) {
   return (
     <div className="space-y-2">
@@ -44,13 +43,13 @@ export function CardioSection({
         <span>Distance (km):</span>
         {isEditingDistance ? (
           <div className="flex items-center gap-2">
-            <input
+            <Input
               type="number"
               value={tempDistance}
               onChange={(e) =>
                 onTempDistanceChange(parseFloat(e.target.value) || 0)
               }
-              className="w-20 rounded bg-zinc-700 px-2 py-1"
+              className="w-20 rounded px-2 py-1"
               min="0"
               step="0.1"
               onFocus={(e) => e.target.select()}
@@ -105,13 +104,13 @@ export function CardioSection({
         <span>Time (minutes):</span>
         {isEditingTime ? (
           <div className="flex items-center gap-2">
-            <input
+            <Input
               type="number"
               value={tempTime ? tempTime / 60 : 0}
               onChange={(e) =>
                 onTempTimeChange((parseFloat(e.target.value) || 0) * 60)
               }
-              className="w-20 rounded bg-zinc-700 px-2 py-1"
+              className="w-20 rounded px-2 py-1"
               min="0"
               step="1"
               onFocus={(e) => e.target.select()}
@@ -135,12 +134,9 @@ export function CardioSection({
                 e.stopPropagation();
                 onTimeCancel();
               }}
-              className={`ml-2 text-red-500 transition-colors hover:text-red-700 ${
-                totalSets <= 1 ? "cursor-not-allowed opacity-50" : ""
-              }`}
+              className="ml-2 text-red-500 transition-colors hover:text-red-700"
               aria-label="Cancel editing time"
               size="icon"
-              disabled={totalSets <= 1}
             >
               <X />
             </Button>

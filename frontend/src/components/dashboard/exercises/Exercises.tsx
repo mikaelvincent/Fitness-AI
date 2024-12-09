@@ -164,6 +164,7 @@ export function Exercises({
                   onTempWeightChange={setTempWeight}
                   onSaveSet={handleSaveSet}
                   onDeleteSet={onDeleteSet}
+                  totalSets={totalSets}
                 />
               ) : (
                 <CardioSection
@@ -180,7 +181,6 @@ export function Exercises({
                   onDistanceCancel={handleDistanceCancel}
                   onTimeSave={handleTimeSave}
                   onTimeCancel={handleTimeCancel}
-                  totalSets={totalSets}
                 />
               )}
 
