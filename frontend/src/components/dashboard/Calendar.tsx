@@ -137,7 +137,7 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
           </div>
         </WeekHeaderNavigation>
       </div>
-      <ScrollArea className="h-full w-full">
+      <ScrollArea className="h-full w-full overflow-hidden">
         <div className="relative mt-4 flex-1">
           <AnimatePresence
             initial={false}
