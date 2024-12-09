@@ -4,6 +4,7 @@ import MessageBubble from "./MessageBubble";
 import { useTheme } from "@/components/theme/theme-provider";
 import { MdArrowBack } from "react-icons/md";
 import { RiAiGenerate } from "react-icons/ri";
+import BackButton from "../custom-ui/BackButton";
 
 const ChatInterface: React.FC = () => {
     const { appliedTheme } = useTheme();
@@ -43,13 +44,7 @@ const ChatInterface: React.FC = () => {
             {/* Chat Header */}
             <header className={`flex flex-col sticky top-0 z-10 p-6 text-center w-full bg-inherit text-foreground `}>
                 <div>
-                    <button
-                        onClick={handleBack}
-                        className="flex items-center text-gray-500"
-                    >
-                        <MdArrowBack size={24} />
-                        <span className="ml-1 text-sm font-medium">Back</span>
-                    </button>
+                    <BackButton onClick={handleBack} />
                 </div>
                 <div className="pt-8">
                     <h1 className="text-2xl lg:text-3xl font-bold">What Is Your Goal?</h1>
@@ -66,7 +61,6 @@ const ChatInterface: React.FC = () => {
                         <RiAiGenerate size={24} />
                         <span className="ml-1 text-sm font-medium">Generate Workout</span>
                     </button>
-
                 </div>
 
             </header>
