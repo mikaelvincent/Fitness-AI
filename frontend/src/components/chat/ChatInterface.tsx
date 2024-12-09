@@ -74,8 +74,7 @@ const ChatInterface: React.FC = () => {
 
             </header>
 
-
-            <main className="flex-1 bg-primary rounded-t-3xl flex flex-col overflow-hidden">
+            <main className="flex-1 bg-primary rounded-t-3xl flex flex-col overflow-hidden w-full max-w-full lg:max-w-3xl mx-auto">
                 <div className="flex-1 flex flex-col justify-end p-4 relative">
                     <div className="absolute inset-0 top-0 bottom-0 overflow-y-auto p-4">
                         <div className="flex flex-col gap-2">
@@ -92,14 +91,12 @@ const ChatInterface: React.FC = () => {
                         )}
                     </div>
                 </div>
+                <ChatInput onSend={sendMessage} isLoading={isLoading} />
             </main>
-
-
-
-
-
             {/* Chat Input */}
-            <ChatInput onSend={sendMessage} isLoading={isLoading} />
+
+
+
         </div>
     );
 };

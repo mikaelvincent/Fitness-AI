@@ -20,7 +20,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-center p-4 border-t">
+        <form onSubmit={handleSubmit} className="flex items-center p-4">
             <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -30,7 +30,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
             <Button
                 type="submit"
                 disabled={isLoading} // Disable button when loading
-                className="ml-2 rounded-lg"
+                className="ml-2 rounded-2xl border-2"
             >
                 <IoIosSend size={20} />
             </Button>
