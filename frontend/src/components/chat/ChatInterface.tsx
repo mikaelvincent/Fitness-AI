@@ -8,15 +8,14 @@ import { RiAiGenerate } from "react-icons/ri";
 const ChatInterface: React.FC = () => {
     const { appliedTheme } = useTheme();
     const [messages, setMessages] = useState<{ sender: "user" | "ai"; message: string }[]>([]);
-    const [isLoading, setIsLoading] = useState(false); // Loading state for AI response
+    const [isLoading, setIsLoading] = useState(false);
     const chatEndRef = useRef<HTMLDivElement | null>(null);
 
     const sendMessage = (userMessage: string) => {
-        if (isLoading) return; // Prevent sending while loading
+        if (isLoading) return;
 
-        // Add user message to the chat
         setMessages((prev) => [...prev, { sender: "user", message: userMessage }]);
-        setIsLoading(true); // Set loading to true while waiting for AI response
+        setIsLoading(true);
 
         // Mock AI response
         setTimeout(() => {
@@ -24,28 +23,25 @@ const ChatInterface: React.FC = () => {
                 ...prev,
                 { sender: "ai", message: "This is a mock response. How can I help you?" },
             ]);
-            setIsLoading(false); // Response complete, allow new input
-        }, 10);
+            setIsLoading(false);
+        }, 100);
     };
 
-    // Scroll to the latest message
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isLoading]);
 
     const handleBack = () => {
         console.log("Back button clicked");
-        // Navigate to previous page or perform a desired action
         window.history.back();
     };
 
     return (
         <div
-            className={`min-h-screen flex flex-col bg-background text-foreground ${appliedTheme === "light" ? "lg:bg-foreground" : "lg:bg-neutral-900"
-                }`}
+            className={`min-h-screen flex flex-col bg-background text-foreground`}
         >
             {/* Chat Header */}
-            <header className={`flex flex-col sticky top-0 z-10 p-6 text-center shadow-md w-full bg-inherit text-foreground `}>
+            <header className={`flex flex-col sticky top-0 z-10 p-6 text-center w-full bg-inherit text-foreground `}>
                 <div>
                     <button
                         onClick={handleBack}
@@ -93,10 +89,6 @@ const ChatInterface: React.FC = () => {
                 </div>
                 <ChatInput onSend={sendMessage} isLoading={isLoading} />
             </main>
-            {/* Chat Input */}
-
-
-
         </div>
     );
 };
