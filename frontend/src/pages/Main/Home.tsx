@@ -201,7 +201,7 @@ const Home = () => {
               sets: [
                 {
                   setNumber: 1,
-                  reps: 10,
+                  reps: 0,
                   weightKg: 0,
                 },
               ],
