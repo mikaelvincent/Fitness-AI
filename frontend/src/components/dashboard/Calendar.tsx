@@ -4,7 +4,7 @@ import { AnimatePresence, Variants } from "framer-motion";
 import SwipableWeekHeader from "./calendarHeader/SwipableWeekHeader";
 import WeekHeaderContent from "./calendarHeader/WeekHeaderContent.tsx";
 import WeekHeaderNavigation from "./calendarHeader/WeekHeaderNavigation";
-import AnimateDayView from "./exerciseSet/AnimateDayView.tsx";
+import AnimateDayView from "@/components/dashboard/exercises/AnimateDayView.tsx";
 import { isSameWeek } from "@/utils/dateUtils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 

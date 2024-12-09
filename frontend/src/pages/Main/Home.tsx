@@ -2,7 +2,7 @@
 
 import Calendar from "@/components/dashboard/Calendar";
 import { useEffect, useRef, useState } from "react";
-import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet.tsx";
+import { Exercises } from "@/components/dashboard/exercises/Exercises";
 import { Exercise, Set } from "@/types/exerciseTypes";
 import { sampleExercises } from "@/utils/exerciseListSample";
 import AddWorkoutButton from "@/components/dashboard/AddWorkoutButton.tsx";
@@ -243,7 +243,7 @@ const Home = () => {
       )}
       <Calendar returnCurrentDate={setCurrentDate}>
         {exercises.map((exercise) => (
-          <ExerciseSet
+          <Exercises
             key={exercise.id}
             exercise={exercise}
             onToggle={() => toggleExerciseCompletion(exercise.id)}
