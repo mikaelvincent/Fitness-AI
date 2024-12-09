@@ -1,30 +1,28 @@
 // frontend/src/components/dashboard/NewExercise.tsx
 
-import React from "react";
+import { KeyboardEvent, MouseEvent, RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, X } from "lucide-react";
 
 interface NewExerciseProps {
-  type: "weight" | "cardio";
   name: string;
   onNameChange: (name: string) => void;
   onSave: () => void;
   onCancel: () => void;
-  containerRef: React.RefObject<HTMLDivElement>;
-  inputRef: React.RefObject<HTMLInputElement>;
+  containerRef: RefObject<HTMLDivElement>;
+  inputRef: RefObject<HTMLInputElement>;
 }
 
-const NewExercise: React.FC<NewExerciseProps> = ({
-  type,
+const NewExercise = ({
   name,
   onNameChange,
   onSave,
   onCancel,
   containerRef,
   inputRef,
-}) => {
+}: NewExerciseProps) => {
   // Handle key events within the input
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       onSave();
     } else if (e.key === "Escape") {
@@ -33,7 +31,7 @@ const NewExercise: React.FC<NewExerciseProps> = ({
   };
 
   // Prevent click events from propagating to parent elements
-  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleContainerClick = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
   };
 

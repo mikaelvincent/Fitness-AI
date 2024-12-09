@@ -263,7 +263,6 @@ const Home = () => {
         {/* Render the NewExercise component if newExercise exists */}
         {newExercise && (
           <NewExercise
-            type={newExercise.type}
             name={newExercise.name}
             onNameChange={handleNewExerciseNameChange}
             onSave={handleSaveNewExercise}
