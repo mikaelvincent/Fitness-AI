@@ -1,10 +1,10 @@
 // components/Calendar.tsx
 import { ReactNode, useMemo, useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, Variants } from "framer-motion";
 import SwipableWeekHeader from "./calendarHeader/SwipableWeekHeader";
 import WeekHeaderContent from "./calendarHeader/WeekHeaderContent.tsx";
 import WeekHeaderNavigation from "./calendarHeader/WeekHeaderNavigation";
-import SwipableDayView from "./exerciseSet/SwipableDayView.tsx";
+import AnimateDayView from "./exerciseSet/AnimateDayView.tsx";
 import { isSameWeek } from "@/utils/dateUtils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -70,21 +70,6 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
     });
   };
 
-  const navigateDay = (direction: "prev" | "next") => {
-    setDayTransitionDirection(direction);
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setDate(prevDate.getDate() + (direction === "next" ? 1 : -1));
-
-      // Check if navigating day has crossed into a different week
-      if (!isSameWeek(prevDate, newDate)) {
-        setWeekTransitionDirection(direction);
-      }
-
-      return newDate;
-    });
-  };
-
   const formatMonthYear = (date: Date) => {
     return date.toLocaleDateString("en-US", {
       month: "long",
@@ -92,11 +77,11 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
     });
   };
 
-  const variants = {
+  const variants: Variants = {
     enter: (direction: "next" | "prev") => ({
       x: direction === "next" ? 1000 : -1000,
       opacity: 0,
-      position: "absolute",
+      position: "absolute" as const, // Explicitly cast string values
       top: 0,
       left: 0,
       width: "100%",
@@ -128,7 +113,7 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
       </div>
 
       <div className="rounded-lg bg-muted py-4 sm:mx-8">
-        {/* Navigation Buttons with Swipeable Week Header */}
+        {/* Navigation Buttons with Swipable Week Header */}
         <WeekHeaderNavigation onNavigateWeek={navigateWeek}>
           <div className="relative h-10 overflow-hidden sm:h-14">
             <AnimatePresence
@@ -159,14 +144,13 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
             custom={dayTransitionDirection}
             onExitComplete={() => setDayTransitionDirection(null)}
           >
-            <SwipableDayView
+            <AnimateDayView
               key={currentDate.getTime()}
               direction={dayTransitionDirection}
-              onNavigateDay={navigateDay}
               variants={variants}
             >
               {children}
-            </SwipableDayView>
+            </AnimateDayView>
           </AnimatePresence>
         </div>
         <ScrollBar orientation="horizontal" className="bg-transparent" />
