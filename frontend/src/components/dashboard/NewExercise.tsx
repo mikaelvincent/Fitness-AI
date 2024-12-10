@@ -61,7 +61,6 @@ const NewExercise = ({
         onChange={(e) => onTypeChange(e.target.value)}
         placeholder="Enter workout type..."
         className="mb-2 w-full rounded px-2 py-1 text-sm"
-        ref={inputRef}
         onKeyDown={handleKeyDown}
       />
       <Button
