@@ -17,13 +17,15 @@ const Home = () => {
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>(sampleExercises);
 
+  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
+
   // Update the URL when currentDate changes
   useEffect(() => {
     const formattedDate = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
     window.history.replaceState(null, "", `?date=${formattedDate}`);
   }, [currentDate]);
 
-  // Toggle completion status for any exercise
+  // Toggle completion status
   const toggleExerciseCompletion = (id: number) => {
     setExercises((prevExercises) =>
       prevExercises.map((exercise) =>
@@ -32,6 +34,11 @@ const Home = () => {
           : exercise,
       ),
     );
+  };
+
+  // Handle expansion toggle
+  const handleExpand = (id: number) => {
+    setActiveExerciseId((prevActiveId) => (prevActiveId === id ? null : id));
   };
 
   // Update set for weight training exercises
@@ -143,6 +150,8 @@ const Home = () => {
             key={exercise.id}
             exercise={exercise} // Pass the entire exercise object
             onToggle={() => toggleExerciseCompletion(exercise.id)}
+            onExpand={() => handleExpand(exercise.id)}
+            isActive={activeExerciseId === exercise.id}
             onUpdateSet={(setNumber, updatedSet) =>
               updateExerciseSet(exercise.id, setNumber, updatedSet)
             }
