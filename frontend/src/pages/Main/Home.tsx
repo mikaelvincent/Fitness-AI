@@ -52,6 +52,12 @@ const Home = () => {
     window.history.replaceState(null, "", `?date=${formattedDate}`);
   }, [currentDate]);
 
+  useEffect(() => {
+    if (newExercise && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [newExercise]);
+
   // Toggle completion status
   const toggleExerciseCompletion = (id: number) => {
     setExercises((prevExercises) =>
