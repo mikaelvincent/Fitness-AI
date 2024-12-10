@@ -1,10 +1,11 @@
-// components/Calendar.tsx
-import { ReactNode, useMemo, useState } from "react";
+// frontend/src/components/dashboard/Calendar.tsx
+
+import { Dispatch, ReactNode, SetStateAction, useMemo, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SwipableWeekHeader from "./calendarHeader/SwipableWeekHeader";
 import WeekHeaderContent from "./calendarHeader/WeekHeaderContent.tsx";
 import WeekHeaderNavigation from "./calendarHeader/WeekHeaderNavigation";
-import SwipableDayView from "./exerciseSet/SwipableDayView.tsx";
+import SwipableView from "./exerciseSet/SwipableView.tsx";
 import { isSameWeek } from "@/utils/dateUtils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button.tsx";
@@ -13,11 +14,11 @@ import { useNavigate } from "react-router-dom";
 
 interface CalendarProps {
   children: ReactNode;
-  returnCurrentDate: (date: Date) => void;
+  currentDate: Date;
+  setCurrentDate: Dispatch<SetStateAction<Date>>;
 }
 
-const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   const [dayTransitionDirection, setDayTransitionDirection] = useState<
     "next" | "prev" | null
   >(null);
@@ -92,7 +93,6 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
       }
 
       setCurrentDate(date);
-      returnCurrentDate(date);
     };
 
     const navigateWeek = (direction: "prev" | "next") => {
@@ -182,7 +182,8 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
     };
 
     const handleMonthProgressView = () => {
-      navigate("/progress");
+      const formattedDate = currentDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+      navigate(`/progress?date=${formattedDate}`);
     };
 
     return (
@@ -248,14 +249,14 @@ const Calendar = ({ children, returnCurrentDate }: CalendarProps) => {
                 custom={dayTransitionDirection}
                 onExitComplete={() => setDayTransitionDirection(null)}
               >
-                <SwipableDayView
+                <SwipableView
                   key={currentDate.getTime()}
                   direction={dayTransitionDirection}
-                  onNavigateDay={navigateDay}
+                  onNavigate={navigateDay}
                   variants={variants}
                 >
                   {children}
-                </SwipableDayView>
+                </SwipableView>
               </AnimatePresence>
             </div>
             <ScrollBar orientation="horizontal" />

@@ -3,7 +3,7 @@
 import { MonthViewCalendar } from "@/components/dashboard/monthView/MonthViewCalendar.tsx";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import {
   Card,
   CardDescription,
@@ -13,20 +13,24 @@ import {
 
 const Progress = () => {
   const [searchParams] = useSearchParams();
-  const initialDateParam = searchParams.get("date");
-  const initialDate = initialDateParam
-    ? new Date(initialDateParam)
-    : new Date();
+  const dateParam = searchParams.get("date");
+  const parsedDate = dateParam ? parseISO(dateParam) : new Date();
+
+  const isValidDate = isValid(parsedDate);
+  const initialDate = isValidDate ? parsedDate : new Date();
 
   const [currentDate, setCurrentDate] = useState(initialDate);
   const navigate = useNavigate();
 
   // Update currentDate if URL param changes
-  // Update the URL when currentDate changes
   useEffect(() => {
-    const formattedDate = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
-    window.history.replaceState(null, "", `?date=${formattedDate}`);
-  }, [currentDate]);
+    if (dateParam) {
+      const newDate = parseISO(dateParam);
+      if (isValid(newDate)) {
+        setCurrentDate(newDate);
+      }
+    }
+  }, [dateParam]);
 
   const handleSelectDate = (date: Date) => {
     setCurrentDate(date);
@@ -55,3 +59,4 @@ const Progress = () => {
 };
 
 export default Progress;
+
