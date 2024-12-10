@@ -136,7 +136,7 @@ export function ExerciseSet({
             onToggle();
           }}
           size="icon"
-          className={`h-8 w-8 rounded-full border-2 border-primary text-primary hover:bg-primary ${exercise.isCompleted ? "bg-primary" : ""}`}
+          className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${exercise.isCompleted ? "border-green-700 bg-green-700" : ""}`}
           aria-label={
             exercise.isCompleted
               ? "Mark exercise as incomplete"
