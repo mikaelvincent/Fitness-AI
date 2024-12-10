@@ -47,7 +47,7 @@ export function MonthViewCalendar({
         </Button>
       </div>
       <div className="grid grid-cols-7 gap-2">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+        {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
           <div key={day} className="text-center text-lg font-medium">
             {day}
           </div>
