@@ -2,8 +2,8 @@
 
 import Calendar from "@/components/dashboard/Calendar";
 import { useEffect, useState } from "react";
-import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet.tsx";
-import { Exercise, Set } from "@/types/exerciseTypes";
+import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet";
+import { Exercise, Metric } from "@/types/exerciseTypes";
 import { sampleExercises } from "@/utils/exerciseListSample";
 import { useSearchParams } from "react-router-dom";
 
@@ -41,76 +41,6 @@ const Home = () => {
     setActiveExerciseId((prevActiveId) => (prevActiveId === id ? null : id));
   };
 
-  // Update set for weight training exercises
-  const updateExerciseSet = (
-    exerciseId: number,
-    setNumber: number,
-    updatedSet: Set,
-  ) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
-        if (exercise.id === exerciseId && exercise.isWeightTraining) {
-          return {
-            ...exercise,
-            sets: exercise.sets?.map((set) =>
-              set.setNumber === setNumber ? updatedSet : set,
-            ),
-          };
-        }
-        return exercise;
-      }),
-    );
-  };
-
-  // Add a new set to a weight training exercise
-  const addExerciseSet = (exerciseId: number) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
-        if (exercise.id === exerciseId && exercise.isWeightTraining) {
-          const nextSetNumber =
-            exercise.sets && exercise.sets.length > 0
-              ? Math.max(...exercise.sets.map((s) => s.setNumber)) + 1
-              : 1;
-          const newSet: Set = {
-            setNumber: nextSetNumber,
-            reps: 0, // Default reps
-            weightKg: 0, // Default weight
-          };
-          return {
-            ...exercise,
-            sets: exercise.sets ? [...exercise.sets, newSet] : [newSet],
-            numSets: exercise.numSets ? exercise.numSets + 1 : 1,
-          };
-        }
-        return exercise;
-      }),
-    );
-  };
-
-  // Delete a set from a weight training exercise
-  const deleteExerciseSet = (exerciseId: number, setNumber: number) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
-        if (exercise.id === exerciseId && exercise.isWeightTraining) {
-          const updatedSets = exercise.sets?.filter(
-            (set) => set.setNumber !== setNumber,
-          );
-          // Re-number the remaining sets to maintain order
-          const renumberedSets = updatedSets?.map((set, index) => ({
-            ...set,
-            setNumber: index + 1,
-          }));
-          return {
-            ...exercise,
-            sets: renumberedSets,
-            numSets: renumberedSets?.length,
-          };
-        }
-        return exercise;
-      }),
-    );
-  };
-
   // Update notes for any exercise
   const updateExerciseNotes = (exerciseId: number, notes: string) => {
     setExercises((prevExercises) =>
@@ -120,25 +50,56 @@ const Home = () => {
     );
   };
 
-  // Update distance for cardio exercises
-  const updateCardioDistance = (exerciseId: number, distanceKm: number) => {
+  // Add a new metric to any exercise
+  const addMetric = (exerciseId: number) => {
     setExercises((prevExercises) =>
-      prevExercises.map((exercise) =>
-        !exercise.isWeightTraining && exercise.id === exerciseId
-          ? { ...exercise, distanceKm }
-          : exercise,
-      ),
+      prevExercises.map((exercise) => {
+        if (exercise.id === exerciseId) {
+          const newMetric: Metric = {
+            name: "New Metric",
+            value: 0,
+            unit: "",
+          };
+          return {
+            ...exercise,
+            metrics: [...exercise.metrics, newMetric],
+          };
+        }
+        return exercise;
+      }),
     );
   };
 
-  // Update time for cardio exercises
-  const updateCardioTime = (exerciseId: number, timeSeconds: number) => {
+  // Update a metric for any exercise
+  const updateMetric = (
+    exerciseId: number,
+    metricIndex: number,
+    updatedMetric: Metric,
+  ) => {
     setExercises((prevExercises) =>
-      prevExercises.map((exercise) =>
-        !exercise.isWeightTraining && exercise.id === exerciseId
-          ? { ...exercise, timeSeconds }
-          : exercise,
-      ),
+      prevExercises.map((exercise) => {
+        if (exercise.id === exerciseId) {
+          const updatedMetrics = [...exercise.metrics];
+          updatedMetrics[metricIndex] = updatedMetric;
+          return { ...exercise, metrics: updatedMetrics };
+        }
+        return exercise;
+      }),
+    );
+  };
+
+  // Delete a metric from any exercise
+  const deleteMetric = (exerciseId: number, metricIndex: number) => {
+    setExercises((prevExercises) =>
+      prevExercises.map((exercise) => {
+        if (exercise.id === exerciseId) {
+          const updatedMetrics = exercise.metrics.filter(
+            (_, idx) => idx !== metricIndex,
+          );
+          return { ...exercise, metrics: updatedMetrics };
+        }
+        return exercise;
+      }),
     );
   };
 
@@ -148,24 +109,16 @@ const Home = () => {
         {exercises.map((exercise) => (
           <ExerciseSet
             key={exercise.id}
-            exercise={exercise} // Pass the entire exercise object
+            exercise={exercise}
             onToggle={() => toggleExerciseCompletion(exercise.id)}
             onExpand={() => handleExpand(exercise.id)}
             isActive={activeExerciseId === exercise.id}
-            onUpdateSet={(setNumber, updatedSet) =>
-              updateExerciseSet(exercise.id, setNumber, updatedSet)
-            }
             onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
-            onAddSet={() => addExerciseSet(exercise.id)}
-            onDeleteSet={(setNumber) =>
-              deleteExerciseSet(exercise.id, setNumber)
+            onAddMetric={() => addMetric(exercise.id)}
+            onUpdateMetric={(idx, updatedMetric) =>
+              updateMetric(exercise.id, idx, updatedMetric)
             }
-            onUpdateCardioDistance={(distanceKm) =>
-              updateCardioDistance(exercise.id, distanceKm ? distanceKm : 0)
-            }
-            onUpdateCardioTime={(timeSeconds) =>
-              updateCardioTime(exercise.id, timeSeconds ? timeSeconds : 0)
-            }
+            onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
           />
         ))}
       </Calendar>
