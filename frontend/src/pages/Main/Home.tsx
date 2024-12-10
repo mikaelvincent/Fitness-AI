@@ -202,6 +202,7 @@ const Home = () => {
               updateMetric(exercise.id, idx, updatedMetric)
             }
             onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
+            onDeleteExercise={() => deleteExercise(exercise.id)}
           />
         ))}
         {newExercise && (
