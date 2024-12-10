@@ -25,6 +25,7 @@ interface ExerciseSetProps {
   onAddMetric: () => void;
   onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
   onDeleteMetric: (metricIndex: number) => void;
+  onDeleteExercise: () => void;
 }
 
 export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
@@ -38,6 +39,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       onAddMetric,
       onUpdateMetric,
       onDeleteMetric,
+      onDeleteExercise,
     },
     ref, // Accept ref as the second argument
   ) => {
@@ -353,7 +355,19 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     </div>
                   ))}
 
-                  <div className="flex w-full justify-end">
+                  <div className="flex w-full justify-between">
+                    <Button
+                      variant="destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteExercise();
+                      }}
+                      className="mt-2 flex items-center rounded p-2"
+                      aria-label="Delete exercise"
+                    >
+                      <Trash2 strokeWidth={2.75} />
+                      Exercise
+                    </Button>
                     <Button
                       variant="link"
                       onClick={(e) => {
