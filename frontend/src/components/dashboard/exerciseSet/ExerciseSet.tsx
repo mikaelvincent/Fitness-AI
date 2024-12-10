@@ -8,23 +8,23 @@ import {
   Edit,
   Plus,
   Save,
+  Trash2,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { Exercise, Set } from "@/types/exerciseTypes.ts";
+import { Exercise, Metric } from "@/types/exerciseTypes.ts";
+import { Input } from "@/components/ui/input.tsx";
 
 interface ExerciseSetProps {
   exercise: Exercise;
   isActive: boolean;
   onExpand: () => void;
   onToggle: () => void;
-  onUpdateSet: (setNumber: number, updatedSet: Set) => void;
   onUpdateNotes: (newNotes: string) => void;
-  onAddSet: () => void;
-  onDeleteSet: (setNumber: number) => void;
-  onUpdateCardioDistance?: (distanceKm: number | undefined) => void;
-  onUpdateCardioTime?: (timeSeconds: number | undefined) => void;
+  onAddMetric: () => void;
+  onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
+  onDeleteMetric: (metricIndex: number) => void;
 }
 
 export function ExerciseSet({
@@ -32,26 +32,21 @@ export function ExerciseSet({
   isActive,
   onToggle,
   onExpand,
-  onUpdateSet,
   onUpdateNotes,
-  onAddSet,
-  onDeleteSet,
-  onUpdateCardioDistance,
-  onUpdateCardioTime,
+  onAddMetric,
+  onUpdateMetric,
+  onDeleteMetric,
 }: ExerciseSetProps) {
-  const [editingSet, setEditingSet] = useState<number | null>(null);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [tempNotes, setTempNotes] = useState(exercise.notes);
-  const [tempReps, setTempReps] = useState<number>(0);
-  const [tempWeight, setTempWeight] = useState<number>(0);
-  const [tempDistance, setTempDistance] = useState<number | undefined>(
-    exercise.isWeightTraining ? 0 : exercise.distanceKm,
+
+  // For editing metrics
+  const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(
+    null,
   );
-  const [tempTime, setTempTime] = useState<number | undefined>(
-    exercise.isWeightTraining ? 0 : exercise.timeSeconds,
-  );
-  const [isEditingDistance, setIsEditingDistance] = useState(false);
-  const [isEditingTime, setIsEditingTime] = useState(false);
+  const [tempMetricName, setTempMetricName] = useState("");
+  const [tempMetricValue, setTempMetricValue] = useState<number>(0);
+  const [tempMetricUnit, setTempMetricUnit] = useState("");
 
   useEffect(() => {
     setTempNotes(exercise.notes);
@@ -59,32 +54,10 @@ export function ExerciseSet({
 
   useEffect(() => {
     if (!isActive) {
-      setEditingSet(null);
       setIsEditingNotes(false);
-      setIsEditingDistance(false);
-      setIsEditingTime(false);
+      setEditingMetricIndex(null);
     }
   }, [isActive]);
-
-  const handleSetClick = (
-    setNumber: number,
-    reps: number,
-    weightKg: number,
-  ) => {
-    if (editingSet === setNumber) {
-      setEditingSet(null);
-    } else {
-      setEditingSet(setNumber);
-      setTempReps(reps);
-      setTempWeight(weightKg || 0);
-    }
-  };
-
-  const handleSaveSet = (setNumber: number) => {
-    const updatedSet: Set = { setNumber, reps: tempReps, weightKg: tempWeight };
-    onUpdateSet(setNumber, updatedSet);
-    setEditingSet(null);
-  };
 
   const handleNotesSave = () => {
     onUpdateNotes(tempNotes);
@@ -96,28 +69,29 @@ export function ExerciseSet({
     setIsEditingNotes(false);
   };
 
-  const handleDistanceSave = () => {
-    if (onUpdateCardioDistance) {
-      onUpdateCardioDistance(tempDistance);
-      setIsEditingDistance(false);
+  const handleMetricClick = (index: number, metric: Metric) => {
+    if (editingMetricIndex === index) {
+      setEditingMetricIndex(null);
+    } else {
+      setEditingMetricIndex(index);
+      setTempMetricName(metric.name);
+      setTempMetricValue(metric.value);
+      setTempMetricUnit(metric.unit);
     }
   };
 
-  const handleDistanceCancel = () => {
-    setTempDistance(exercise.distanceKm);
-    setIsEditingDistance(false);
+  const handleSaveMetric = (index: number) => {
+    const updatedMetric: Metric = {
+      name: tempMetricName,
+      value: tempMetricValue,
+      unit: tempMetricUnit,
+    };
+    onUpdateMetric(index, updatedMetric);
+    setEditingMetricIndex(null);
   };
 
-  const handleTimeSave = () => {
-    if (onUpdateCardioTime) {
-      onUpdateCardioTime(tempTime);
-      setIsEditingTime(false);
-    }
-  };
-
-  const handleTimeCancel = () => {
-    setTempTime(exercise.timeSeconds);
-    setIsEditingTime(false);
+  const handleCancelMetricEdit = () => {
+    setEditingMetricIndex(null);
   };
 
   const detailsVariants = {
@@ -136,7 +110,9 @@ export function ExerciseSet({
             onToggle();
           }}
           size="icon"
-          className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${exercise.isCompleted ? "border-green-700 bg-green-700" : ""}`}
+          className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${
+            exercise.isCompleted ? "border-green-700 bg-green-700" : ""
+          }`}
           aria-label={
             exercise.isCompleted
               ? "Mark exercise as incomplete"
@@ -161,7 +137,10 @@ export function ExerciseSet({
             <Check size={20} strokeWidth={3} className="text-background" />
           </motion.span>
         </Button>
-        <h3 className="flex-grow text-xl font-semibold">{exercise.name}</h3>
+        <h3 className="flex-grow text-xl font-semibold">
+          {exercise.name}{" "}
+          <span className="text-sm text-primary">({exercise.type})</span>
+        </h3>
         <div
           className="text-primary transition-colors hover:text-orange-400"
           aria-label={
@@ -231,48 +210,89 @@ export function ExerciseSet({
                 )}
               </div>
 
-              {/* Exercise Type Specific Sections */}
-              {exercise.isWeightTraining && (
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Sets:</h4>
-                  {exercise.sets?.map((set) => (
-                    <div
-                      key={set.setNumber}
-                      className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
-                    >
-                      <span>Set {set.setNumber}</span>
-                      {editingSet === set.setNumber ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            value={tempReps}
-                            onChange={(e) =>
-                              setTempReps(parseInt(e.target.value) || 0)
-                            }
-                            className="w-16 rounded bg-zinc-700 px-2 py-1"
-                            min="0"
-                          />
-                          <span>reps</span>
-                          <span>x</span>
-                          <input
-                            type="number"
-                            value={tempWeight}
-                            onChange={(e) =>
-                              setTempWeight(parseFloat(e.target.value) || 0)
-                            }
-                            className="w-16 rounded bg-zinc-700 px-2 py-1"
-                            min="0"
-                            step="0.5"
-                          />
-                          <span>kg</span>
+              {/* Metrics Section */}
+              <div className="space-y-2">
+                <h4 className="font-semibold">Metrics:</h4>
+                {exercise.metrics.map((metric, index) => (
+                  <div
+                    key={index}
+                    className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
+                    onClick={() => handleMetricClick(index, metric)}
+                  >
+                    {editingMetricIndex === index ? (
+                      <div className="w-full">
+                        <div className="grid grid-cols-3 gap-2">
+                          {/* Metric Name */}
+                          <div className="flex flex-col">
+                            <label
+                              htmlFor={`metric-name-${index}`}
+                              className="text-xs text-gray-300"
+                            >
+                              Name
+                            </label>
+                            <Input
+                              id={`metric-name-${index}`}
+                              type="text"
+                              value={tempMetricName}
+                              onChange={(e) =>
+                                setTempMetricName(e.target.value)
+                              }
+                              className="w-full rounded px-2 py-1 text-sm"
+                              placeholder="Metric Name"
+                            />
+                          </div>
+                          {/* Metric Value */}
+                          <div className="flex flex-col">
+                            <label
+                              htmlFor={`metric-value-${index}`}
+                              className="text-xs text-gray-300"
+                            >
+                              Value
+                            </label>
+                            <Input
+                              id={`metric-value-${index}`}
+                              type="number"
+                              value={tempMetricValue}
+                              onChange={(e) =>
+                                setTempMetricValue(
+                                  parseFloat(e.target.value) || 0,
+                                )
+                              }
+                              className="w-full rounded px-2 py-1 text-sm"
+                              min="0"
+                              step="0.1"
+                              placeholder="Value"
+                            />
+                          </div>
+                          {/* Metric Unit */}
+                          <div className="flex flex-col">
+                            <label
+                              htmlFor={`metric-unit-${index}`}
+                              className="text-xs text-gray-300"
+                            >
+                              Unit
+                            </label>
+                            <Input
+                              id={`metric-unit-${index}`}
+                              type="text"
+                              value={tempMetricUnit}
+                              onChange={(e) =>
+                                setTempMetricUnit(e.target.value)
+                              }
+                              className="w-full rounded px-2 py-1 text-sm"
+                              placeholder="Unit"
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-2 flex items-center justify-end gap-2">
                           <Button
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSaveSet(set.setNumber);
+                              handleSaveMetric(index);
                             }}
                             className="text-primary transition-colors hover:text-orange-400"
-                            aria-label="Save set"
+                            aria-label="Save metric"
                             size="icon"
                           >
                             <Save />
@@ -281,177 +301,69 @@ export function ExerciseSet({
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onDeleteSet(set.setNumber);
+                              handleCancelMetricEdit();
                             }}
                             className="text-red-500 transition-colors hover:text-red-700"
-                            aria-label="Delete set"
+                            aria-label="Cancel editing metric"
                             size="icon"
                           >
                             <X />
                           </Button>
+                          <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteMetric(index);
+                            }}
+                            className="text-red-500 transition-colors hover:text-red-700"
+                            aria-label="Delete metric"
+                            size="icon"
+                          >
+                            <Trash2 />
+                          </Button>
                         </div>
-                      ) : (
-                        <span
-                          onClick={() =>
-                            handleSetClick(
-                              set.setNumber,
-                              set.reps,
-                              set.weightKg,
-                            )
-                          }
-                        >
-                          {set.reps} reps x {set.weightKg} kg
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                  <div className="flex w-full justify-end">
-                    <Button
-                      variant="link"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddSet();
-                      }}
-                      className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
-                      aria-label="Add new set"
-                    >
-                      <Plus strokeWidth={2.75} />
-                      Add Set
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {!exercise.isWeightTraining && (
-                <div className="space-y-2">
-                  <h4 className="font-semibold">Cardio Details:</h4>
-
-                  {/* Distance */}
-                  <div className="flex items-center justify-between">
-                    <span>Distance (km):</span>
-                    {isEditingDistance ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={tempDistance}
-                          onChange={(e) =>
-                            setTempDistance(parseFloat(e.target.value) || 0)
-                          }
-                          className="w-20 rounded bg-zinc-700 px-2 py-1"
-                          min="0"
-                          step="0.1"
-                        />
-                        <span>km</span>
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDistanceSave();
-                          }}
-                          className="text-primary transition-colors hover:text-orange-400"
-                          aria-label="Save distance"
-                          size="icon"
-                        >
-                          <Save />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDistanceCancel();
-                          }}
-                          className="ml-2 text-red-500 transition-colors hover:text-red-700"
-                          aria-label="Cancel editing distance"
-                          size="icon"
-                        >
-                          <X />
-                        </Button>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm">{exercise.distanceKm} km</p>
+                      <>
+                        <div className="grid flex-grow grid-cols-3">
+                          <p>{metric.name}: </p>
+                          <p>
+                            {metric.value} {metric.unit}
+                          </p>
+                          <p></p>
+                        </div>
                         <Button
                           variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setIsEditingDistance(true);
+                            onDeleteMetric(index);
                           }}
-                          className="text-primary transition-colors hover:text-orange-400"
-                          aria-label="Edit distance"
+                          className="text-red-500 transition-colors hover:text-red-700"
+                          aria-label="Delete metric"
                           size="icon"
                         >
-                          <Edit />
+                          <Trash2 />
                         </Button>
-                      </div>
+                      </>
                     )}
                   </div>
+                ))}
 
-                  {/* Time */}
-                  <div className="flex items-center justify-between">
-                    <span>Time (minutes):</span>
-                    {isEditingTime ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          value={tempTime ? tempTime / 60 : 0} // Convert seconds to minutes for display
-                          onChange={(e) =>
-                            setTempTime((parseFloat(e.target.value) || 0) * 60)
-                          }
-                          className="w-20 rounded bg-zinc-700 px-2 py-1"
-                          min="0"
-                          step="1"
-                        />
-                        <span>min</span>
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTimeSave();
-                          }}
-                          className="text-primary transition-colors hover:text-orange-400"
-                          aria-label="Save time"
-                          size="icon"
-                        >
-                          <Save />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTimeCancel();
-                          }}
-                          className="ml-2 text-red-500 transition-colors hover:text-red-700"
-                          aria-label="Cancel editing time"
-                          size="icon"
-                        >
-                          <X />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm">
-                          {exercise.timeSeconds
-                            ? Math.round(exercise.timeSeconds / 60)
-                            : 0}{" "}
-                          min
-                        </p>
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsEditingTime(true);
-                          }}
-                          className="text-primary transition-colors hover:text-orange-400"
-                          aria-label="Edit time"
-                          size="icon"
-                        >
-                          <Edit />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                <div className="flex w-full justify-end">
+                  <Button
+                    variant="link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddMetric();
+                    }}
+                    className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
+                    aria-label="Add new metric"
+                  >
+                    <Plus strokeWidth={2.75} />
+                    Add Metric
+                  </Button>
                 </div>
-              )}
+              </div>
             </div>
           </motion.div>
         )}
