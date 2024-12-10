@@ -130,7 +130,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-1 flex-col">
       <div className="mx-2 flex items-center py-6 sm:mx-8">
         <Button
           variant="ghost"

@@ -9,7 +9,7 @@ const MainLayout = () => {
       <ResponsiveNav />
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-hidden pb-20 lg:ml-64">
+      <div className="flex-1 overflow-y-hidden pb-20 lg:ml-64 lg:p-0">
         <Outlet />
       </div>
     </div>
