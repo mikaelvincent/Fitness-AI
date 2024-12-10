@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Exercise, Set } from "@/types/exerciseTypes.ts";
 
 interface ExerciseSetProps {
@@ -120,6 +120,12 @@ export function ExerciseSet({
     setIsEditingTime(false);
   };
 
+  const detailsVariants = {
+    hidden: { opacity: 0, height: 0 },
+    visible: { opacity: 1, height: "auto" },
+    exit: { opacity: 0, height: 0 },
+  };
+
   return (
     <div className="border-b-2 border-b-primary p-4">
       <div className="mb-2 flex items-center gap-3" onClick={onExpand}>
@@ -169,270 +175,287 @@ export function ExerciseSet({
           )}
         </div>
       </div>
-      {isActive && (
-        <div className="mt-2 space-y-4">
-          {/* Notes Section */}
-          <div className="flex items-center justify-between">
-            {isEditingNotes ? (
-              <div className="mr-2 flex-grow">
-                <textarea
-                  value={tempNotes}
-                  onChange={(e) => setTempNotes(e.target.value)}
-                  className="w-full rounded bg-zinc-700 px-2 py-1 text-sm"
-                  placeholder="Add notes..."
-                  rows={3}
-                />
-              </div>
-            ) : (
-              <p className="text-sm">{exercise.notes}</p>
-            )}
-            <Button
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                isEditingNotes ? handleNotesSave() : setIsEditingNotes(true);
-              }}
-              className="text-primary transition-colors hover:text-orange-400"
-              aria-label={isEditingNotes ? "Save notes" : "Edit notes"}
-              size="icon"
-            >
-              {isEditingNotes ? <Save /> : <Edit />}
-            </Button>
-            {isEditingNotes && (
-              <Button
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNotesCancel();
-                }}
-                className="ml-2 text-red-500 transition-colors hover:text-red-700"
-                aria-label="Cancel editing notes"
-                size="icon"
-              >
-                <X />
-              </Button>
-            )}
-          </div>
-
-          {/* Exercise Type Specific Sections */}
-          {exercise.isWeightTraining && (
-            <div className="space-y-2">
-              <h4 className="font-semibold">Sets:</h4>
-              {exercise.sets?.map((set) => (
-                <div
-                  key={set.setNumber}
-                  className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
-                >
-                  <span>Set {set.setNumber}</span>
-                  {editingSet === set.setNumber ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={tempReps}
-                        onChange={(e) =>
-                          setTempReps(parseInt(e.target.value) || 0)
-                        }
-                        className="w-16 rounded bg-zinc-700 px-2 py-1"
-                        min="0"
-                      />
-                      <span>reps</span>
-                      <span>x</span>
-                      <input
-                        type="number"
-                        value={tempWeight}
-                        onChange={(e) =>
-                          setTempWeight(parseFloat(e.target.value) || 0)
-                        }
-                        className="w-16 rounded bg-zinc-700 px-2 py-1"
-                        min="0"
-                        step="0.5"
-                      />
-                      <span>kg</span>
-                      <Button
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSaveSet(set.setNumber);
-                        }}
-                        className="text-primary transition-colors hover:text-orange-400"
-                        aria-label="Save set"
-                        size="icon"
-                      >
-                        <Save />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteSet(set.setNumber);
-                        }}
-                        className="text-red-500 transition-colors hover:text-red-700"
-                        aria-label="Delete set"
-                        size="icon"
-                      >
-                        <X />
-                      </Button>
-                    </div>
-                  ) : (
-                    <span
-                      onClick={() =>
-                        handleSetClick(set.setNumber, set.reps, set.weightKg)
-                      }
-                    >
-                      {set.reps} reps x {set.weightKg} kg
-                    </span>
-                  )}
-                </div>
-              ))}
-              <div className="flex w-full justify-end">
+      <AnimatePresence>
+        {isActive && (
+          <motion.div
+            className="mt-2 space-y-4"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={detailsVariants}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <div className="mt-2 space-y-4">
+              {/* Notes Section */}
+              <div className="flex items-center justify-between">
+                {isEditingNotes ? (
+                  <div className="mr-2 flex-grow">
+                    <textarea
+                      value={tempNotes}
+                      onChange={(e) => setTempNotes(e.target.value)}
+                      className="w-full rounded bg-zinc-700 px-2 py-1 text-sm"
+                      placeholder="Add notes..."
+                      rows={3}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-sm">{exercise.notes}</p>
+                )}
                 <Button
-                  variant="link"
+                  variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAddSet();
+                    isEditingNotes
+                      ? handleNotesSave()
+                      : setIsEditingNotes(true);
                   }}
-                  className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
-                  aria-label="Add new set"
+                  className="text-primary transition-colors hover:text-orange-400"
+                  aria-label={isEditingNotes ? "Save notes" : "Edit notes"}
+                  size="icon"
                 >
-                  <Plus strokeWidth={2.75} />
-                  Add Set
+                  {isEditingNotes ? <Save /> : <Edit />}
                 </Button>
-              </div>
-            </div>
-          )}
-
-          {!exercise.isWeightTraining && (
-            <div className="space-y-2">
-              <h4 className="font-semibold">Cardio Details:</h4>
-
-              {/* Distance */}
-              <div className="flex items-center justify-between">
-                <span>Distance (km):</span>
-                {isEditingDistance ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={tempDistance}
-                      onChange={(e) =>
-                        setTempDistance(parseFloat(e.target.value) || 0)
-                      }
-                      className="w-20 rounded bg-zinc-700 px-2 py-1"
-                      min="0"
-                      step="0.1"
-                    />
-                    <span>km</span>
-                    <Button
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDistanceSave();
-                      }}
-                      className="text-primary transition-colors hover:text-orange-400"
-                      aria-label="Save distance"
-                      size="icon"
-                    >
-                      <Save />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDistanceCancel();
-                      }}
-                      className="ml-2 text-red-500 transition-colors hover:text-red-700"
-                      aria-label="Cancel editing distance"
-                      size="icon"
-                    >
-                      <X />
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm">{exercise.distanceKm} km</p>
-                    <Button
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditingDistance(true);
-                      }}
-                      className="text-primary transition-colors hover:text-orange-400"
-                      aria-label="Edit distance"
-                      size="icon"
-                    >
-                      <Edit />
-                    </Button>
-                  </div>
+                {isEditingNotes && (
+                  <Button
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNotesCancel();
+                    }}
+                    className="ml-2 text-red-500 transition-colors hover:text-red-700"
+                    aria-label="Cancel editing notes"
+                    size="icon"
+                  >
+                    <X />
+                  </Button>
                 )}
               </div>
 
-              {/* Time */}
-              <div className="flex items-center justify-between">
-                <span>Time (minutes):</span>
-                {isEditingTime ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      value={tempTime ? tempTime / 60 : 0} // Convert seconds to minutes for display
-                      onChange={(e) =>
-                        setTempTime((parseFloat(e.target.value) || 0) * 60)
-                      }
-                      className="w-20 rounded bg-zinc-700 px-2 py-1"
-                      min="0"
-                      step="1"
-                    />
-                    <span>min</span>
+              {/* Exercise Type Specific Sections */}
+              {exercise.isWeightTraining && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold">Sets:</h4>
+                  {exercise.sets?.map((set) => (
+                    <div
+                      key={set.setNumber}
+                      className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
+                    >
+                      <span>Set {set.setNumber}</span>
+                      {editingSet === set.setNumber ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={tempReps}
+                            onChange={(e) =>
+                              setTempReps(parseInt(e.target.value) || 0)
+                            }
+                            className="w-16 rounded bg-zinc-700 px-2 py-1"
+                            min="0"
+                          />
+                          <span>reps</span>
+                          <span>x</span>
+                          <input
+                            type="number"
+                            value={tempWeight}
+                            onChange={(e) =>
+                              setTempWeight(parseFloat(e.target.value) || 0)
+                            }
+                            className="w-16 rounded bg-zinc-700 px-2 py-1"
+                            min="0"
+                            step="0.5"
+                          />
+                          <span>kg</span>
+                          <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSaveSet(set.setNumber);
+                            }}
+                            className="text-primary transition-colors hover:text-orange-400"
+                            aria-label="Save set"
+                            size="icon"
+                          >
+                            <Save />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteSet(set.setNumber);
+                            }}
+                            className="text-red-500 transition-colors hover:text-red-700"
+                            aria-label="Delete set"
+                            size="icon"
+                          >
+                            <X />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span
+                          onClick={() =>
+                            handleSetClick(
+                              set.setNumber,
+                              set.reps,
+                              set.weightKg,
+                            )
+                          }
+                        >
+                          {set.reps} reps x {set.weightKg} kg
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex w-full justify-end">
                     <Button
-                      variant="ghost"
+                      variant="link"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleTimeSave();
+                        onAddSet();
                       }}
-                      className="text-primary transition-colors hover:text-orange-400"
-                      aria-label="Save time"
-                      size="icon"
+                      className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
+                      aria-label="Add new set"
                     >
-                      <Save />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTimeCancel();
-                      }}
-                      className="ml-2 text-red-500 transition-colors hover:text-red-700"
-                      aria-label="Cancel editing time"
-                      size="icon"
-                    >
-                      <X />
+                      <Plus strokeWidth={2.75} />
+                      Add Set
                     </Button>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm">
-                      {exercise.timeSeconds
-                        ? Math.round(exercise.timeSeconds / 60)
-                        : 0}{" "}
-                      min
-                    </p>
-                    <Button
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditingTime(true);
-                      }}
-                      className="text-primary transition-colors hover:text-orange-400"
-                      aria-label="Edit time"
-                      size="icon"
-                    >
-                      <Edit />
-                    </Button>
+                </div>
+              )}
+
+              {!exercise.isWeightTraining && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold">Cardio Details:</h4>
+
+                  {/* Distance */}
+                  <div className="flex items-center justify-between">
+                    <span>Distance (km):</span>
+                    {isEditingDistance ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={tempDistance}
+                          onChange={(e) =>
+                            setTempDistance(parseFloat(e.target.value) || 0)
+                          }
+                          className="w-20 rounded bg-zinc-700 px-2 py-1"
+                          min="0"
+                          step="0.1"
+                        />
+                        <span>km</span>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDistanceSave();
+                          }}
+                          className="text-primary transition-colors hover:text-orange-400"
+                          aria-label="Save distance"
+                          size="icon"
+                        >
+                          <Save />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDistanceCancel();
+                          }}
+                          className="ml-2 text-red-500 transition-colors hover:text-red-700"
+                          aria-label="Cancel editing distance"
+                          size="icon"
+                        >
+                          <X />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm">{exercise.distanceKm} km</p>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsEditingDistance(true);
+                          }}
+                          className="text-primary transition-colors hover:text-orange-400"
+                          aria-label="Edit distance"
+                          size="icon"
+                        >
+                          <Edit />
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+
+                  {/* Time */}
+                  <div className="flex items-center justify-between">
+                    <span>Time (minutes):</span>
+                    {isEditingTime ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={tempTime ? tempTime / 60 : 0} // Convert seconds to minutes for display
+                          onChange={(e) =>
+                            setTempTime((parseFloat(e.target.value) || 0) * 60)
+                          }
+                          className="w-20 rounded bg-zinc-700 px-2 py-1"
+                          min="0"
+                          step="1"
+                        />
+                        <span>min</span>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTimeSave();
+                          }}
+                          className="text-primary transition-colors hover:text-orange-400"
+                          aria-label="Save time"
+                          size="icon"
+                        >
+                          <Save />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTimeCancel();
+                          }}
+                          className="ml-2 text-red-500 transition-colors hover:text-red-700"
+                          aria-label="Cancel editing time"
+                          size="icon"
+                        >
+                          <X />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm">
+                          {exercise.timeSeconds
+                            ? Math.round(exercise.timeSeconds / 60)
+                            : 0}{" "}
+                          min
+                        </p>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsEditingTime(true);
+                          }}
+                          className="text-primary transition-colors hover:text-orange-400"
+                          aria-label="Edit time"
+                          size="icon"
+                        >
+                          <Edit />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
