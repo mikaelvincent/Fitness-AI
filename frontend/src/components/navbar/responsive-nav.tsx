@@ -8,7 +8,7 @@ import { BotMessageSquare, CircleUser, Home } from "lucide-react";
 
 // Define your navigation items with activePaths
 const navItems = [
-  { name: "Home", href: "/", icon: Home },
+  { name: "Home", href: "/", icon: Home, activePaths: ["/", "/progress"] },
   { name: "Chat with Genie", href: "/chat", icon: BotMessageSquare },
   { name: "Profile", href: "/profile", icon: CircleUser },
 ];
@@ -69,13 +69,20 @@ export const ResponsiveNav = () => {
 };
 
 interface NavItemProps {
-  item: { name: string; href: string; icon: ElementType };
+  item: {
+    name: string;
+    href: string;
+    icon: ElementType;
+    activePaths?: string[];
+  };
   pathname: string;
   onClick?: () => void;
 }
 
 const NavItem = ({ item, pathname, onClick }: NavItemProps) => {
-  const isActive = pathname === item.href;
+  const isActive = item.activePaths
+    ? item.activePaths.includes(pathname)
+    : pathname === item.href;
   const Icon = item.icon;
 
   const linkClasses = `flex items-center space-x-4 px-4 py-4 rounded-md transition-colors ${isActive
@@ -102,17 +109,19 @@ const NavItem = ({ item, pathname, onClick }: NavItemProps) => {
 };
 
 interface BottomNavItemProps {
-  item: { name: string; href: string; icon: ElementType };
-  pathname: string;
-}
-
-interface BottomNavItemProps {
-  item: { name: string; href: string; icon: ElementType };
+  item: {
+    name: string;
+    href: string;
+    icon: ElementType;
+    activePaths?: string[];
+  };
   pathname: string;
 }
 
 const BottomNavItem = ({ item, pathname }: BottomNavItemProps) => {
-  const isActive = pathname === item.href;
+  const isActive = item.activePaths
+    ? item.activePaths.includes(pathname)
+    : pathname === item.href;
   const Icon = item.icon;
 
   const linkClasses = `flex gap-1 items-center justify-center py-2 px-6 rounded-full transition-colors ${isActive
