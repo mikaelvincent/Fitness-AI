@@ -7,7 +7,7 @@ import { BotMessageSquare, CircleUser, Home } from "lucide-react";
 const navItems = [
   { name: "Home", href: "/", icon: Home, activePaths: ["/", "/progress"] },
   { name: "Chat with Genie", href: "/chat", icon: BotMessageSquare },
-  { name: "Profile", href: "/profile", icon: CircleUser },
+  { name: "Profile", href: "/profile", icon: CircleUser, isPrefix: true },
 ];
 
 export const ResponsiveNav = () => {
@@ -46,15 +46,18 @@ interface NavItemProps {
     href: string;
     icon: ElementType;
     activePaths?: string[];
+    isPrefix?: boolean;
   };
   pathname: string;
   onClick?: () => void;
 }
 
 const NavItem = ({ item, pathname, onClick }: NavItemProps) => {
-  const isActive = item.activePaths
-    ? item.activePaths.includes(pathname)
-    : pathname === item.href;
+  const isActive = item.isPrefix
+    ? pathname.startsWith(item.href)
+    : item.activePaths
+      ? item.activePaths.includes(pathname)
+      : pathname === item.href;
   const Icon = item.icon;
 
   const linkClasses = `flex items-center space-x-4 px-4 py-4 rounded-md transition-colors ${
