@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,15 +27,17 @@ class UserAttributeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'attributes' => ['required', 'array'],
-            'attributes.*' => 'string',
+            'attributes.*' => 'string|max:255',
         ]);
 
         $validator->after(function ($validator) use ($request) {
             $attributes = $request->input('attributes');
-            foreach ($attributes as $key => $value) {
-                if (!is_string($key)) {
-                    $validator->errors()->add('attributes', 'All attribute keys must be strings.');
-                    break;
+            if (is_array($attributes)) {
+                foreach ($attributes as $key => $value) {
+                    if (!is_string($key)) {
+                        $validator->errors()->add('attributes', 'All attribute keys must be strings.');
+                        break;
+                    }
                 }
             }
         });
@@ -57,7 +60,7 @@ class UserAttributeController extends Controller
     {
         $validated = $request->validate([
             'keys' => 'required|array',
-            'keys.*' => 'string',
+            'keys.*' => 'string|max:255',
         ]);
 
         foreach ($validated['keys'] as $key) {
