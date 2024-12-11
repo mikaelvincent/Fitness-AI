@@ -32,19 +32,17 @@ const Home = () => {
   // Ref to the last ExerciseSet component
   const lastExerciseRef = useRef<HTMLDivElement>(null);
 
-  // Ref to store the previous length of exercises
-  const prevExercisesLength = useRef<number>(exercises.length);
+  // Ref to track the previous value of newExercise
+  const prevNewExerciseRef = useRef<typeof newExercise>(null);
 
   useEffect(() => {
-    if (exercises.length > prevExercisesLength.current) {
-      // Scroll to the last exercise
-      lastExerciseRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    // Focus the name input only when newExercise is first set
+    if (!prevNewExerciseRef.current && newExercise && inputRef.current) {
+      inputRef.current.focus();
     }
-    prevExercisesLength.current = exercises.length;
-  }, [exercises]);
+    // Update the ref with the current newExercise value
+    prevNewExerciseRef.current = newExercise;
+  }, [newExercise]);
 
   // Update the URL when currentDate changes
   useEffect(() => {
@@ -52,11 +50,10 @@ const Home = () => {
     window.history.replaceState(null, "", `?date=${formattedDate}`);
   }, [currentDate]);
 
+  // useEffect to reset activeExerciseId when currentDate changes
   useEffect(() => {
-    if (newExercise && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [newExercise]);
+    setActiveExerciseId(null);
+  }, [currentDate]);
 
   // Toggle completion status
   const toggleExerciseCompletion = (id: number) => {

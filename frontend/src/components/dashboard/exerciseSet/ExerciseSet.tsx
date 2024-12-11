@@ -226,7 +226,10 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                       onClick={() => handleMetricClick(index, metric)}
                     >
                       {editingMetricIndex === index ? (
-                        <div className="w-full">
+                        <div
+                          className="w-full"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <div className="grid grid-cols-3 gap-2">
                             {/* Metric Name */}
                             <div className="flex flex-col">
