@@ -10,7 +10,7 @@ import ForgotPassword from "./pages/Auth/ForgotPassword.tsx";
 import VerifyEmail from "./pages/Auth/VerifyEmail.tsx";
 import Progress from "./pages/Main/Progress.tsx";
 import Chat from "./pages/Chat.tsx";
-import Profile from "./pages/Profile.tsx";
+import Profile from "./pages/Main/Profile.tsx";
 
 import { ThemeProvider } from "./components/theme/theme-provider.tsx";
 import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
@@ -56,10 +56,10 @@ const App = () => {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="progress" element={<Progress />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           <Route path="/chat" element={<Chat />} />
-          <Route path="/profile" element={<Profile />} />
 
           {/* Setup process with its own context and layout */}
           {/* Single route for setup wizard */}
