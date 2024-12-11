@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\Auth\SessionController;
@@ -7,7 +6,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TokenController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Profile\ProfileController;
-use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\Chat\ChatController;
 
 // Registration Routes
 Route::group([], function () {
@@ -42,11 +41,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/two-factor/enable', [TwoFactorController::class, 'enable']);
     Route::post('/two-factor/confirm', [TwoFactorController::class, 'confirm']);
     Route::post('/two-factor/disable', [TwoFactorController::class, 'disable']);
+});
 
-    // Profile Retrieval Route
+// Profile Routes
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
+    Route::post('/profile', [ProfileController::class, 'update']);
+});
 
-    // Chatbot Interaction Route
-    Route::post('/chatbot/interact', [ChatbotController::class, 'interact'])
-        ->middleware('custom.rate_limiter:global');
+// Chat Routes
+Route::middleware(['auth:sanctum', 'custom.rate_limiter:global'])->group(function () {
+    Route::post('/chat', [ChatController::class, 'interact']);
 });
