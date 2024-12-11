@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -24,6 +25,41 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'two_factor_confirmed_at' => 'datetime',
     ];
+
+    /**
+     * Get the attributes for the user.
+     */
+    public function attributes()
+    {
+        return $this->hasMany(UserAttribute::class);
+    }
+
+    /**
+     * Retrieve the value of a specific attribute by key.
+     */
+    public function getAttributeByKey(string $key): ?string
+    {
+        return $this->attributes()->where('key', $key)->value('value');
+    }
+
+    /**
+     * Add or update an attribute for the user.
+     */
+    public function setAttributeByKey(string $key, string $value): void
+    {
+        $this->attributes()->updateOrCreate(
+            ['key' => $key],
+            ['value' => $value]
+        );
+    }
+
+    /**
+     * Remove an attribute from the user.
+     */
+    public function removeAttributeByKey(string $key): void
+    {
+        $this->attributes()->where('key', $key)->delete();
+    }
 
     /**
      * Send the password reset notification.
