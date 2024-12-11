@@ -1,10 +1,11 @@
-import { KeyRound, LogOut, Shield, User } from "lucide-react";
+import { KeyRound, Shield, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/theme/ModeToggle.tsx";
 import { UserProfileInfo } from "@/types/UserProfileInfo";
+import LogoutButton from "@/components/authentication/LogoutButton";
 
 interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
@@ -79,15 +80,7 @@ export default function ProfileDashboardUI({
               Two-Factor Authentication
             </Button>
             <Separator className="my-4 bg-zinc-800" />
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
-            >
-              <div className="mr-4 rounded-full bg-primary p-2">
-                <LogOut className="h-5 w-5" />
-              </div>
-              Logout
-            </Button>
+            <LogoutButton />
           </div>
         </CardContent>
       </Card>
