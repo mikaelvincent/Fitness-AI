@@ -50,6 +50,11 @@ const Home = () => {
     window.history.replaceState(null, "", `?date=${formattedDate}`);
   }, [currentDate]);
 
+  // useEffect to reset activeExerciseId when currentDate changes
+  useEffect(() => {
+    setActiveExerciseId(null);
+  }, [currentDate]);
+
   // Toggle completion status
   const toggleExerciseCompletion = (id: number) => {
     setExercises((prevExercises) =>
