@@ -7,6 +7,9 @@ return [
         "endpoint" => env("MAILGUN_ENDPOINT", "api.mailgun.net"),
         "scheme" => "https",
     ],
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
     "postmark" => [
         "token" => env("POSTMARK_TOKEN"),
     ],
