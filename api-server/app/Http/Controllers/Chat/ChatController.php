@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
@@ -35,22 +34,26 @@ class ChatController extends Controller
      * @bodyParam messages array required An array of message objects with 'role' and 'content'.
      *
      * @response 200 {
-     * "message": "Chatbot response generated successfully.",
-     * "data": {
-     * "response": "Hello! How can I assist you today?",
-     * "updated_attributes": {
-     * "key1": "value1",
-     * "key2": "value2"
-     * },
-     * "deleted_attributes": ["key3", "key4"]
-     * }
+     *   "message": "Chatbot response generated successfully.",
+     *   "data": {
+     *     "response": "For optimal muscle growth, training each muscle group twice a week is recommended.",
+     *     "updated_attributes": {
+     *       "preferred_training_frequency": "twice a week"
+     *     },
+     *     "deleted_attributes": []
+     *   }
      * }
      *
      * @response 422 {
-     * "message": "Validation failed.",
-     * "errors": {
-     * "messages": ["The messages field is required."]
+     *   "message": "Validation failed.",
+     *   "errors": {
+     *     "messages": ["The messages field is required."]
+     *   }
      * }
+     *
+     * @response 500 {
+     *   "message": "An error occurred while generating the response.",
+     *   "error": "Internal server error."
      * }
      */
     public function interact(Request $request)
@@ -161,12 +164,14 @@ class ChatController extends Controller
                                 break;
                         }
                     }
+
                     // After handling the operations, send a confirmation to the assistant
                     $messages[] = [
                         'role' => 'function',
                         'name' => $functionName,
                         'content' => json_encode(['status' => 'success']),
                     ];
+
                     // Get the final response after function execution
                     $response = $client->chat()->create([
                         'model' => 'gpt-4',
@@ -190,7 +195,7 @@ class ChatController extends Controller
             // Handle exceptions or API errors
             return response()->json([
                 'message' => 'An error occurred while generating the response.',
-                'error' => $e->getMessage(),
+                'error' => 'Internal server error.',
             ], 500);
         }
     }
