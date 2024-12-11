@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserAttributeController extends Controller
 {
@@ -23,10 +23,22 @@ class UserAttributeController extends Controller
      */
     public function update(Request $request)
     {
-        $validated = $request->validate([
-            'attributes'   => 'required|array',
+        $validator = Validator::make($request->all(), [
+            'attributes' => ['required', 'array'],
             'attributes.*' => 'string',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $attributes = $request->input('attributes');
+            foreach ($attributes as $key => $value) {
+                if (!is_string($key)) {
+                    $validator->errors()->add('attributes', 'All attribute keys must be strings.');
+                    break;
+                }
+            }
+        });
+
+        $validated = $validator->validate();
 
         foreach ($validated['attributes'] as $key => $value) {
             $request->user()->setAttributeByKey($key, $value);
@@ -43,7 +55,7 @@ class UserAttributeController extends Controller
     public function destroy(Request $request)
     {
         $validated = $request->validate([
-            'keys'   => 'required|array',
+            'keys' => 'required|array',
             'keys.*' => 'string',
         ]);
 
