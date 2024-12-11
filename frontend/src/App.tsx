@@ -19,6 +19,9 @@ import { Toaster } from "@/components/ui/toaster";
 import SetupLayout from "./layout/SetupLayout.tsx";
 import { SetupProvider } from "./components/setup/SetupContext.tsx";
 import SetupWizard from "./pages/setup/SetupWizard";
+import { UpdateProfile } from "@/pages/Main/Profile/UpdateProfile.tsx";
+import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
+import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
 
 import ChatPage from "./pages/ChatPage.tsx";
 
@@ -30,13 +33,36 @@ const App = () => {
         {/*Uncomment for protected routes*/}
         {/*<Routes>*/}
         {/*    /!* Main layout routes *!/*/}
-        {/*    <Route path="/" element={<ProtectedRoute><MainLayout/> </ProtectedRoute>}>*/}
-        {/*        <Route index element={<Home/>}/>*/}
-        {/*<Route path="progress" element={<Progress/>}/>*/}
-        {/*    </Route>*/}
+        {/*<Route*/}
+        {/*  path="/"*/}
+        {/*  element={*/}
+        {/*    <ProtectedRoute>*/}
+        {/*      <MainLayout />*/}
+        {/*    </ProtectedRoute>*/}
+        {/*  }*/}
+        {/*>*/}
+        {/*  /!* Root Route *!/*/}
+        {/*  <Route index element={<Home />} />*/}
+
+        {/*  /!* Progress Route *!/*/}
+        {/*  <Route path="progress" element={<Progress />} />*/}
+
+        {/*  /!* Profile Routes *!/*/}
+        {/*  <Route path="profile">*/}
+        {/*    /!* Default Profile Page *!/*/}
+        {/*    <Route index element={<Profile />} />*/}
+
+        {/*    /!* Nested Profile Actions *!/*/}
+        {/*    <Route path="update-profile" element={<UpdateProfile />} />*/}
+        {/*    <Route path="change-password" element={<ChangePassword />} />*/}
+        {/*    <Route*/}
+        {/*      path="two-factor-authentication"*/}
+        {/*      element={<TwoFactorAuthentication />}*/}
+        {/*    />*/}
+        {/*  </Route>*/}
+        {/*</Route>*/}
 
         {/*<Route path="chat" element={<ProtectedRoute><Chat/></ProtectedRoute>}>}/>*/}
-        {/*<Route path="profile" element={<ProtectedRoute><Profile/></ProtectedRoute>}>}/>*/}
 
         {/*    /!* Authentication layout routes *!/*/}
         {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
@@ -56,9 +82,25 @@ const App = () => {
         <Routes>
           {/* Main layout routes */}
           <Route path="/" element={<MainLayout />}>
+            {/* Root Route */}
             <Route index element={<Home />} />
+
+            {/* Other Top-Level Routes */}
             <Route path="progress" element={<Progress />} />
-            <Route path="profile" element={<Profile />} />
+
+            {/* Profile Routes */}
+            <Route path="profile">
+              {/* Default Profile Page */}
+              <Route index element={<Profile />} />
+
+              {/* Nested Profile Actions */}
+              <Route path="update-profile" element={<UpdateProfile />} />
+              <Route path="change-password" element={<ChangePassword />} />
+              <Route
+                path="two-factor-authentication"
+                element={<TwoFactorAuthentication />}
+              />
+            </Route>
           </Route>
 
           <Route path="/chat" element={<Chat />} />
