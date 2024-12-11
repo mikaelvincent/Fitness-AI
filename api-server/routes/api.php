@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TokenController;
 use App\Http\Controllers\Auth\TwoFactorController;
-use App\Http\Controllers\User\UserAttributeController;
+use App\Http\Controllers\UserAttributeController;
 
 // Registration Routes
 Route::group([], function () {
@@ -44,6 +44,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/two-factor/disable', [TwoFactorController::class, 'disable']);
 });
 
+// User Attributes Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user/attributes', [UserAttributeController::class, 'index']);
+    Route::put('/user/attributes', [UserAttributeController::class, 'update']);
+    Route::delete('/user/attributes', [UserAttributeController::class, 'destroy']);
+});
 // User Attributes Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/attributes', [UserAttributeController::class, 'index']);
