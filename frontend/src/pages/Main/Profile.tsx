@@ -1,11 +1,11 @@
+import ProfileDashboardUI from "@/components/profile/ProfileDashboardUI.tsx";
+
 const Profile = () => {
-    return (
-        <>
-            <div>
-                <h1>Profile</h1>
-            </div>
-        </>
-    );
+  return (
+    <>
+      <ProfileDashboardUI />
+    </>
+  );
 };
 
 export default Profile;
