@@ -9,10 +9,12 @@ import LogoutButton from "@/components/authentication/LogoutButton";
 
 interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
+  handleNavigation: (path: string) => void;
 }
 
 export default function ProfileDashboardUI({
   profileInfo,
+  handleNavigation,
 }: ProfileDashboardUIProps) {
   return (
     <div className="flex h-full w-full flex-col justify-center gap-8 p-4 lg:p-8">
@@ -55,6 +57,7 @@ export default function ProfileDashboardUI({
             <Button
               variant="ghost"
               className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
+              onClick={() => handleNavigation("update-profile")}
             >
               <div className="mr-4 rounded-full bg-primary p-2">
                 <User className="h-5 w-5" />
@@ -64,6 +67,7 @@ export default function ProfileDashboardUI({
             <Button
               variant="ghost"
               className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
+              onClick={() => handleNavigation("change-password")}
             >
               <div className="mr-4 rounded-full bg-primary p-2">
                 <KeyRound className="h-5 w-5" />
@@ -73,6 +77,7 @@ export default function ProfileDashboardUI({
             <Button
               variant="ghost"
               className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
+              onClick={() => handleNavigation("two-factor-authentication")}
             >
               <div className="mr-4 rounded-full bg-primary p-2">
                 <Shield className="h-5 w-5" />
