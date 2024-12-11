@@ -18,6 +18,7 @@ import { Toaster } from "@/components/ui/toaster";
 import SetupLayout from "./layout/SetupLayout.tsx";
 import { SetupProvider } from "./components/setup/SetupContext.tsx";
 import SetupWizard from "./pages/setup/SetupWizard";
+import { UpdateProfile } from "@/pages/Main/Profile/UpdateProfile.tsx";
 import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
 import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
 
@@ -60,7 +61,7 @@ const App = () => {
         {/*  </Route>*/}
         {/*</Route>*/}
 
-        {/*<Route path="chat" element={<ProtectedRoute><ChatPage/></ProtectedRoute>}>}/>*/}
+        {/*<Route path="chat" element={<ProtectedRoute><Chat/></ProtectedRoute>}>}/>*/}
 
         {/*    /!* Authentication layout routes *!/*/}
         {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
@@ -81,7 +82,10 @@ const App = () => {
           {/* Main layout routes */}
           <Route path="/" element={<MainLayout />}>
             {/* Root Route */}
+            {/* Root Route */}
             <Route index element={<Home />} />
+
+            {/* Other Top-Level Routes */}
 
             {/* Other Top-Level Routes */}
             <Route path="progress" element={<Progress />} />
@@ -92,6 +96,7 @@ const App = () => {
               <Route index element={<Profile />} />
 
               {/* Nested Profile Actions */}
+              <Route path="update-profile" element={<UpdateProfile />} />
               <Route path="change-password" element={<ChangePassword />} />
               <Route
                 path="two-factor-authentication"
