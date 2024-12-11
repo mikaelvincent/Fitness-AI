@@ -81,10 +81,7 @@ const App = () => {
           {/* Main layout routes */}
           <Route path="/" element={<MainLayout />}>
             {/* Root Route */}
-            {/* Root Route */}
             <Route index element={<Home />} />
-
-            {/* Other Top-Level Routes */}
 
             {/* Other Top-Level Routes */}
             <Route path="progress" element={<Progress />} />
