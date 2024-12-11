@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
@@ -27,11 +26,40 @@ class ProfileController extends Controller
      *
      * Validates provided attributes. If a value is null, the attribute is removed.
      * Otherwise, attributes are created or updated.
+     *
+     * @group Profile Management
+     * @authenticated
+     *
+     * @bodyParam attributes array required An associative array of attribute keys and values.
+     * @bodyParam attributes.* string The value of the attribute. Set to null to remove the attribute.
+     *
+     * @exampleRequest {
+     *   "attributes": {
+     *     "fitness_goal": "Build muscle",
+     *     "experience_level": "Intermediate",
+     *     "preferred_workout_time": null
+     *   }
+     * }
+     *
+     * @response 200 {
+     *   "message": "Profile updated successfully."
+     * }
+     *
+     * @response 422 {
+     *   "message": "Validation failed.",
+     *   "errors": {
+     *     "attributes": ["The attributes field is required."],
+     *     "attributes.experience_level": ["The experience level must be a string."]
+     *   }
+     * }
+     *
+     * @response 401 {
+     *   "message": "User not authenticated."
+     * }
      */
     public function update(Request $request)
     {
         $user = $request->user();
-
         if (!$user) {
             return response()->json([
                 'message' => 'User not authenticated.'
@@ -68,16 +96,18 @@ class ProfileController extends Controller
     /**
      * Retrieve the authenticated user's profile and optional filtered attributes.
      *
+     * Returns the user's profile attributes. If 'attributes' query parameter is provided, only returns the specified attributes.
+     *
      * @group Profile Management
      * @authenticated
      *
-     * @queryParam attributes string Optional comma-separated list of attribute keys to retrieve. Example: key1,key2
+     * @queryParam attributes string Optional comma-separated list of attribute keys to retrieve. Example: fitness_goal,experience_level
      *
      * @response 200 {
      *   "user_id": 1,
      *   "attributes": {
-     *     "key1": "value1",
-     *     "key2": "value2"
+     *     "fitness_goal": "Build muscle",
+     *     "experience_level": "Intermediate"
      *   }
      * }
      *
