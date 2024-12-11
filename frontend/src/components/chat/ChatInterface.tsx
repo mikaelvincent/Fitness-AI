@@ -5,6 +5,8 @@ import { useTheme } from "@/components/theme/theme-provider";
 import { MdArrowBack } from "react-icons/md";
 import { RiAiGenerate } from "react-icons/ri";
 import BackButton from "../custom-ui/BackButton";
+import { MdOutlineInfo } from "react-icons/md";
+
 
 const ChatInterface: React.FC = () => {
     const { appliedTheme } = useTheme();
@@ -60,6 +62,13 @@ const ChatInterface: React.FC = () => {
                     >
                         <RiAiGenerate size={24} />
                         <span className="ml-1 text-sm font-medium">Generate Workout</span>
+                    </button>
+                    <button
+                        onClick={() => console.log("Fitness Profile clicked")}
+                        className="flex items-center text-primary hover:text-white transition-colors rounded-lg px-3 py-2"
+                    >
+                        <MdOutlineInfo size={24} />
+                        <span className="ml-1 text-sm font-medium">Fitness Profile</span>
                     </button>
                 </div>
 
