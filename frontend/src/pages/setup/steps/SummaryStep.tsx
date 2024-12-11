@@ -25,6 +25,9 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({ data }) => {
                     <strong>Birthdate:</strong> {birthdateString}
                 </div>
                 <div className="p-4 border rounded-lg">
+                    <strong>Measurement:</strong> {data.measurement}
+                </div>
+                <div className="p-4 border rounded-lg">
                     <strong>Weight:</strong> {displayedWeight}
                 </div>
                 <div className="p-4 border rounded-lg">
