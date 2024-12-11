@@ -7,6 +7,17 @@ interface MeasurementStepProps {
 };
 
 export const MeasurementStep: React.FC<MeasurementStepProps> = ({ measurement, onChange }) => {
+    const updateData = (measurement: string) => {
+        onChange("measurement", measurement);
+        if (measurement === "metric") {
+            onChange("weightUnit", "kg");
+            onChange("heightUnit", "cm");
+        } else {
+            onChange("weightUnit", "lbs");
+            onChange("heightUnit", "inches");
+        }
+    }
+
     return (
         <div className="space-y-6">
             <Label htmlFor="Measurement">Select your measurement system</Label>
@@ -16,7 +27,7 @@ export const MeasurementStep: React.FC<MeasurementStepProps> = ({ measurement, o
                         ? "bg-orange-500 border-orange-600 text-white"
                         : "border-gray-300 text-gray-600"
                         }`}
-                    onClick={() => onChange("measurement", "metric")}
+                    onClick={() => updateData("metric")}
                 >
                     <span className="text-lg font-semibold">Metric</span>
                     <span className="text-xs">(kg, cm)</span>
@@ -28,7 +39,7 @@ export const MeasurementStep: React.FC<MeasurementStepProps> = ({ measurement, o
                         ? "bg-orange-500 border-orange-600 text-white"
                         : "border-gray-300 text-gray-600"
                         }`}
-                    onClick={() => onChange("measurement", "imperial")}
+                    onClick={() => updateData("imperial")}
                 >
                     <span className="text-lg font-semibold">Imperial</span>
                     <span className="text-xs">(lbs, inches)</span>
