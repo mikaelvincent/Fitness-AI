@@ -21,11 +21,6 @@ import { SetupProvider } from './pages/setup/SetupContext';
 import SetupWizard from './pages/setup/SetupWizard';
 
 import ChatPage from './pages/ChatPage.tsx';
-import { Toaster } from "@/components/ui/toaster";
-
-import SetupLayout from "./layout/SetupLayout.tsx";
-import { SetupProvider } from "./pages/setup/SetupContext";
-import SetupWizard from "./pages/setup/SetupWizard";
 
 const App = () => {
   return (
