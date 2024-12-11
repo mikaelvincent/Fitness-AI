@@ -2,6 +2,7 @@ import ProfileDashboardUI from "@/components/profile/ProfileDashboardUI.tsx";
 import { UserProfileInfo } from "@/types/UserProfileInfo.ts";
 import { useState } from "react";
 import { calculateAge } from "@/utils/calculateAge.ts";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [profileInfo, setProfileInfo] = useState<UserProfileInfo>({
@@ -12,9 +13,18 @@ const Profile = () => {
     height: 1.7,
   });
 
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <>
-      <ProfileDashboardUI profileInfo={profileInfo} />
+      <ProfileDashboardUI
+        profileInfo={profileInfo}
+        handleNavigation={handleNavigation}
+      />
     </>
   );
 };
