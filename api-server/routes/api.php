@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\TokenController;
 use App\Http\Controllers\Auth\TwoFactorController;
-use App\Http\Controllers\UserAttributeController;
+use App\Http\Controllers\User\UserAttributeController;
 
 // Registration Routes
 Route::group([], function () {
