@@ -22,13 +22,22 @@ class DynamicProfileAttributesRepository
     }
 
     /**
+     * Retrieve a specific attribute for a given user.
+     * Returns the attribute value or null if not found.
+     */
+    public function getAttributeForUser(int $userId, string $key)
+    {
+        $attribute = UserProfileAttribute::forUser($userId)->byKey($key)->first();
+        return $attribute ? $attribute->attribute_value : null;
+    }
+
+    /**
      * Set or update an attribute for a given user's profile.
      * Creates the user profile if it does not exist.
      */
     public function setAttributeForUser(int $userId, string $key, $value): void
     {
         $profile = UserProfile::firstOrCreate(['user_id' => $userId]);
-
         UserProfileAttribute::updateOrCreate(
             [
                 'user_profile_id' => $profile->id,
