@@ -1,4 +1,4 @@
-import { ENV } from "@/utils/env";
+import { ENV } from "@/utils/env.ts";
 import { ChangePasswordSchema } from "@/utils/schema/ChangePasswordSchema.ts";
 import { z } from "zod";
 

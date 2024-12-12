@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ChangePasswordSchema } from "@/utils/schema/ChangePasswordSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangePasswordRequest } from "@/services/ChangePassword.ts";
+import { ChangePasswordRequest } from "@/services/User/ChangePassword.ts";
 import { toast } from "@/hooks/use-toast";
 
 export const ChangePassword = () => {
