@@ -119,7 +119,7 @@ const ChatInterface: React.FC = () => {
                                                 key={index}
                                                 className="flex justify-between items-center p-3 rounded-lg bg-background hover:bg-gray-700 transition duration-300"
                                             >
-                                                <span className="text-md">${item.label}: ${item.value}</span>
+                                                <span className="text-md">{item.label}: {item.value}</span>
                                             </li>
                                         ))}
                                     </ul>
