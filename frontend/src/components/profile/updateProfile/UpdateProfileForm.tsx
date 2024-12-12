@@ -145,8 +145,13 @@ export const UpdateProfileForm = ({
                         <Input
                           {...field}
                           type="number"
-                          step={0.1}
-                          placeholder=""
+                          step="0.1"
+                          min="0"
+                          placeholder="Enter weight"
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            field.onChange(isNaN(value) ? "" : value);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -163,8 +168,13 @@ export const UpdateProfileForm = ({
                         <Input
                           {...field}
                           type="number"
-                          step={0.1}
-                          placeholder=""
+                          step="0.1"
+                          min="0"
+                          placeholder="Enter height"
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            field.onChange(isNaN(value) ? "" : value);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
