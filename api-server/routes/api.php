@@ -54,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Activities Routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user/activities', [ActivityController::class, 'index']);
-    Route::put('/user/activities', [ActivityController::class, 'update']);
-    Route::delete('/user/activities', [ActivityController::class, 'destroy']);
+    Route::get('/activities', [ActivityController::class, 'index']);
+    Route::put('/activities', [ActivityController::class, 'update']);
+    Route::delete('/activities', [ActivityController::class, 'destroy']);
 });
