@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 const steps = [
     { id: "gender", title: "What's your gender?" },
     { id: "birthdate", title: "When's your birthdate?" },
+    { id: "measurement", title: "Preferred Measurement" },
     { id: "weight", title: "What's your weight?" },
     { id: "height", title: "What's your height?" },
     { id: "activity", title: "What's your level of physical activity?" },
@@ -40,7 +41,7 @@ const SetupWizard = () => {
             Number(birthdateMonth) - 1,
             Number(birthdateDay)
         );
-        if (isNaN(birthDate.getTime())) return false; // Invalid date check
+        if (isNaN(birthDate.getTime())) return false;
 
         const today = new Date();
         const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
@@ -53,7 +54,7 @@ const SetupWizard = () => {
     const canGoNext = (): boolean => {
         switch (step.id) {
             case "gender":
-                return data.gender.trim() !== ""; // Check if gender is non-empty
+                return data.gender.trim() !== "";
             case "birthdate":
                 return (
                     data.birthdateDay.trim() !== "" &&
@@ -61,6 +62,8 @@ const SetupWizard = () => {
                     data.birthdateYear.trim() !== "" &&
                     isAtLeast13AtMost100() // Ensure the user is at least 13
                 );
+            case "measurement":
+                return data.measurement === "imperial" || data.measurement === "metric";
             case "weight":
                 return data.weight > 0; // Ensure weight is a positive number
             case "height":

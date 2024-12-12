@@ -1,12 +1,14 @@
 import React from "react";
 import { GenderStep } from "./steps/GenderStep";
 import { BirthdateStep } from "./steps/BirthdateStep";
+import { MeasurementStep } from "./steps/MeasurementStep";
 import { WeightStep } from "./steps/WeightStep";
 import { HeightStep } from "./steps/HeightStep";
 import { ActivityStep } from "./steps/ActivityStep";
 import { UsernameStep } from "./steps/UsernameStep";
 import { SummaryStep } from "./steps/SummaryStep";
 import { SetupData } from "./SetupContext";
+
 
 interface StepContentProps {
     stepId: string;
@@ -24,6 +26,13 @@ const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => 
                     birthdateDay={data.birthdateDay}
                     birthdateMonth={data.birthdateMonth}
                     birthdateYear={data.birthdateYear}
+                    onChange={onChange}
+                />
+            );
+        case "measurement":
+            return (
+                <MeasurementStep
+                    measurement={data.measurement}
                     onChange={onChange}
                 />
             );
