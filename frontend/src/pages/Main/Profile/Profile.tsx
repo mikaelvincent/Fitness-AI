@@ -35,7 +35,12 @@ const Profile = () => {
       }
 
       if (response?.success && response?.data) {
-        setAttributes(response.data as Attribute[]);
+        // Transform the data object into an array of Attribute objects
+        const dataObject = response.data as Record<string, string | number>;
+        const attributesArray: Attribute[] = Object.entries(dataObject).map(
+          ([name, value]) => ({ name, value }),
+        );
+        setAttributes(attributesArray);
       }
     } catch (error) {
       console.error("Error retrieving attributes:", error);
