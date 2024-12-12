@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -63,6 +64,10 @@ const TwoFactorAuthForm = ({
       <DialogContent className="flex flex-col">
         <DialogHeader>
           <DialogTitle>Enter your Verification Code</DialogTitle>
+          <DialogDescription>
+            You can enter your recovery codes if you do not have access to your
+            2FA
+          </DialogDescription>
         </DialogHeader>
         <div className="self-center py-4">
           <Form {...form}>
