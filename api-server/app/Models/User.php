@@ -34,6 +34,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Establish a one-to-many relationship for the user's activities.
+     */
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
+    /**
      * Retrieve the value of a specific attribute by key.
      */
     public function getAttributeByKey(string $key): ?string
