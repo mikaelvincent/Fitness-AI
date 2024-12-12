@@ -11,7 +11,9 @@ class Activity extends Model
 
     protected $fillable = [
         'user_id',
+        'date',
         'parent_id',
+        'position',
         'name',
         'description',
         'notes',
@@ -20,6 +22,7 @@ class Activity extends Model
 
     protected $casts = [
         'metrics' => 'array',
+        'date' => 'date',
     ];
 
     public function parent()
@@ -35,5 +38,17 @@ class Activity extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Recursively update all descendants' dates to match the given date.
+     */
+    public function syncDescendantsDate($date)
+    {
+        foreach ($this->children as $child) {
+            $child->date = $date;
+            $child->save();
+            $child->syncDescendantsDate($date);
+        }
     }
 }
