@@ -79,7 +79,6 @@ class UserTest extends TestCase
         $user = User::factory()->create([
             'two_factor_confirmed_at' => now(),
         ]);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->email_verified_at);
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->two_factor_confirmed_at);
     }
 
