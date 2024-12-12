@@ -1,3 +1,4 @@
+// Profile.tsx
 import ProfileDashboardUI from "@/components/profile/ProfileDashboardUI.tsx";
 import { UserProfileInfo } from "@/types/UserProfileInfo.ts";
 import { useState } from "react";
@@ -13,19 +14,43 @@ const Profile = () => {
     height: 1.7,
   });
 
+  const [isUpdateName, setIsUpdateName] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
     navigate(path);
   };
 
+  const handleEditName = () => {
+    setIsUpdateName(true);
+  };
+
+  const handleSaveName = () => {
+    // Implement save logic here, e.g., API call to update the name
+    // For now, we'll just exit the edit mode
+    setIsUpdateName(false);
+  };
+
+  const handleCancelEditName = () => {
+    // Optionally reset the name if needed
+    setProfileInfo((prev) => ({ ...prev, name: prev.name }));
+    setIsUpdateName(false);
+  };
+
+  const handleNameChange = (newName: string) => {
+    setProfileInfo((prev) => ({ ...prev, name: newName }));
+  };
+
   return (
-    <>
-      <ProfileDashboardUI
-        profileInfo={profileInfo}
-        handleNavigation={handleNavigation}
-      />
-    </>
+    <ProfileDashboardUI
+      profileInfo={profileInfo}
+      isUpdateName={isUpdateName}
+      onEditName={handleEditName}
+      onSaveName={handleSaveName}
+      onCancelEditName={handleCancelEditName}
+      onNameChange={handleNameChange}
+      handleNavigation={handleNavigation}
+    />
   );
 };
 
