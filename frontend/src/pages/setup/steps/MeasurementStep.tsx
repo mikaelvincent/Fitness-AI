@@ -14,7 +14,7 @@ export const MeasurementStep: React.FC<MeasurementStepProps> = ({ measurement, o
             onChange("heightUnit", "cm");
         } else {
             onChange("weightUnit", "lbs");
-            onChange("heightUnit", "inches");
+            onChange("heightUnit", "in");
         }
     }
 
