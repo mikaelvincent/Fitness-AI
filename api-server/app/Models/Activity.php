@@ -10,6 +10,7 @@ class Activity extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'parent_id',
         'name',
         'description',
@@ -17,24 +18,22 @@ class Activity extends Model
         'metrics',
     ];
 
-    // Cast metrics field to array for convenient JSON handling.
     protected $casts = [
         'metrics' => 'array',
     ];
 
-    /**
-     * Each activity may belong to a parent activity.
-     */
     public function parent()
     {
         return $this->belongsTo(Activity::class, 'parent_id');
     }
 
-    /**
-     * Each activity may have multiple child activities.
-     */
     public function children()
     {
         return $this->hasMany(Activity::class, 'parent_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
