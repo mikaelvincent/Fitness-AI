@@ -50,9 +50,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/attributes', [UserAttributeController::class, 'update']);
     Route::delete('/user/attributes', [UserAttributeController::class, 'destroy']);
 });
-// User Attributes Routes
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user/attributes', [UserAttributeController::class, 'index']);
-    Route::put('/user/attributes', [UserAttributeController::class, 'update']);
-    Route::delete('/user/attributes', [UserAttributeController::class, 'destroy']);
-});

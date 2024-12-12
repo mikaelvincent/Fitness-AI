@@ -57,10 +57,11 @@ const NavItem = ({ item, pathname, onClick }: NavItemProps) => {
     : pathname === item.href;
   const Icon = item.icon;
 
-  const linkClasses = `flex items-center space-x-4 px-4 py-4 rounded-md transition-colors ${isActive
+  const linkClasses = `flex items-center space-x-4 px-4 py-4 rounded-md transition-colors ${
+    isActive
       ? "bg-primary text-white"
       : "dark:text-orange-200 hover:bg-orange-400 hover:text-foreground"
-    }`;
+  }`;
 
   return (
     <Link to={item.href} onClick={onClick} className={linkClasses}>
@@ -86,10 +87,11 @@ const BottomNavItem = ({ item, pathname }: BottomNavItemProps) => {
     : pathname === item.href;
   const Icon = item.icon;
 
-  const linkClasses = `flex gap-1 items-center justify-center py-2 px-6 rounded-full transition-colors ${isActive
+  const linkClasses = `flex gap-1 items-center justify-center py-2 px-6 rounded-full transition-colors ${
+    isActive
       ? "bg-orange-700 text-white"
       : "text-orange-200 hover:bg-orange-700 hover:text-foreground"
-    }`;
+  }`;
 
   return (
     <Link to={item.href} className={linkClasses}>

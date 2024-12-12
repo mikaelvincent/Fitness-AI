@@ -19,7 +19,9 @@ import { Toaster } from "@/components/ui/toaster";
 import SetupLayout from "./layout/SetupLayout.tsx";
 import { SetupProvider } from "./pages/setup/SetupContext";
 import SetupWizard from "./pages/setup/SetupWizard";
+
 import ChatPage from "./pages/ChatPage.tsx";
+
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
@@ -73,6 +75,7 @@ const App = () => {
           >
             <Route index element={<SetupWizard />} />
           </Route>
+
           <Route path="/initial-chat" element={<ChatPage />} />
 
           {/* Authentication layout routes */}
