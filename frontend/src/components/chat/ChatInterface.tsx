@@ -2,18 +2,17 @@ import React, { useState, useRef, useEffect } from "react";
 import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
 import { useTheme } from "@/components/theme/theme-provider";
-import { MdArrowBack } from "react-icons/md";
 import { RiAiGenerate } from "react-icons/ri";
 import BackButton from "../custom-ui/BackButton";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
-import { MdClose } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 const ChatInterface: React.FC = () => {
-    const { appliedTheme } = useTheme();
     const [messages, setMessages] = useState<{ sender: "user" | "ai"; message: string }[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [currentView, setCurrentView] = useState<"chat" | "fitnessProfile">("chat");
     const chatEndRef = useRef<HTMLDivElement | null>(null);
+    const navigate = useNavigate();
 
     const profileInfo = [
         { label: "Age", value: "28" },
@@ -47,6 +46,7 @@ const ChatInterface: React.FC = () => {
     const handleBack = () => window.history.back();
     const handleFitnessProfileClick = () => setCurrentView("fitnessProfile");
     const handleBackToChat = () => setCurrentView("chat");
+    const handleGenerateWorkout = () => navigate("/");
 
     return (
         <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -76,7 +76,7 @@ const ChatInterface: React.FC = () => {
 
                 <div className="flex justify-center mt-4">
                     <button
-                        onClick={() => console.log("Generate workout clicked")}
+                        onClick={handleGenerateWorkout}
                         className="flex items-center text-primary hover:text-white transition-colors rounded-lg px-3 py-2"
                     >
                         <RiAiGenerate size={24} />
