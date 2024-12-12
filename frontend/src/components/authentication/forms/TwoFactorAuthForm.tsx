@@ -42,6 +42,11 @@ const TwoFactorAuthForm = ({
   formStatus,
   formMessage,
 }: TwoFactorAuthFormProps) => {
+  const displayMessage =
+    (status === "error" && cooldown === 0) ||
+    cooldown > 0 ||
+    status === "loading";
+
   const getMessage = () => {
     if (status === "error" && cooldown === 0) {
       return formMessage;
@@ -55,9 +60,6 @@ const TwoFactorAuthForm = ({
 
     return "";
   };
-
-  // Determine if there's a message to display
-  const displayMessage = (status === "error" && cooldown === 0) || cooldown > 0;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
