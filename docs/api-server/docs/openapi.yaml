@@ -252,6 +252,110 @@ paths:
                   items:
                     type: string
       security: []
+  /api/user/activities:
+    get:
+      summary: 'Retrieve all activities for the authenticated user.'
+      operationId: retrieveAllActivitiesForTheAuthenticatedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Add or update activities for the authenticated user.'
+      operationId: addOrUpdateActivitiesForTheAuthenticatedUser
+      description: "Expects an 'activities' array in the request.\nIf 'id' is provided, the corresponding activity is updated; otherwise, a new one is created."
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                activities:
+                  type: array
+                  description: ''
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: 'The <code>id</code> of an existing record in the activities table.'
+                        example: 10
+                        nullable: true
+                      parent_id:
+                        type: integer
+                        description: 'The <code>id</code> of an existing record in the activities table.'
+                        example: 10
+                        nullable: true
+                      name:
+                        type: string
+                        description: 'Must not be greater than 255 characters.'
+                        example: cjanyizogaho
+                        nullable: false
+                      description:
+                        type: string
+                        description: ''
+                        example: 'Explicabo ex accusantium excepturi tenetur voluptas.'
+                        nullable: true
+                      notes:
+                        type: string
+                        description: ''
+                        example: voluptatum
+                        nullable: true
+                      metrics:
+                        type: object
+                        description: ''
+                        example: null
+                        nullable: true
+                        properties: {  }
+                    required:
+                      - name
+              required:
+                - activities
+      security: []
+    delete:
+      summary: 'Delete specified activities for the authenticated user.'
+      operationId: deleteSpecifiedActivitiesForTheAuthenticatedUser
+      description: 'Expects an ''ids'' array of activity IDs to delete.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 'The <code>id</code> of an existing record in the activities table.'
+                  example:
+                    - 10
+                  items:
+                    type: integer
+      security: []
   /api/password/forgot:
     post:
       summary: 'Send a password reset link to the user''s email.'
