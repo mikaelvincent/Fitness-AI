@@ -1,4 +1,4 @@
-import { KeyRound, Shield, User } from "lucide-react";
+import { BotMessageSquare, KeyRound, Shield } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { ModeToggle } from "@/components/theme/ModeToggle.tsx";
 import { UserProfileInfo } from "@/types/UserProfileInfo";
 import LogoutButton from "@/components/authentication/LogoutButton";
+import { Link } from "react-router-dom";
 
 interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
@@ -22,7 +23,7 @@ export default function ProfileDashboardUI({
         <ModeToggle />
       </div>
       {/* Profile Section */}
-      <Card className="border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900">
+      <Card className="border-zinc-100 bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900">
         <CardContent className="p-6">
           <div className="space-y-6">
             <div className="space-y-2">
@@ -31,8 +32,8 @@ export default function ProfileDashboardUI({
             </div>
 
             {/* Stats Grid - Vertical on mobile, horizontal on desktop */}
-            <div className="flex justify-center">
-              <div className="flex w-full flex-col rounded-lg bg-primary lg:w-1/2">
+            <div className="flex-col">
+              <div className="flex w-full flex-col rounded-lg bg-primary">
                 <div className="p-4">
                   <p className="text-2xl font-bold">{profileInfo.age}</p>
                   <p className="text-sm text-orange-100">Age</p>
@@ -46,6 +47,14 @@ export default function ProfileDashboardUI({
                   <p className="text-sm text-orange-100">Height</p>
                 </div>
               </div>
+              <div className="mt-4 flex w-full justify-end">
+                <Button variant="link" size="lg">
+                  <Link to="/chat" className="flex items-center gap-1">
+                    <BotMessageSquare />
+                    Chat with Genie to Edit Attributes
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -54,16 +63,6 @@ export default function ProfileDashboardUI({
       <Card className="border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900">
         <CardContent className="p-6">
           <div className="space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
-              onClick={() => handleNavigation("update-profile")}
-            >
-              <div className="mr-4 rounded-full bg-primary p-2">
-                <User className="h-5 w-5" />
-              </div>
-              Update Profile
-            </Button>
             <Button
               variant="ghost"
               className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
