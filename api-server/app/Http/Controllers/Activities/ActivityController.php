@@ -3,103 +3,73 @@
 namespace App\Http\Controllers\Activities;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Activity;
 
 class ActivityController extends Controller
 {
     /**
-     * Store a newly created activity.
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'parent_id' => ['nullable', 'integer', 'exists:activities,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'notes' => ['nullable', 'string'],
-            'metrics' => ['nullable', 'array'],
-        ]);
-
-        $validated = $validator->validate();
-
-        // Assign current user's id to the new activity
-        $activity = Activity::create(array_merge($validated, [
-            'user_id' => $request->user()->id,
-        ]));
-
-        return response()->json(['data' => $activity], 201);
-    }
-
-    /**
-     * Display a listing of activities.
+     * Retrieve all activities for the authenticated user.
      */
     public function index(Request $request)
     {
-        $query = Activity::where('user_id', $request->user()->id);
-
-        if ($request->boolean('with_children')) {
-            $query->with('children');
-        }
-
-        $activities = $query->get();
+        $activities = $request->user()->activities()->with('children')->get();
 
         return response()->json(['data' => $activities], 200);
     }
 
     /**
-     * Display a specific activity.
+     * Add or update activities for the authenticated user.
+     * Expects an 'activities' array in the request.
+     * If 'id' is provided, the corresponding activity is updated; otherwise, a new one is created.
      */
-    public function show(Request $request, $id)
-    {
-        $query = Activity::where('id', $id)
-            ->where('user_id', $request->user()->id);
-
-        if ($request->boolean('with_children')) {
-            $query->with('children');
-        }
-
-        $activity = $query->firstOrFail();
-
-        return response()->json(['data' => $activity], 200);
-    }
-
-    /**
-     * Update the specified activity.
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'parent_id' => ['nullable', 'integer', 'exists:activities,id'],
-            'name' => ['sometimes', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'notes' => ['nullable', 'string'],
-            'metrics' => ['nullable', 'array'],
+            'activities' => ['required', 'array'],
+            'activities.*.id' => ['nullable', 'integer', 'exists:activities,id'],
+            'activities.*.parent_id' => ['nullable', 'integer', 'exists:activities,id'],
+            'activities.*.name' => ['required', 'string', 'max:255'],
+            'activities.*.description' => ['nullable', 'string'],
+            'activities.*.notes' => ['nullable', 'string'],
+            'activities.*.metrics' => ['nullable', 'array'],
         ]);
 
         $validated = $validator->validate();
+        $updatedActivities = [];
 
-        $activity = Activity::where('id', $id)
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
+        foreach ($validated['activities'] as $activityData) {
+            if (isset($activityData['id'])) {
+                $activity = $request->user()->activities()->where('id', $activityData['id'])->firstOrFail();
+                $activity->update($activityData);
+                $updatedActivities[] = $activity;
+            } else {
+                $updatedActivities[] = $request->user()->activities()->create($activityData);
+            }
+        }
 
-        $activity->update($validated);
-
-        return response()->json(['data' => $activity], 200);
+        return response()->json([
+            'message' => 'Activities updated successfully.',
+            'data' => $updatedActivities,
+        ], 200);
     }
 
     /**
-     * Remove the specified activity.
+     * Delete specified activities for the authenticated user.
+     * Expects an 'ids' array of activity IDs to delete.
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request)
     {
-        $activity = Activity::where('id', $id)
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:activities,id',
+        ]);
 
-        $activity->delete();
+        $request->user()->activities()->whereIn('id', $validated['ids'])->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Activities deleted successfully.',
+        ], 200);
     }
 }
