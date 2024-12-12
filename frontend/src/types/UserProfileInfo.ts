@@ -1,7 +1,11 @@
+// Define a type for individual attributes
+
 export interface UserProfileInfo {
   name: string;
   email: string;
-  age: number;
-  weight: number;
-  height: number;
+}
+
+export interface Attribute {
+  name: string;
+  value: string | number;
 }
