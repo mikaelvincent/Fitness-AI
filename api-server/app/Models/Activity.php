@@ -17,6 +17,11 @@ class Activity extends Model
         'metrics',
     ];
 
+    // Cast metrics field to array for convenient JSON handling.
+    protected $casts = [
+        'metrics' => 'array',
+    ];
+
     /**
      * Each activity may belong to a parent activity.
      */
