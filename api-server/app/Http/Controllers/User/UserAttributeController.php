@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class UserAttributeController extends Controller
 {
@@ -22,6 +23,7 @@ class UserAttributeController extends Controller
 
     /**
      * Add or update attributes for the authenticated user.
+     * Wrapped in a transaction to ensure atomicity.
      */
     public function update(Request $request)
     {
@@ -42,11 +44,20 @@ class UserAttributeController extends Controller
             }
         });
 
-        $validated = $validator->validate();
-
-        foreach ($validated['attributes'] as $key => $value) {
-            $request->user()->setAttributeByKey($key, $value);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
         }
+
+        $validated = $validator->validated();
+
+        DB::transaction(function () use ($request, $validated) {
+            foreach ($validated['attributes'] as $key => $value) {
+                $request->user()->setAttributeByKey($key, $value);
+            }
+        });
 
         return response()->json([
             'message' => 'Attributes updated successfully.',
@@ -55,6 +66,7 @@ class UserAttributeController extends Controller
 
     /**
      * Delete specified attributes for the authenticated user.
+     * Wrapped in a transaction to ensure atomicity.
      */
     public function destroy(Request $request)
     {
@@ -63,9 +75,11 @@ class UserAttributeController extends Controller
             'keys.*' => 'string|max:255',
         ]);
 
-        foreach ($validated['keys'] as $key) {
-            $request->user()->removeAttributeByKey($key);
-        }
+        DB::transaction(function () use ($request, $validated) {
+            foreach ($validated['keys'] as $key) {
+                $request->user()->removeAttributeByKey($key);
+            }
+        });
 
         return response()->json([
             'message' => 'Attributes deleted successfully.',
