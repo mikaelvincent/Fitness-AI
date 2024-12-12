@@ -10,7 +10,9 @@ return new class extends Migration {
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->date('date');
             $table->unsignedBigInteger('parent_id')->nullable();
+            $table->integer('position')->default(0);
             $table->string('name');
             $table->text('description')->nullable();
             $table->text('notes')->nullable();
@@ -23,9 +25,9 @@ return new class extends Migration {
                 ->onDelete('cascade');
 
             $table->foreign('user_id')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 
