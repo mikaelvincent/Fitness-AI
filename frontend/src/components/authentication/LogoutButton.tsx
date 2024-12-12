@@ -6,6 +6,7 @@ import useStatus from "@/hooks/useStatus.tsx";
 import { toast } from "@/hooks/use-toast";
 import useTimer from "@/hooks/useTimer.tsx";
 import { useNavigate } from "react-router-dom";
+import { LoadingSpinner } from "@/components/ui/loading-spinner.tsx";
 
 function LogoutButton() {
   const { token, logoutUser: contextLogoutUser } = useUser();
@@ -25,6 +26,7 @@ function LogoutButton() {
   );
 
   const handleLogout = async () => {
+    setLoading(); // If useStatus manages loading
     try {
       const response = await logoutUser(token);
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
@@ -48,6 +50,7 @@ function LogoutButton() {
           description: response?.message || "Logout successful",
         });
         navigate("/login");
+        setDone();
         return;
       }
     } catch (error) {
@@ -59,16 +62,32 @@ function LogoutButton() {
     }
   };
   return (
-    <Button
-      variant="ghost"
-      className="w-full justify-start py-10 text-lg hover:bg-secondary hover:text-primary"
-      onClick={handleLogout}
-    >
-      <div className="mr-4 rounded-full bg-primary p-2">
-        <LogOut className="h-5 w-5" />
-      </div>
-      Logout
-    </Button>
+    <>
+      {/* Backdrop */}
+      {status === "loading" && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+          aria-live="assertive"
+          aria-busy="true"
+        >
+          <div className="flex flex-col items-center justify-center space-y-4 rounded bg-white p-6 shadow-lg dark:bg-zinc-800">
+            <LoadingSpinner size={48} className="text-primary" />{" "}
+            {/* Use LoadingSpinner */}
+            <p className="text-lg font-medium text-primary">Logging out...</p>
+          </div>
+        </div>
+      )}
+      <Button
+        variant="ghost"
+        className="w-full justify-start py-10 text-lg hover:bg-secondary hover:text-primary"
+        onClick={handleLogout}
+      >
+        <div className="mr-4 rounded-full bg-primary p-2">
+          <LogOut className="h-5 w-5" />
+        </div>
+        Logout
+      </Button>
+    </>
   );
 }
 
