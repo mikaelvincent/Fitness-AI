@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
@@ -20,6 +21,11 @@ return new class extends Migration {
                 ->references('id')
                 ->on('activities')
                 ->onDelete('cascade');
+
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
     }
 
