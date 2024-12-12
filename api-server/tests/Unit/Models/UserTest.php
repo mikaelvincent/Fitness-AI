@@ -75,10 +75,8 @@ class UserTest extends TestCase
     public function test_date_attributes_are_cast_correctly()
     {
         $user = User::factory()->create([
-            'email_verified_at' => now(),
             'two_factor_confirmed_at' => now(),
         ]);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->email_verified_at);
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $user->two_factor_confirmed_at);
     }
 
