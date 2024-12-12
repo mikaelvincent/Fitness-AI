@@ -12,5 +12,5 @@ export const LoginSchema = z.object({
 export const LoginSchemaWith2FA = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, "Please enter your password"),
-  two_factor_code: z.string().min(6, "Verification code must be 6 digits"),
+  two_factor_code: z.string().min(1, "Verification code must be 1 digits"),
 });
