@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "7c500287-7e5b-4f91-ab5b-3472836f5904",
+        "_postman_id": "9429adcb-1ed0-4430-8e5b-58548f6332e5",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -261,6 +261,116 @@
                             "raw": "{\"keys\":[\"mcjanyizogah\"]}"
                         },
                         "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Retrieve all activities for the authenticated user.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/user\/activities",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/user\/activities"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "access-control-allow-origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "code": 401,
+                            "body": "{\"message\":\"Unauthenticated.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Add or update activities for the authenticated user.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/user\/activities",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/user\/activities"
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"activities\":[{\"id\":10,\"parent_id\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\"}]}"
+                        },
+                        "description": "Expects an 'activities' array in the request.\nIf 'id' is provided, the corresponding activity is updated; otherwise, a new one is created.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete specified activities for the authenticated user.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/user\/activities",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/user\/activities"
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"ids\":[10]}"
+                        },
+                        "description": "Expects an 'ids' array of activity IDs to delete.",
                         "auth": {
                             "type": "noauth"
                         }

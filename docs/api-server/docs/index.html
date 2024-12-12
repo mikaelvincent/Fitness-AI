@@ -100,6 +100,15 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-DELETEapi-user-attributes">
                                 <a href="#endpoints-DELETEapi-user-attributes">Delete specified attributes for the authenticated user.</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-user-activities">
+                                <a href="#endpoints-GETapi-user-activities">Retrieve all activities for the authenticated user.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-PUTapi-user-activities">
+                                <a href="#endpoints-PUTapi-user-activities">Add or update activities for the authenticated user.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-DELETEapi-user-activities">
+                                <a href="#endpoints-DELETEapi-user-activities">Delete specified activities for the authenticated user.</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-password-management" class="tocify-header">
@@ -1274,6 +1283,599 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Must not be greater than 255 characters.</p>
+        </div>
+        </form>
+
+                    <h2 id="endpoints-GETapi-user-activities">Retrieve all activities for the authenticated user.</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-user-activities">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://127.0.0.1:8000/api/user/activities" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/user/activities"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/user/activities';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/user/activities'
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('GET', url, headers=headers)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-user-activities">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+access-control-allow-origin: *
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Unauthenticated.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-user-activities" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-user-activities"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-user-activities"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-user-activities" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-user-activities">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-user-activities" data-method="GET"
+      data-path="api/user/activities"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-user-activities', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-user-activities"
+                    onclick="tryItOut('GETapi-user-activities');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-user-activities"
+                    onclick="cancelTryOut('GETapi-user-activities');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-user-activities"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/user/activities</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-user-activities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-user-activities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="endpoints-PUTapi-user-activities">Add or update activities for the authenticated user.</h2>
+
+<p>
+</p>
+
+<p>Expects an 'activities' array in the request.
+If 'id' is provided, the corresponding activity is updated; otherwise, a new one is created.</p>
+
+<span id="example-requests-PUTapi-user-activities">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PUT \
+    "http://127.0.0.1:8000/api/user/activities" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"activities\": [
+        {
+            \"id\": 10,
+            \"parent_id\": 10,
+            \"name\": \"cjanyizogaho\",
+            \"description\": \"Explicabo ex accusantium excepturi tenetur voluptas.\",
+            \"notes\": \"voluptatum\"
+        }
+    ]
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/user/activities"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "activities": [
+        {
+            "id": 10,
+            "parent_id": 10,
+            "name": "cjanyizogaho",
+            "description": "Explicabo ex accusantium excepturi tenetur voluptas.",
+            "notes": "voluptatum"
+        }
+    ]
+};
+
+fetch(url, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/user/activities';
+$response = $client-&gt;put(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'activities' =&gt; [
+                [
+                    'id' =&gt; 10,
+                    'parent_id' =&gt; 10,
+                    'name' =&gt; 'cjanyizogaho',
+                    'description' =&gt; 'Explicabo ex accusantium excepturi tenetur voluptas.',
+                    'notes' =&gt; 'voluptatum',
+                ],
+            ],
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/user/activities'
+payload = {
+    "activities": [
+        {
+            "id": 10,
+            "parent_id": 10,
+            "name": "cjanyizogaho",
+            "description": "Explicabo ex accusantium excepturi tenetur voluptas.",
+            "notes": "voluptatum"
+        }
+    ]
+}
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('PUT', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-PUTapi-user-activities">
+</span>
+<span id="execution-results-PUTapi-user-activities" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PUTapi-user-activities"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PUTapi-user-activities"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PUTapi-user-activities" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PUTapi-user-activities">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PUTapi-user-activities" data-method="PUT"
+      data-path="api/user/activities"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-user-activities', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PUTapi-user-activities"
+                    onclick="tryItOut('PUTapi-user-activities');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PUTapi-user-activities"
+                    onclick="cancelTryOut('PUTapi-user-activities');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PUTapi-user-activities"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-darkblue">PUT</small>
+            <b><code>api/user/activities</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PUTapi-user-activities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PUTapi-user-activities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>activities</code></b>&nbsp;&nbsp;
+<small>object[]</small>&nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="activities.0.id"                data-endpoint="PUTapi-user-activities"
+               value="10"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the activities table. Example: <code>10</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="activities.0.parent_id"                data-endpoint="PUTapi-user-activities"
+               value="10"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the activities table. Example: <code>10</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="activities.0.name"                data-endpoint="PUTapi-user-activities"
+               value="cjanyizogaho"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>cjanyizogaho</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="activities.0.description"                data-endpoint="PUTapi-user-activities"
+               value="Explicabo ex accusantium excepturi tenetur voluptas."
+               data-component="body">
+    <br>
+<p>Example: <code>Explicabo ex accusantium excepturi tenetur voluptas.</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="activities.0.notes"                data-endpoint="PUTapi-user-activities"
+               value="voluptatum"
+               data-component="body">
+    <br>
+<p>Example: <code>voluptatum</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>metrics</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="activities.0.metrics"                data-endpoint="PUTapi-user-activities"
+               value=""
+               data-component="body">
+    <br>
+
+                    </div>
+                                    </details>
+        </div>
+        </form>
+
+                    <h2 id="endpoints-DELETEapi-user-activities">Delete specified activities for the authenticated user.</h2>
+
+<p>
+</p>
+
+<p>Expects an 'ids' array of activity IDs to delete.</p>
+
+<span id="example-requests-DELETEapi-user-activities">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://127.0.0.1:8000/api/user/activities" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"ids\": [
+        10
+    ]
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/user/activities"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "ids": [
+        10
+    ]
+};
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/user/activities';
+$response = $client-&gt;delete(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'ids' =&gt; [
+                10,
+            ],
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/user/activities'
+payload = {
+    "ids": [
+        10
+    ]
+}
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('DELETE', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-user-activities">
+</span>
+<span id="execution-results-DELETEapi-user-activities" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-user-activities"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-user-activities"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-user-activities" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-user-activities">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-user-activities" data-method="DELETE"
+      data-path="api/user/activities"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-user-activities', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-user-activities"
+                    onclick="tryItOut('DELETEapi-user-activities');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-user-activities"
+                    onclick="cancelTryOut('DELETEapi-user-activities');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-user-activities"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/user/activities</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-user-activities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-user-activities"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>ids</code></b>&nbsp;&nbsp;
+<small>integer[]</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="ids[0]"                data-endpoint="DELETEapi-user-activities"
+               data-component="body">
+        <input type="number" style="display: none"
+               name="ids[1]"                data-endpoint="DELETEapi-user-activities"
+               data-component="body">
+    <br>
+<p>The <code>id</code> of an existing record in the activities table.</p>
         </div>
         </form>
 
