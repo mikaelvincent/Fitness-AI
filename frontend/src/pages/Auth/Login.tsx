@@ -45,7 +45,7 @@ const Login = () => {
 
   const onSubmit = async (data: z.infer<typeof LoginSchema>) => {
     setLoading();
-
+    formStatus.startSubmission(data, "post", "/api/login");
     try {
       // Check if two_factor_code is present to determine the type of submission
       const is2FASubmission = !!data.two_factor_code;
@@ -83,6 +83,13 @@ const Login = () => {
       }
 
       if (!response?.success && response?.status === 422 && !isOpen2FAModal) {
+        setLoading();
+        setFormMessage("Two-Factor Authentication is required.");
+        setIsOpen2FAModal(true);
+        return;
+      }
+
+      if (!response?.success && response?.status === 422 && isOpen2FAModal) {
         setError();
         setFormMessage("Two-Factor Authentication is required.");
         setIsOpen2FAModal(true);
@@ -105,7 +112,6 @@ const Login = () => {
       setError();
       setFormMessage("An unexpected error occurred.");
     } finally {
-      setLoading(false);
       formStatus.endSubmission();
     }
   };
