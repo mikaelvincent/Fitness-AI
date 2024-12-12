@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
 import { useTheme } from "@/components/theme/theme-provider";
+import { MdArrowBack } from "react-icons/md";
 import { RiAiGenerate } from "react-icons/ri";
 import BackButton from "../custom-ui/BackButton";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
+import { MdClose } from "react-icons/md";
 
 const ChatInterface: React.FC = () => {
     const { appliedTheme } = useTheme();
@@ -100,53 +102,37 @@ const ChatInterface: React.FC = () => {
                 </div>
             </header>
 
-            {/* Main content area */}
-            <main className="flex-1 bg-primary rounded-t-3xl flex flex-col overflow-hidden w-full max-w-full lg:max-w-3xl mx-auto relative">
-                <div className="flex-1 flex flex-col p-4 relative">
-
-                    {/* Chat View */}
-                    <div
-                        className={`
-        absolute inset-0 overflow-y-auto
-        transition-all duration-500
-        ${currentView === "chat" ? "opacity-100 translate-y-0 z-10" : "opacity-0 -translate-y-full z-0"}
-    `}
-                    >
+            {/* Conditional Rendering */}
+            <main className="flex-1 bg-primary rounded-t-3xl flex flex-col overflow-hidden w-full max-w-full lg:max-w-3xl mx-auto">
+                <div className="flex-1 flex flex-col justify-end p-4 relative">
+                    <div className="absolute inset-0 top-0 bottom-0 overflow-y-auto p-4">
                         <div className="flex flex-col gap-2">
-                            {messages.map((msg, index) => (
-                                <MessageBubble key={index} message={msg.message} sender={msg.sender} />
-                            ))}
+                            {currentView === "chat" ? (
+                                messages.map((msg, index) => (
+                                    <MessageBubble key={index} message={msg.message} sender={msg.sender} />
+                                ))
+                            ) : (
+                                <div className="p-4 text-white rounded-lg">
+                                    <ul className="space-y-2 w-full">
+                                        {profileInfo.map((item, index) => (
+                                            <li
+                                                key={index}
+                                                className="flex justify-between items-center p-3 rounded-lg bg-background hover:bg-gray-700 transition duration-300"
+                                            >
+                                                <span className="text-md">${item.label}: ${item.value}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                            )}
                             <div ref={chatEndRef} />
                         </div>
-                        {isLoading && (
-                            <div className="text-xl text-center animate-pulse mt-4">Genie is thinking...</div>
-                        )}
                     </div>
-
-                    {/* Fitness Profile View */}
-                    <div
-                        className={`
-                            absolute inset-0 overflow-y-auto
-                            transition-all duration-500
-                            ${currentView === "fitnessProfile" ? "opacity-100 translate-y-0 z-10" : "opacity-0 translate-y-full z-0"}
-                        `}
-                    >
-                        <div className="p-4 text-white rounded-lg">
-                            <ul className="space-y-2 w-full">
-                                {profileInfo.map((item, index) => (
-                                    <li
-                                        key={index}
-                                        className="flex justify-between items-center p-3 rounded-lg bg-background hover:bg-gray-700 transition duration-300"
-                                    >
-                                        <span className="text-md">{`${item.label}: ${item.value}`}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
+                    {isLoading && (
+                        <div className="text-xl text-center animate-pulse mt-4">Genie is thinking...</div>
+                    )}
                 </div>
-
-
                 {currentView === "chat" && <ChatInput onSend={sendMessage} isLoading={isLoading} />}
             </main>
         </div>
