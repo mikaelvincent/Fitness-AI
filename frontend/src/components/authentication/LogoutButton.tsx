@@ -61,7 +61,7 @@ function LogoutButton() {
   return (
     <Button
       variant="ghost"
-      className="w-full justify-start text-lg hover:bg-secondary hover:text-primary"
+      className="w-full justify-start py-10 text-lg hover:bg-secondary hover:text-primary"
       onClick={handleLogout}
     >
       <div className="mr-4 rounded-full bg-primary p-2">
