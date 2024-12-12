@@ -52,11 +52,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user/attributes', [UserAttributeController::class, 'destroy']);
 });
 
-// Activities Routes, now protected by auth
+// Activities Routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/activities', [ActivityController::class, 'store']);
-    Route::get('/activities', [ActivityController::class, 'index']);
-    Route::get('/activities/{id}', [ActivityController::class, 'show']);
-    Route::put('/activities/{id}', [ActivityController::class, 'update']);
-    Route::delete('/activities/{id}', [ActivityController::class, 'destroy']);
+    Route::get('/user/activities', [ActivityController::class, 'index']);
+    Route::put('/user/activities', [ActivityController::class, 'update']);
+    Route::delete('/user/activities', [ActivityController::class, 'destroy']);
 });
