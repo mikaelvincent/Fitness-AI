@@ -19,7 +19,6 @@ import { Toaster } from "@/components/ui/toaster";
 import SetupLayout from "./layout/SetupLayout.tsx";
 import { SetupProvider } from "./components/setup/SetupContext.tsx";
 import SetupWizard from "./pages/setup/SetupWizard";
-import { UpdateProfile } from "@/pages/Main/Profile/UpdateProfile.tsx";
 import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
 import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
 
@@ -94,7 +93,6 @@ const App = () => {
               <Route index element={<Profile />} />
 
               {/* Nested Profile Actions */}
-              <Route path="update-profile" element={<UpdateProfile />} />
               <Route path="change-password" element={<ChangePassword />} />
               <Route
                 path="two-factor-authentication"
