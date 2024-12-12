@@ -1,6 +1,6 @@
 // Profile.tsx
 import ProfileDashboardUI from "@/components/profile/ProfileDashboardUI.tsx";
-import { UserProfileInfo } from "@/types/UserProfileInfo.ts";
+import { Attribute, UserProfileInfo } from "@/types/UserProfileInfo.ts";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RetrieveAttributes } from "@/services/User/RetreiveAllAttributes.ts";
@@ -8,7 +8,7 @@ import { useUser } from "@/hooks/context/UserContext.tsx";
 import { toast } from "@/hooks/use-toast.tsx";
 
 const Profile = () => {
-  const [attributes, setAttributes] = useState<object>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [profileInfo, setProfileInfo] = useState<UserProfileInfo>({
     name: "Jericho",
     email: "pascojericho@gmail.com",
@@ -35,7 +35,7 @@ const Profile = () => {
       }
 
       if (response?.success && response?.data) {
-        setAttributes(response.data);
+        setAttributes(response.data as Attribute[]);
       }
     } catch (error) {
       console.error("Error retrieving attributes:", error);
