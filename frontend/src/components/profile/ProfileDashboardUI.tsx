@@ -15,6 +15,7 @@ import { Attribute, UserProfileInfo } from "@/types/UserProfileInfo";
 import LogoutButton from "@/components/authentication/LogoutButton";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
@@ -109,27 +110,27 @@ export default function ProfileDashboardUI({
           <CardContent className="h-full p-6">
             <div className="h-full flex-col">
               <div className="flex h-5/6 w-full flex-col rounded-lg bg-primary">
-                {attributes && attributes.length > 0 ? (
-                  attributes.map((attribute, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 ${
-                        index > 0
-                          ? "border-orange-400 md:border-l-0 md:border-t"
-                          : ""
-                      }`}
-                    >
-                      <p className="text-2xl font-bold">{attribute.value}</p>
-                      <p className="text-sm text-orange-100">
-                        {attribute.name}
-                      </p>
+                <ScrollArea className="h-full w-full">
+                  {attributes && attributes.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                      {attributes.map((attribute, index) => (
+                        <div key={index} className="rounded p-4 shadow">
+                          <p className="text-2xl font-semibold">
+                            {attribute.value}
+                          </p>
+                          <p className="text-sm text-orange-200">
+                            {attribute.name}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))
-                ) : (
-                  <div className="flex h-full items-center justify-center text-4xl text-white">
-                    No Attributes
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-4xl text-white">
+                      No Attributes
+                    </div>
+                  )}
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
               </div>
               <div className="mt-4 flex w-full justify-end">
                 <Button variant="link" size="lg">
