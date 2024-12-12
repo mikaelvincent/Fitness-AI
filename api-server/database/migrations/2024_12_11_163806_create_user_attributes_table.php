@@ -14,10 +14,8 @@ return new class extends Migration {
             $table->string('value');
             $table->timestamps();
 
-            // Add composite unique constraint on user_id and key
             $table->unique(['user_id', 'key']);
 
-            // Foreign key constraint referencing users table
             $table->foreign('user_id')
                   ->references('id')
                   ->on('users')
