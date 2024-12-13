@@ -7,6 +7,7 @@ import { MdOutlineInfo, MdMessage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { getUserAttributes } from "@/services/userAttributesService";
+import { postChatMessage } from "@/services/chatService";
 
 const ChatInterface: React.FC = () => {
     const [messages, setMessages] = useState<{ sender: "user" | "ai"; message: string }[]>([]);
@@ -32,21 +33,33 @@ const ChatInterface: React.FC = () => {
         }
     };
 
-    const sendMessage = (userMessage: string) => {
+    const sendMessage = async (userMessage: string) => {
         if (isLoading) return;
 
+        // Add the user message to the chat
         setMessages((prev) => [...prev, { sender: "user", message: userMessage }]);
         setIsLoading(true);
 
-        // Mock AI response
-        setTimeout(() => {
+        try {
+            // Call the API with the user's message
+            const response = await postChatMessage(messages);
+
+            // Extract the AI response from the API response
+            const aiResponse = response?.data?.response || "Sorry, something went wrong.";
+
+            // Add the AI response to the chat
+            setMessages((prev) => [...prev, { sender: "ai", message: aiResponse }]);
+        } catch (error) {
+            console.error("Error sending message:", error);
             setMessages((prev) => [
                 ...prev,
-                { sender: "ai", message: "This is a mock response. How can I help you?" },
+                { sender: "ai", message: "Oops! There was an error. Please try again later." },
             ]);
+        } finally {
             setIsLoading(false);
-        }, 2000);
+        }
     };
+
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
