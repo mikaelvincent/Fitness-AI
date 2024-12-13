@@ -13,6 +13,8 @@ import { useUser } from "@/hooks/context/UserContext.tsx";
 import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UpdateOrAddActivity } from "@/services/exercises/UpdateOrAddActivity.tsx";
+import { toast } from "@/hooks/use-toast.tsx";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -24,7 +26,7 @@ const Home = () => {
   const { status, setLoading, setDone, setError } = useStatus();
   const { token } = useUser();
 
-  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
+  const [currentDate, setcurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>([]);
 
   const [activeParentId, setActiveParentId] = useState<number | null>(null);
@@ -35,13 +37,23 @@ const Home = () => {
   const [newExercise, setNewExercise] = useState<{
     name: string;
     type: string;
-    parentId: number;
+    parentId: number | null;
   } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastExerciseRef = useRef<HTMLDivElement>(null);
   const prevNewExerciseRef = useRef<typeof newExercise>(null);
+
+  const generateTempId = () => -Date.now();
+
+  // Separate useStatus for updating activities
+  const {
+    status: updateStatus,
+    setLoading: setUpdateLoading,
+    setDone: setUpdateDone,
+    setError: setUpdateError,
+  } = useStatus();
 
   useEffect(() => {
     if (!prevNewExerciseRef.current && newExercise && inputRef.current) {
@@ -55,6 +67,7 @@ const Home = () => {
     window.history.replaceState(null, "", `?date=${formattedDate}`);
 
     fetchExercises().then((r) => r);
+    setNewExercise(null);
   }, [currentDate]);
 
   const fetchExercises = async () => {
@@ -96,38 +109,102 @@ const Home = () => {
     }
   };
 
-  const toggleExerciseCompletion = (id: number) => {
+  const toggleExerciseCompletion = async (id: number | null | undefined) => {
+    if (id === null || id === undefined) return;
+
+    // Find the exercise to toggle
+    const exercise = exercises.find((ex) => ex.id === id);
+    if (!exercise) return;
+
+    // Optimistically update the frontend state
     setExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === id
-          ? { ...exercise, completed: !exercise.completed }
-          : exercise,
+      prev.map((ex) =>
+        ex.id === id ? { ...ex, completed: !ex.completed } : ex,
       ),
     );
+
+    try {
+      setUpdateLoading();
+
+      // Prepare the updated exercise data
+      const updatedExercise: Exercise = {
+        ...exercise,
+        completed: !exercise.completed,
+      };
+
+      // Send the update to the backend
+      const response = await UpdateOrAddActivity({
+        token,
+        activities: updatedExercise,
+      });
+
+      if (!response.success) {
+        throw new Error(response.message || "Failed to toggle activity");
+      }
+
+      setResponseMessage("Activity toggled successfully.");
+      setUpdateDone();
+      toast({
+        title: "Activity toggled successfully.",
+      });
+    } catch (error) {
+      console.error("Error toggling activity:", error);
+      setUpdateError();
+      setResponseMessage(
+        "An unexpected error occurred while updating the activity.",
+      );
+      toast({
+        variant: "destructive",
+        title: "Failed to toggle activity",
+        description:
+          "An error occurred while updating the activity. Please try again.",
+      });
+
+      // Revert the optimistic update
+      setExercises((prev) =>
+        prev.map((ex) =>
+          ex.id === id ? { ...ex, completed: exercise.completed } : ex,
+        ),
+      );
+    }
   };
 
-  const handleParentExpand = (id: number) => {
-    setActiveParentId((prev) => (prev === id ? null : id));
+  const handleParentExpand = (id: number | null | undefined) => {
+    // Use nullish coalescing to ensure 'id' is either a number or null
+    const safeId = id ?? null;
+
+    setActiveParentId((prev) => (prev === safeId ? null : safeId));
+
     // If we switch parent or collapse the parent, reset child
-    if (activeParentId !== id) {
+    if (activeParentId !== safeId) {
       setActiveChildId(null);
     }
   };
 
-  // Modify handleExpand:
-  const handleChildExpand = (childId: number, parentId: number) => {
+  // Modify handleChildExpand:
+  const handleChildExpand = (
+    childId: number | null | undefined,
+    parentId: number | null | undefined,
+  ) => {
+    // Use nullish coalescing to ensure values are number or null
+    const safeParentId = parentId ?? null;
+    const safeChildId = childId ?? null;
+
     // Ensure the parent is active first
-    if (activeParentId !== parentId) {
+    if (activeParentId !== safeParentId) {
       // If parent isn't active, activate it now (and reset child)
-      setActiveParentId(parentId);
-      setActiveChildId(childId);
+      setActiveParentId(safeParentId);
+      setActiveChildId(safeChildId);
     } else {
       // If same parent is already active, just toggle the child
-      setActiveChildId((prev) => (prev === childId ? null : childId));
+      setActiveChildId((prev) => (prev === safeChildId ? null : safeChildId));
     }
   };
 
-  const updateExerciseNotes = (exerciseId: number, notes: string) => {
+  const updateExerciseNotes = (
+    exerciseId: number | null | undefined,
+    notes: string,
+  ) => {
     setExercises((prev) =>
       prev.map((exercise) =>
         exercise.id === exerciseId ? { ...exercise, notes } : exercise,
@@ -135,7 +212,7 @@ const Home = () => {
     );
   };
 
-  const addMetric = (exerciseId: number) => {
+  const addMetric = (exerciseId: number | null | undefined) => {
     setExercises((prev) =>
       prev.map((exercise) => {
         if (exercise.id === exerciseId) {
@@ -148,7 +225,7 @@ const Home = () => {
   };
 
   const updateMetric = (
-    exerciseId: number,
+    exerciseId: number | null | undefined,
     metricIndex: number,
     updatedMetric: Metric,
   ) => {
@@ -164,11 +241,14 @@ const Home = () => {
     );
   };
 
-  const deleteMetric = (exerciseId: number, metricIndex: number) => {
+  const deleteMetric = (
+    exerciseId: number | null | undefined,
+    metricIndex: number,
+  ) => {
     setExercises((prev) =>
       prev.map((exercise) => {
         if (exercise.id === exerciseId) {
-          const updatedMetrics = exercise.metrics.filter(
+          const updatedMetrics = exercise.metrics?.filter(
             (_, idx) => idx !== metricIndex,
           );
           return { ...exercise, metrics: updatedMetrics };
@@ -178,7 +258,7 @@ const Home = () => {
     );
   };
 
-  const initiateAddExercise = (parentId: number = 0) => {
+  const initiateAddExercise = (parentId: number | null = null) => {
     // If parentId = 0, top-level exercise; otherwise a child exercise
     setNewExercise({ name: "", type: "", parentId });
   };
@@ -187,30 +267,84 @@ const Home = () => {
     setNewExercise((prev) => (prev ? { ...prev, name } : null));
   };
 
-  const handleNewExerciseTypeChange = (type: string) => {
-    setNewExercise((prev) => (prev ? { ...prev, type } : null));
+  const handleNewExerciseDescriptionChange = (description: string) => {
+    setNewExercise((prev) => (prev ? { ...prev, type: description } : null));
   };
 
-  const handleSaveNewExercise = () => {
+  // Modify handleSaveNewExercise to integrate AddorUpdateActivities
+  const handleSaveNewExercise = async () => {
     if (
       newExercise &&
       newExercise.name.trim() !== "" &&
       newExercise.type.trim() !== ""
     ) {
-      const newId =
-        exercises.length > 0 ? Math.max(...exercises.map((e) => e.id)) + 1 : 1;
+      // Generate a temporary ID
+      const tempId = generateTempId();
+
+      // Create a new exercise object with the temporary ID
       const exerciseToAdd: Exercise = {
-        id: newId,
+        id: tempId, // Temporary ID
         name: newExercise.name.trim(),
         description: newExercise.type.trim(),
         completed: false,
         notes: "",
         metrics: [],
-        parent_id: newExercise.parentId,
-        date: currentDate,
+        parent_id: newExercise.parentId, // Parent node
+        date: currentDate, // Current date
+        children: [], // Initialize children if necessary
       };
-      setExercises([...exercises, exerciseToAdd]);
+
+      // Optimistically update the frontend state
+      setExercises((prev) => [...prev, exerciseToAdd]);
+
+      // Clear the new exercise form
       setNewExercise(null);
+
+      try {
+        // Set loading state for updating activities
+        setUpdateLoading();
+
+        // Call the UpdateOrAddActivity service
+        const response = await UpdateOrAddActivity({
+          token,
+          activities: {
+            ...exerciseToAdd,
+            id: null, // Backend will assign the actual ID
+          },
+        });
+
+        if (!response.success) {
+          throw new Error(response.message || "Failed to add activity");
+        }
+
+        if (response.success) {
+          // Replace the temporary exercise with the one returned from the backend
+          setExercises((prev) =>
+            prev.map((ex) => (ex.id === tempId ? exerciseToAdd : ex)),
+          );
+
+          setUpdateDone();
+          setResponseMessage("Activity added successfully.");
+          toast({
+            title: "Activity added successfully.",
+          });
+        }
+      } catch (error) {
+        console.error("Error adding activity:", error);
+        setUpdateError();
+        setResponseMessage(
+          "An unexpected error occurred while adding the activity.",
+        );
+        toast({
+          variant: "destructive",
+          title: "Failed to add activity",
+          description:
+            "An error occurred while adding the activity. Please try again.",
+        });
+
+        // Revert the optimistic update by removing the temporary exercise
+        setExercises((prev) => prev.filter((ex) => ex.id !== tempId));
+      }
     }
   };
 
@@ -218,7 +352,7 @@ const Home = () => {
     setNewExercise(null);
   };
 
-  const deleteExercise = (exerciseId: number) => {
+  const deleteExercise = (exerciseId: number | null | undefined) => {
     setExercises((prev) =>
       prev.filter((exercise) => exercise.id !== exerciseId),
     );
@@ -227,12 +361,12 @@ const Home = () => {
   const topLevelExercises = exercises.filter(
     (ex) =>
       (ex.parent_id === null || ex.parent_id === 0) &&
-      ex.date.toDateString() === currentDate.toDateString(),
+      ex.date?.toDateString() === currentDate.toDateString(),
   );
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
-      <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate}>
+      <Calendar currentDate={currentDate} setCurrentDate={setcurrentDate}>
         {status === "loading" && (
           <Skeleton className="h-[500px] w-[500px] rounded-xl" />
         )}
@@ -245,6 +379,7 @@ const Home = () => {
             </AlertDescription>
           </Alert>
         )}
+        {/* For top-level new exercise (when parentId=0) */}
         {status === "done" &&
           topLevelExercises.map((exercise, index) => (
             <ExerciseTree
@@ -274,7 +409,7 @@ const Home = () => {
               onChildExpand={handleChildExpand}
               newExercise={newExercise}
               handleNewExerciseNameChange={handleNewExerciseNameChange}
-              handleNewExerciseTypeChange={handleNewExerciseTypeChange}
+              handleNewExerciseTypeChange={handleNewExerciseDescriptionChange}
               handleSaveNewExercise={handleSaveNewExercise}
               handleCancelNewExercise={handleCancelNewExercise}
               containerRef={containerRef}
@@ -284,14 +419,12 @@ const Home = () => {
               }
             />
           ))}
-
-        {/* For top-level new exercise (when parentId=0) */}
-        {newExercise && newExercise.parentId === 0 && (
+        {newExercise && newExercise.parentId === null && (
           <NewExercise
             name={newExercise.name}
             type={newExercise.type}
             onNameChange={handleNewExerciseNameChange}
-            onTypeChange={handleNewExerciseTypeChange}
+            onTypeChange={handleNewExerciseDescriptionChange}
             onSave={handleSaveNewExercise}
             onCancel={handleCancelNewExercise}
             containerRef={containerRef}
@@ -304,7 +437,7 @@ const Home = () => {
           variant="ghost"
           className="rounded-lg text-lg shadow-lg"
           size="lg"
-          onClick={() => initiateAddExercise(0)}
+          onClick={() => initiateAddExercise()}
           aria-label="Add New Activity"
         >
           <Plus size={24} className="text-primary hover:text-orange-400" />
