@@ -69,7 +69,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     }, [isActive]);
     
     const handleNotesSave = () => {
-      onUpdateNotes(tempNotes);
+      onUpdateNotes(tempNotes?.trim() || "");
       setIsEditingNotes(false);
     };
     
@@ -111,50 +111,53 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     
     return (
       <div ref={ref} className="border-b-2 border-b-primary p-4">
-        <div className="mb-2 flex items-center gap-3" onClick={onExpand}>
-          <Button
-            variant="ghost"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle();
-            }}
-            size="icon"
-            className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${
-              exercise.completed ? "border-green-700 bg-green-700" : ""
-            }`}
-            aria-label={
-              exercise.completed
-                ? "Mark exercise as incomplete"
-                : "Mark exercise as complete"
-            }
-          >
-            <motion.span
-              key={exercise.completed ? "completed" : "incomplete"}
-              initial={{
-                rotate: exercise.completed ? 0 : 180,
-                scale: exercise.completed ? 1 : 0.8,
-                opacity: exercise.completed ? 1 : 0
+        <div className="mb-2 flex items-center gap-3 justify-between">
+          <div className="flex gap-2 items-center">
+            <Button
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle();
               }}
-              animate={{
-                rotate: exercise.completed ? 0 : 180,
-                scale: exercise.completed ? 1 : 0.8,
-                opacity: exercise.completed ? 1 : 0
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="inline-block"
+              size="icon"
+              className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${
+                exercise.completed ? "border-green-700 bg-green-700" : ""
+              }`}
+              aria-label={
+                exercise.completed
+                  ? "Mark exercise as incomplete"
+                  : "Mark exercise as complete"
+              }
             >
-              <Check size={20} strokeWidth={3} className="text-background" />
-            </motion.span>
-          </Button>
-          <h3 className="flex-grow text-xl font-semibold">
-            {exercise.name}{" "}
-            <span className="text-sm text-primary">{exercise.description}</span>
-          </h3>
+              <motion.span
+                key={exercise.completed ? "completed" : "incomplete"}
+                initial={{
+                  rotate: exercise.completed ? 0 : 180,
+                  scale: exercise.completed ? 1 : 0.8,
+                  opacity: exercise.completed ? 1 : 0
+                }}
+                animate={{
+                  rotate: exercise.completed ? 0 : 180,
+                  scale: exercise.completed ? 1 : 0.8,
+                  opacity: exercise.completed ? 1 : 0
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="inline-block"
+              >
+                <Check size={20} strokeWidth={3} className="text-background" />
+              </motion.span>
+            </Button>
+            <h3 className="text-xl font-semibold" onClick={onExpand}>
+              {exercise.name}{" "}
+              <span className="text-sm text-primary">{exercise.description}</span>
+            </h3>
+          </div>
           <div
             className="text-primary transition-colors hover:text-orange-400"
             aria-label={
               isActive ? "Collapse exercise details" : "Expand exercise details"
             }
+            onClick={onExpand}
           >
             {isActive ? (
               <ChevronUp className="h-6 w-6" />
@@ -222,7 +225,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                 {/* Metrics Section */}
                 <div className="space-y-2">
                   <h4 className="font-semibold">Metrics:</h4>
-                  {exercise.metrics.map((metric, index) => (
+                  {exercise.metrics?.map((metric, index) => (
                     <div
                       key={index}
                       className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
