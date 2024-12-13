@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "9429adcb-1ed0-4430-8e5b-58548f6332e5",
+        "_postman_id": "9e74e8cd-0350-435e-85b9-5c6629703a05",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -229,7 +229,7 @@
                             "mode": "raw",
                             "raw": "{\"attributes\":[\"mcjanyizogah\"]}"
                         },
-                        "description": "",
+                        "description": "Wrapped in a transaction to ensure atomicity.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -260,7 +260,7 @@
                             "mode": "raw",
                             "raw": "{\"keys\":[\"mcjanyizogah\"]}"
                         },
-                        "description": "",
+                        "description": "Wrapped in a transaction to ensure atomicity.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -268,13 +268,13 @@
                     "response": []
                 },
                 {
-                    "name": "Retrieve all activities for the authenticated user.",
+                    "name": "Retrieve activities with optional nesting and date filtering.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/user\/activities",
+                            "path": "api\/activities",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/user\/activities"
+                            "raw": "{{baseUrl}}\/api\/activities"
                         },
                         "method": "GET",
                         "header": [
@@ -316,13 +316,13 @@
                     ]
                 },
                 {
-                    "name": "Add or update activities for the authenticated user.",
+                    "name": "Add or update activities.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/user\/activities",
+                            "path": "api\/activities",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/user\/activities"
+                            "raw": "{{baseUrl}}\/api\/activities"
                         },
                         "method": "PUT",
                         "header": [
@@ -337,9 +337,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"activities\":[{\"id\":10,\"parent_id\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\"}]}"
+                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-13T06:59:32\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
                         },
-                        "description": "Expects an 'activities' array in the request.\nIf 'id' is provided, the corresponding activity is updated; otherwise, a new one is created.",
+                        "description": "",
                         "auth": {
                             "type": "noauth"
                         }
@@ -347,13 +347,13 @@
                     "response": []
                 },
                 {
-                    "name": "Delete specified activities for the authenticated user.",
+                    "name": "Delete activities by ID.",
                     "request": {
                         "url": {
                             "host": "{{baseUrl}}",
-                            "path": "api\/user\/activities",
+                            "path": "api\/activities",
                             "query": [],
-                            "raw": "{{baseUrl}}\/api\/user\/activities"
+                            "raw": "{{baseUrl}}\/api\/activities"
                         },
                         "method": "DELETE",
                         "header": [
@@ -370,7 +370,7 @@
                             "mode": "raw",
                             "raw": "{\"ids\":[10]}"
                         },
-                        "description": "Expects an 'ids' array of activity IDs to delete.",
+                        "description": "",
                         "auth": {
                             "type": "noauth"
                         }
