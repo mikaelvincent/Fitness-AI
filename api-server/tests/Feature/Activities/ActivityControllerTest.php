@@ -24,6 +24,7 @@ class ActivityControllerTest extends TestCase
                 'date' => '2023-12-01',
                 'description' => 'Test Description',
                 'metrics' => ['distance' => 5, 'unit' => 'km'],
+                'completed' => false,
             ],
         ];
 
@@ -39,6 +40,7 @@ class ActivityControllerTest extends TestCase
                         'description' => 'Test Description',
                         'metrics' => ['distance' => 5, 'unit' => 'km'],
                         'user_id' => $user->id,
+                        'completed' => false,
                     ],
                 ],
             ]);
@@ -47,6 +49,7 @@ class ActivityControllerTest extends TestCase
             'name' => 'Test Activity',
             'description' => 'Test Description',
             'user_id' => $user->id,
+            'completed' => false,
         ]);
     }
 
@@ -103,15 +106,8 @@ class ActivityControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $activity1 = Activity::factory()->create([
-            'user_id' => $user->id,
-            'name' => 'Activity One',
-        ]);
-
-        $activity2 = Activity::factory()->create([
-            'user_id' => $user->id,
-            'name' => 'Activity Two',
-        ]);
+        Activity::factory()->create(['user_id' => $user->id, 'name' => 'Activity One']);
+        Activity::factory()->create(['user_id' => $user->id, 'name' => 'Activity Two']);
 
         $response = $this->actingAs($user)
             ->getJson('/api/activities');
@@ -159,7 +155,7 @@ class ActivityControllerTest extends TestCase
             'name' => 'Parent Activity',
         ]);
 
-        $childActivity = Activity::factory()->create([
+        Activity::factory()->create([
             'user_id' => $user->id,
             'parent_id' => $parentActivity->id,
             'name' => 'Child Activity',
@@ -322,14 +318,8 @@ class ActivityControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $parentActivity = Activity::factory()->create([
-            'user_id' => $user->id,
-        ]);
-
-        $childActivity = Activity::factory()->create([
-            'user_id' => $user->id,
-            'parent_id' => $parentActivity->id,
-        ]);
+        $parentActivity = Activity::factory()->create(['user_id' => $user->id]);
+        $childActivity = Activity::factory()->create(['user_id' => $user->id, 'parent_id' => $parentActivity->id]);
 
         $payload = [$parentActivity->id];
 
@@ -431,7 +421,6 @@ class ActivityControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        // Missing required fields
         $payload = [
             [
                 // 'name' is missing
@@ -471,5 +460,134 @@ class ActivityControllerTest extends TestCase
 
         $this->assertDatabaseHas('activities', ['name' => 'Activity 1']);
         $this->assertDatabaseHas('activities', ['name' => 'Activity 2']);
+    }
+
+    /**
+     * Test completion logic: setting completed to true affects descendants.
+     */
+    public function test_completion_propagation_to_descendants()
+    {
+        $user = User::factory()->create();
+
+        $parent = Activity::factory()->create([
+            'user_id' => $user->id,
+            'completed' => false,
+        ]);
+
+        $child = Activity::factory()->create([
+            'user_id' => $user->id,
+            'parent_id' => $parent->id,
+            'completed' => false,
+        ]);
+
+        $payload = [
+            [
+                'id' => $parent->id,
+                'name' => $parent->name,
+                'date' => $parent->date->toDateString(),
+                'completed' => true,
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->putJson('/api/activities', $payload)
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('activities', [
+            'id' => $parent->id,
+            'completed' => true,
+        ]);
+
+        $this->assertDatabaseHas('activities', [
+            'id' => $child->id,
+            'completed' => true,
+        ]);
+    }
+
+    /**
+     * Test completion logic: resetting completed to false affects descendants.
+     */
+    public function test_completion_reset_to_false()
+    {
+        $user = User::factory()->create();
+
+        $parent = Activity::factory()->create([
+            'user_id' => $user->id,
+            'completed' => true,
+        ]);
+
+        $child = Activity::factory()->create([
+            'user_id' => $user->id,
+            'parent_id' => $parent->id,
+            'completed' => true,
+        ]);
+
+        $payload = [
+            [
+                'id' => $parent->id,
+                'name' => $parent->name,
+                'date' => $parent->date->toDateString(),
+                'completed' => false,
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->putJson('/api/activities', $payload)
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('activities', [
+            'id' => $parent->id,
+            'completed' => false,
+        ]);
+
+        $this->assertDatabaseHas('activities', [
+            'id' => $child->id,
+            'completed' => false,
+        ]);
+    }
+
+    /**
+     * Test completion logic: if all siblings are completed true, parent's completed is also set to true.
+     */
+    public function test_completion_bubbles_up()
+    {
+        $user = User::factory()->create();
+
+        $parent = Activity::factory()->create([
+            'user_id' => $user->id,
+            'completed' => false,
+        ]);
+
+        $child1 = Activity::factory()->create([
+            'user_id' => $user->id,
+            'parent_id' => $parent->id,
+            'completed' => true,
+        ]);
+
+        $child2 = Activity::factory()->create([
+            'user_id' => $user->id,
+            'parent_id' => $parent->id,
+            'completed' => false,
+        ]);
+
+        // Turn the second child's completed to true
+        $payload = [
+            [
+                'id' => $child2->id,
+                'name' => $child2->name,
+                'date' => $child2->date->toDateString(),
+                'completed' => true,
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->putJson('/api/activities', $payload)
+            ->assertStatus(200);
+
+        // Now all children of the parent are completed, so parent should also become completed
+        $this->assertDatabaseHas('activities', [
+            'id' => $parent->id,
+            'completed' => true,
+        ]);
     }
 }
