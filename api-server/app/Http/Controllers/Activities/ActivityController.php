@@ -42,8 +42,6 @@ class ActivityController extends Controller
 
     /**
      * Add or update activities.
-     * Ensures parent's date consistency and updates descendants.
-     * Wrapped in a transaction to ensure atomicity.
      */
     public function update(Request $request)
     {
@@ -63,6 +61,7 @@ class ActivityController extends Controller
             'activities.*.description' => ['nullable', 'string'],
             'activities.*.notes' => ['nullable', 'string'],
             'activities.*.metrics' => ['nullable', 'array'],
+            'activities.*.completed' => ['nullable', 'boolean'],
         ]);
 
         // Custom validation to ensure activity IDs exist and belong to the user
@@ -93,6 +92,7 @@ class ActivityController extends Controller
             foreach ($data as $activityData) {
                 $activityData['user_id'] = $request->user()->id;
 
+                // Ensure parent's date consistency
                 if (isset($activityData['parent_id'])) {
                     $parent = $request->user()->activities()->find($activityData['parent_id']);
                     $parentDate = $parent->date;
@@ -101,22 +101,50 @@ class ActivityController extends Controller
                     }
                 }
 
+                // Default completed to false if not provided
+                if (!isset($activityData['completed'])) {
+                    $activityData['completed'] = false;
+                }
+
                 if (isset($activityData['id'])) {
                     $activity = $request->user()->activities()->find($activityData['id']);
+
+                    $oldCompleted = $activity->completed;
                     $activity->update($activityData);
                     $processedActivities[] = $activity;
+
+                    // After updating, ensure date and completion propagation
+                    if ($activity->parent_id) {
+                        $parent = $activity->parent;
+                        $activity->syncDescendantsDate($parent->date);
+                    } else {
+                        $activity->syncDescendantsDate($activity->date);
+                    }
+
+                    // Handle completion logic
+                    if ($oldCompleted !== $activity->completed) {
+                        $activity->syncDescendantsCompletion($activity->completed);
+                        if ($activity->completed) {
+                            $activity->syncAncestorsCompletionIfNeeded();
+                        }
+                    }
                 } else {
                     $newActivity = Activity::create($activityData);
                     $processedActivities[] = $newActivity;
-                }
-            }
 
-            foreach ($processedActivities as $updatedActivity) {
-                if ($updatedActivity->parent_id) {
-                    $parent = $updatedActivity->parent;
-                    $updatedActivity->syncDescendantsDate($parent->date);
-                } else {
-                    $updatedActivity->syncDescendantsDate($updatedActivity->date);
+                    // New activities also respect parent's date
+                    if ($newActivity->parent_id) {
+                        $parent = $newActivity->parent;
+                        $newActivity->syncDescendantsDate($parent->date);
+                    } else {
+                        $newActivity->syncDescendantsDate($newActivity->date);
+                    }
+
+                    // Handle completion logic for new activities
+                    if ($newActivity->completed) {
+                        $newActivity->syncDescendantsCompletion(true);
+                        $newActivity->syncAncestorsCompletionIfNeeded();
+                    }
                 }
             }
         });
@@ -129,8 +157,6 @@ class ActivityController extends Controller
 
     /**
      * Delete activities by ID.
-     * Children are deleted due to database cascade.
-     * Wrapped in a transaction to ensure atomicity.
      */
     public function destroy(Request $request)
     {
@@ -187,7 +213,7 @@ class ActivityController extends Controller
                 $activitiesById[$activity['parent_id']]['children'][] = &$activity;
             }
         }
-        unset($activity); // Break the reference
+        unset($activity);
 
         // Extract root activities
         $nestedActivities = [];
