@@ -16,7 +16,6 @@ class ActivityController extends Controller
     public function index(Request $request)
     {
         $query = $request->user()->activities();
-
         $fromDate = $request->query('from_date');
         $toDate = $request->query('to_date');
 
@@ -29,10 +28,10 @@ class ActivityController extends Controller
         }
 
         $activities = $query->orderBy('date')
-                            ->orderBy('parent_id')
-                            ->orderBy('position')
-                            ->orderBy('name')
-                            ->get();
+            ->orderBy('parent_id')
+            ->orderBy('position')
+            ->orderBy('name')
+            ->get();
 
         if ($request->boolean('nested', false)) {
             $activities = $this->buildNestedStructure($activities);
@@ -56,15 +55,33 @@ class ActivityController extends Controller
 
         $validator = Validator::make(['activities' => $data], [
             'activities' => ['required', 'array'],
-            'activities.*.id' => ['nullable', 'integer', 'exists:activities,id'],
-            'activities.*.date' => ['nullable', 'date'],
-            'activities.*.parent_id' => ['nullable', 'integer', 'exists:activities,id'],
+            'activities.*.id' => ['nullable', 'integer'],
+            'activities.*.date' => ['required', 'date'],
+            'activities.*.parent_id' => ['nullable', 'integer'],
             'activities.*.position' => ['nullable', 'integer'],
             'activities.*.name' => ['required', 'string', 'max:255'],
             'activities.*.description' => ['nullable', 'string'],
             'activities.*.notes' => ['nullable', 'string'],
             'activities.*.metrics' => ['nullable', 'array'],
         ]);
+
+        // Custom validation to ensure activity IDs exist and belong to the user
+        $validator->after(function ($validator) use ($request, $data) {
+            foreach ($data as $key => $activityData) {
+                if (isset($activityData['id'])) {
+                    $activity = $request->user()->activities()->find($activityData['id']);
+                    if (!$activity) {
+                        $validator->errors()->add('activities.' . $key . '.id', 'The selected activity ID is invalid.');
+                    }
+                }
+                if (isset($activityData['parent_id'])) {
+                    $parentActivity = $request->user()->activities()->find($activityData['parent_id']);
+                    if (!$parentActivity) {
+                        $validator->errors()->add('activities.' . $key . '.parent_id', 'The selected parent activity ID is invalid.');
+                    }
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
@@ -77,7 +94,7 @@ class ActivityController extends Controller
                 $activityData['user_id'] = $request->user()->id;
 
                 if (isset($activityData['parent_id'])) {
-                    $parent = $request->user()->activities()->findOrFail($activityData['parent_id']);
+                    $parent = $request->user()->activities()->find($activityData['parent_id']);
                     $parentDate = $parent->date;
                     if (!isset($activityData['date']) || $activityData['date'] != $parentDate->toDateString()) {
                         $activityData['date'] = $parentDate->toDateString();
@@ -85,7 +102,7 @@ class ActivityController extends Controller
                 }
 
                 if (isset($activityData['id'])) {
-                    $activity = $request->user()->activities()->where('id', $activityData['id'])->firstOrFail();
+                    $activity = $request->user()->activities()->find($activityData['id']);
                     $activity->update($activityData);
                     $processedActivities[] = $activity;
                 } else {
@@ -125,8 +142,18 @@ class ActivityController extends Controller
 
         $validator = Validator::make(['ids' => $data], [
             'ids' => ['required', 'array'],
-            'ids.*' => ['required', 'integer', 'exists:activities,id'],
+            'ids.*' => ['required', 'integer'],
         ]);
+
+        // Custom validation to ensure activity IDs exist and belong to the user
+        $validator->after(function ($validator) use ($request, $data) {
+            foreach ($data as $index => $id) {
+                $activity = $request->user()->activities()->find($id);
+                if (!$activity) {
+                    $validator->errors()->add('ids.' . $index, 'The selected activity ID is invalid.');
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json(['message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
@@ -146,17 +173,30 @@ class ActivityController extends Controller
      */
     protected function buildNestedStructure($activities)
     {
-        $activitiesById = $activities->keyBy('id');
-        foreach ($activitiesById as $activity) {
-            $activity->children = [];
+        $activitiesById = [];
+
+        // Convert activities to arrays and initialize children
+        foreach ($activities as $activity) {
+            $activitiesById[$activity->id] = $activity->toArray();
+            $activitiesById[$activity->id]['children'] = [];
         }
 
-        foreach ($activitiesById as $activity) {
-            if ($activity->parent_id && isset($activitiesById[$activity->parent_id])) {
-                $activitiesById[$activity->parent_id]->children[] = $activity;
+        // Build the nested structure
+        foreach ($activitiesById as $id => &$activity) {
+            if ($activity['parent_id'] && isset($activitiesById[$activity['parent_id']])) {
+                $activitiesById[$activity['parent_id']]['children'][] = &$activity;
+            }
+        }
+        unset($activity); // Break the reference
+
+        // Extract root activities
+        $nestedActivities = [];
+        foreach ($activitiesById as $id => $activity) {
+            if (!$activity['parent_id']) {
+                $nestedActivities[] = $activity;
             }
         }
 
-        return $activitiesById->whereNull('parent_id')->values()->toArray();
+        return $nestedActivities;
     }
 }
