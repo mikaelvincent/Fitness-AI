@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\TokenController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\User\UserAttributeController;
 use App\Http\Controllers\Activities\ActivityController;
+use App\Http\Controllers\Chat\ChatController;
 
 // Registration Routes
 Route::group([], function () {
