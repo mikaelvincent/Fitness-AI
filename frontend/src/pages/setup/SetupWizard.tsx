@@ -49,7 +49,7 @@ const SetupWizard = () => {
                 nickname: data.nickname,
             };
 
-            await updateUserAttributes(payload, token);
+            await updateUserAttributes(payload);
             navigate("/");
         } catch (error: any) {
             console.error("Error:", error.message);

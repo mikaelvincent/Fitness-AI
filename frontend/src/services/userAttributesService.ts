@@ -1,21 +1,24 @@
 import { ENV } from "@/utils/env";
+import Cookies from "js-cookie"; // Assumes you're using js-cookie
 
 // Common headers for all requests
-const defaultHeaders = (token?: string) => ({
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-});
+const defaultHeaders = () => {
+    const token = Cookies.get("token"); // Automatically retrieve token
+    return {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+    };
+};
 
 // Helper function for fetch calls
 const fetchAPI = async (
     endpoint: string,
     method: string,
-    token?: string,
     body?: object
 ) => {
     const url = new URL(endpoint, ENV.API_URL);
-    const headers = defaultHeaders(token);
+    const headers = defaultHeaders();
 
     const options: RequestInit = {
         method,
@@ -34,19 +37,18 @@ const fetchAPI = async (
 };
 
 // Fetch all user attributes
-export const getUserAttributes = async (token: string) => {
-    return fetchAPI("/api/user/attributes", "GET", token);
+export const getUserAttributes = async () => {
+    return fetchAPI("/api/user/attributes", "GET");
 };
 
 // Update user attributes
 export const updateUserAttributes = async (
-    attributes: Record<string, string>,
-    token: string
+    attributes: Record<string, string>
 ) => {
-    return fetchAPI("/api/user/attributes", "PUT", token, { attributes });
+    return fetchAPI("/api/user/attributes", "PUT", { attributes });
 };
 
 // Delete specified user attributes
-export const deleteUserAttributes = async (keys: string[], token: string) => {
-    return fetchAPI("/api/user/attributes", "DELETE", token, { keys });
+export const deleteUserAttributes = async (keys: string[]) => {
+    return fetchAPI("/api/user/attributes", "DELETE", { keys });
 };
