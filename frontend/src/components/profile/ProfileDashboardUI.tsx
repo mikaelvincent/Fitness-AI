@@ -39,13 +39,13 @@ export default function ProfileDashboardUI({
   attributes,
 }: ProfileDashboardUIProps) {
   return (
-    <div className="flex h-full w-full flex-col justify-center gap-8 p-4 lg:p-8">
+    <div className="flex h-full w-full flex-col justify-start gap-8 p-4 lg:p-8 xl:justify-center">
       <div className="flex justify-end">
         <ModeToggle />
       </div>
-      <div className="flex h-4/6 w-full gap-2">
+      <div className="flex h-4/6 w-full flex-col gap-2 xl:flex-row">
         {/* Profile Section */}
-        <Card className="w-1/3 flex-none border-zinc-100 bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900">
+        <Card className="flex-none border-zinc-100 bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900 xl:w-1/3">
           <CardContent className="flex h-full flex-col justify-between p-6">
             <div className="flex flex-1 flex-col justify-center space-y-2">
               {!isUpdateName ? (
