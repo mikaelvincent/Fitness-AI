@@ -10,30 +10,39 @@ interface ExerciseTreeProps {
   isActive: boolean;
   onExpand: () => void;
   onToggle: () => void;
-  toggleExerciseCompletion: (id: number) => void;
+  toggleExerciseCompletion: (id: number | null | undefined) => void;
   onUpdateNotes: (notes: string) => void;
-  updateExerciseNotes: (exerciseId: number, notes: string) => void;
+  updateExerciseNotes: (
+    exerciseId: number | null | undefined,
+    notes: string,
+  ) => void;
   onAddMetric: () => void;
-  addMetric: (exerciseId: number) => void;
+  addMetric: (exerciseId: number | null | undefined) => void;
   onUpdateMetric: (idx: number, updatedMetric: Metric) => void;
   updateMetric: (
-    exerciseId: number,
+    exerciseId: number | null | undefined,
     metricIndex: number,
     updatedMetric: Metric,
   ) => void;
   onDeleteMetric: (idx: number) => void;
-  deleteMetric: (exerciseId: number, metricIndex: number) => void;
+  deleteMetric: (
+    exerciseId: number | null | undefined,
+    metricIndex: number,
+  ) => void;
   onDeleteExercise: () => void;
-  deleteExercise: (exerciseId: number) => void;
+  deleteExercise: (exerciseId: number | null | undefined) => void;
   onAddChildExercise: () => void;
-  addChildExercise: (parentId: number) => void;
+  addChildExercise: (parentId: number | null | undefined) => void;
   activeParentId: number | null;
   activeChildId: number | null;
-  onChildExpand: (childId: number, parentId: number) => void;
+  onChildExpand: (
+    childId: number | null | undefined,
+    parentId: number | null | undefined,
+  ) => void;
   newExercise: {
     name: string;
     type: string;
-    parentId: number;
+    parentId: number | null;
   } | null;
   handleNewExerciseNameChange: (name: string) => void;
   handleNewExerciseTypeChange: (type: string) => void;
