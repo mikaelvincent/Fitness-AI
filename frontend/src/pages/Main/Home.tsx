@@ -1,14 +1,14 @@
 // frontend/src/pages/Home.tsx
 
-import Calendar from "@/components/dashboard/Calendar";
 import { useEffect, useRef, useState } from "react";
-import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet";
+import Calendar from "@/components/dashboard/Calendar";
 import { Exercise, Metric } from "@/types/exerciseTypes";
 import { sampleExercises } from "@/utils/exerciseListSample";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button.tsx";
 import { Plus } from "lucide-react";
 import NewExercise from "@/components/dashboard/NewExercise.tsx";
+import ExerciseTree from "@/components/dashboard/exerciseSet/ExerciseTree.tsx";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -20,7 +20,9 @@ const Home = () => {
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>(sampleExercises);
 
-  const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
+  const [activeParentId, setActiveParentId] = useState<number | null>(null);
+  const [activeChildId, setActiveChildId] = useState<number | null>(null);
+
   const [newExercise, setNewExercise] = useState<{
     name: string;
     type: string;
@@ -28,86 +30,79 @@ const Home = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Ref to the last ExerciseSet component
   const lastExerciseRef = useRef<HTMLDivElement>(null);
-
-  // Ref to track the previous value of newExercise
   const prevNewExerciseRef = useRef<typeof newExercise>(null);
 
   useEffect(() => {
-    // Focus the name input only when newExercise is first set
     if (!prevNewExerciseRef.current && newExercise && inputRef.current) {
       inputRef.current.focus();
     }
-    // Update the ref with the current newExercise value
     prevNewExerciseRef.current = newExercise;
   }, [newExercise]);
 
-  // Update the URL when currentDate changes
   useEffect(() => {
     const formattedDate = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
     window.history.replaceState(null, "", `?date=${formattedDate}`);
   }, [currentDate]);
 
-  // useEffect to reset activeExerciseId when currentDate changes
-  useEffect(() => {
-    setActiveExerciseId(null);
-  }, [currentDate]);
-
-  // Toggle completion status
   const toggleExerciseCompletion = (id: number) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) =>
+    setExercises((prev) =>
+      prev.map((exercise) =>
         exercise.id === id
-          ? { ...exercise, isCompleted: !exercise.isCompleted }
+          ? { ...exercise, completed: !exercise.completed }
           : exercise,
       ),
     );
   };
 
-  // Handle expansion toggle
-  const handleExpand = (id: number) => {
-    setActiveExerciseId((prevActiveId) => (prevActiveId === id ? null : id));
+  const handleParentExpand = (id: number) => {
+    setActiveParentId((prev) => (prev === id ? null : id));
+    // If we switch parent or collapse the parent, reset child
+    if (activeParentId !== id) {
+      setActiveChildId(null);
+    }
   };
 
-  // Update notes for any exercise
+  // Modify handleExpand:
+  const handleChildExpand = (childId: number, parentId: number) => {
+    // Ensure the parent is active first
+    if (activeParentId !== parentId) {
+      // If parent isn't active, activate it now (and reset child)
+      setActiveParentId(parentId);
+      setActiveChildId(childId);
+    } else {
+      // If same parent is already active, just toggle the child
+      setActiveChildId((prev) => (prev === childId ? null : childId));
+    }
+  };
+
   const updateExerciseNotes = (exerciseId: number, notes: string) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) =>
+    setExercises((prev) =>
+      prev.map((exercise) =>
         exercise.id === exerciseId ? { ...exercise, notes } : exercise,
       ),
     );
   };
 
-  // Add a new metric to any exercise
   const addMetric = (exerciseId: number) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
+    setExercises((prev) =>
+      prev.map((exercise) => {
         if (exercise.id === exerciseId) {
-          const newMetric: Metric = {
-            name: "New Metric",
-            value: 0,
-            unit: "",
-          };
-          return {
-            ...exercise,
-            metrics: [...exercise.metrics, newMetric],
-          };
+          const newMetric: Metric = { name: "New Metric", value: 0, unit: "" };
+          return { ...exercise, metrics: [...exercise.metrics, newMetric] };
         }
         return exercise;
       }),
     );
   };
 
-  // Update a metric for any exercise
   const updateMetric = (
     exerciseId: number,
     metricIndex: number,
     updatedMetric: Metric,
   ) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
+    setExercises((prev) =>
+      prev.map((exercise) => {
         if (exercise.id === exerciseId) {
           const updatedMetrics = [...exercise.metrics];
           updatedMetrics[metricIndex] = updatedMetric;
@@ -118,10 +113,9 @@ const Home = () => {
     );
   };
 
-  // Delete a metric from any exercise
   const deleteMetric = (exerciseId: number, metricIndex: number) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
+    setExercises((prev) =>
+      prev.map((exercise) => {
         if (exercise.id === exerciseId) {
           const updatedMetrics = exercise.metrics.filter(
             (_, idx) => idx !== metricIndex,
@@ -133,22 +127,18 @@ const Home = () => {
     );
   };
 
-  // Handle adding a new exercise (opens input)
   const initiateAddExercise = () => {
     setNewExercise({ name: "", type: "" });
   };
 
-  // Handle input change for new exercise name
   const handleNewExerciseNameChange = (name: string) => {
     setNewExercise((prev) => (prev ? { ...prev, name } : null));
   };
 
-  // Handle input change for new exercise type
   const handleNewExerciseTypeChange = (type: string) => {
     setNewExercise((prev) => (prev ? { ...prev, type } : null));
   };
 
-  // Save the new exercise to the list
   const handleSaveNewExercise = () => {
     if (
       newExercise &&
@@ -156,50 +146,69 @@ const Home = () => {
       newExercise.type.trim() !== ""
     ) {
       const newId =
-        exercises.length > 0 ? Math.max(...exercises.map((e) => e.id)) + 1 : 1; // Ensure unique ID
+        exercises.length > 0 ? Math.max(...exercises.map((e) => e.id)) + 1 : 1;
       const exerciseToAdd: Exercise = {
         id: newId,
         name: newExercise.name.trim(),
-        type: newExercise.type.trim(),
-        isCompleted: false,
+        description: newExercise.type.trim(),
+        completed: false,
         notes: "",
         metrics: [],
+        parent_id: 0,
+        date: currentDate,
       };
       setExercises([...exercises, exerciseToAdd]);
       setNewExercise(null);
     }
   };
 
-  // Cancel adding a new exercise
   const handleCancelNewExercise = () => {
     setNewExercise(null);
   };
 
-  // Function to delete an exercise
   const deleteExercise = (exerciseId: number) => {
-    setExercises((prevExercises) =>
-      prevExercises.filter((exercise) => exercise.id !== exerciseId),
+    setExercises((prev) =>
+      prev.filter((exercise) => exercise.id !== exerciseId),
     );
   };
+
+  // Filter top-level exercises for the current date
+  const topLevelExercises = exercises.filter(
+    (ex) =>
+      ex.parent_id === 0 &&
+      ex.date.toDateString() === currentDate.toDateString(),
+  );
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
       <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate}>
-        {exercises.map((exercise, index) => (
-          <ExerciseSet
+        {topLevelExercises.map((exercise, index) => (
+          <ExerciseTree
             key={exercise.id}
-            ref={index === exercises.length - 1 ? lastExerciseRef : null} // Assign ref to last ExerciseSet
             exercise={exercise}
+            exercises={exercises}
+            isActive={activeParentId === exercise.id} // Check if this parent is active
+            onExpand={() => handleParentExpand(exercise.id)}
             onToggle={() => toggleExerciseCompletion(exercise.id)}
-            onExpand={() => handleExpand(exercise.id)}
-            isActive={activeExerciseId === exercise.id}
+            toggleExerciseCompletion={toggleExerciseCompletion}
             onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
+            updateExerciseNotes={updateExerciseNotes}
             onAddMetric={() => addMetric(exercise.id)}
+            addMetric={addMetric}
             onUpdateMetric={(idx, updatedMetric) =>
               updateMetric(exercise.id, idx, updatedMetric)
             }
+            updateMetric={updateMetric}
             onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
+            deleteMetric={deleteMetric}
             onDeleteExercise={() => deleteExercise(exercise.id)}
+            deleteExercise={deleteExercise}
+            activeParentId={activeParentId}
+            activeChildId={activeChildId}
+            onChildExpand={handleChildExpand} // Pass down a function to handle child expansion
+            ref={
+              index === topLevelExercises.length - 1 ? lastExerciseRef : null
+            }
           />
         ))}
         {newExercise && (
@@ -221,10 +230,10 @@ const Home = () => {
           className="rounded-lg text-lg shadow-lg"
           size="lg"
           onClick={initiateAddExercise}
-          aria-label="Add New Exercise"
+          aria-label="Add New Activity"
         >
           <Plus size={24} className="text-primary hover:text-orange-400" />
-          <p className="text-primary hover:text-orange-400">Workout</p>
+          <p className="text-primary hover:text-orange-400">Activity</p>
         </Button>
       </div>
     </div>
