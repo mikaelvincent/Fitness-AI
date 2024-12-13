@@ -30,7 +30,9 @@ class ChatController extends Controller
      *
      * Expected request format:
      * {
-     *   "message": "User query..."
+     *   "message": "User query...",
+     *   "stream": true, // Optional: Enable streaming
+     *   "tools": ["getUserAttributes", "updateActivities"] // Optional: Specify tools
      * }
      *
      * @param Request $request
@@ -40,6 +42,9 @@ class ChatController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'message' => ['required', 'string'],
+            'stream' => ['sometimes', 'boolean'],
+            'tools' => ['sometimes', 'array'],
+            'tools.*' => ['string', 'in:getUserAttributes,updateUserAttributes,deleteUserAttributes,getActivities,updateActivities,deleteActivities'],
         ]);
 
         if ($validator->fails()) {
@@ -49,12 +54,33 @@ class ChatController extends Controller
             ], 422);
         }
 
+        $validated = $validator->validated();
+
         $context = $this->chatContextService->getContext($request->user()->id);
+        $stream = $validated['stream'] ?? false;
+        $tools = $validated['tools'] ?? [];
+
         $response = $this->chatService->getResponse(
             $request->user()->id,
-            $validator->validated()['message'],
-            $context
+            $validated['message'],
+            $context,
+            $stream,
+            $tools
         );
+
+        if ($stream) {
+            return response()->stream(function () use ($response) {
+                foreach ($response as $chunk) {
+                    echo $chunk;
+                    ob_flush();
+                    flush();
+                }
+            }, 200, [
+                'Content-Type' => 'text/event-stream',
+                'Cache-Control' => 'no-cache',
+                'Connection' => 'keep-alive',
+            ]);
+        }
 
         return response()->json([
             'message' => 'Chat response generated successfully.',
