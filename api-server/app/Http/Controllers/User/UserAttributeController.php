@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class UserAttributeController extends Controller
 {
@@ -22,12 +23,13 @@ class UserAttributeController extends Controller
 
     /**
      * Add or update attributes for the authenticated user.
+     * Wrapped in a transaction to ensure atomicity.
      */
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'attributes' => ['required', 'array'],
-            'attributes.*' => 'string|max:255',
+            'attributes'     => ['required', 'array'],
+            'attributes.*'   => 'string|max:255',
         ]);
 
         $validator->after(function ($validator) use ($request) {
@@ -38,15 +40,27 @@ class UserAttributeController extends Controller
                         $validator->errors()->add('attributes', 'All attribute keys must be strings.');
                         break;
                     }
+                    if (mb_strlen($key) > 255) {
+                        $validator->errors()->add('attributes.' . $key, 'Attribute keys may not be greater than 255 characters.');
+                    }
                 }
             }
         });
 
-        $validated = $validator->validate();
-
-        foreach ($validated['attributes'] as $key => $value) {
-            $request->user()->setAttributeByKey($key, $value);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors'  => $validator->errors(),
+            ], 422);
         }
+
+        $validated = $validator->validated();
+
+        DB::transaction(function () use ($request, $validated) {
+            foreach ($validated['attributes'] as $key => $value) {
+                $request->user()->setAttributeByKey($key, $value);
+            }
+        });
 
         return response()->json([
             'message' => 'Attributes updated successfully.',
@@ -55,17 +69,20 @@ class UserAttributeController extends Controller
 
     /**
      * Delete specified attributes for the authenticated user.
+     * Wrapped in a transaction to ensure atomicity.
      */
     public function destroy(Request $request)
     {
         $validated = $request->validate([
-            'keys' => 'required|array',
+            'keys'   => 'required|array',
             'keys.*' => 'string|max:255',
         ]);
 
-        foreach ($validated['keys'] as $key) {
-            $request->user()->removeAttributeByKey($key);
-        }
+        DB::transaction(function () use ($request, $validated) {
+            foreach ($validated['keys'] as $key) {
+                $request->user()->removeAttributeByKey($key);
+            }
+        });
 
         return response()->json([
             'message' => 'Attributes deleted successfully.',
