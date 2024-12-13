@@ -12,6 +12,7 @@ interface StepCardProps {
     canGoNext?: boolean;
     isLastStep?: boolean;
     isFirstStep?: boolean;
+    isSubmitting?: boolean;
 }
 
 export const StepCard: React.FC<StepCardProps> = ({
@@ -23,6 +24,7 @@ export const StepCard: React.FC<StepCardProps> = ({
     canGoNext = true,
     isLastStep = false,
     isFirstStep = false,
+    isSubmitting = false,
 }) => {
     return (
         <Card className="w-full mx-auto border-0">
@@ -46,8 +48,8 @@ export const StepCard: React.FC<StepCardProps> = ({
                     </Button>
                 )}
                 {isLastStep && (
-                    <Button onClick={onFinish}>
-                        Finish
+                    <Button onClick={onFinish} disabled={!canGoNext || isSubmitting}>
+                        {isSubmitting ? "Submitting..." : "Finish"}
                     </Button>
                 )}
             </CardFooter>
