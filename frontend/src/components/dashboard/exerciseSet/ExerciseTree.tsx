@@ -1,7 +1,8 @@
 // Define the props for ExerciseTree
+import { forwardRef, Ref, RefObject } from "react";
 import { Exercise, Metric } from "@/types/exerciseTypes.ts";
-import { forwardRef, Ref } from "react";
 import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet.tsx";
+import NewExercise from "@/components/dashboard/NewExercise.tsx";
 
 interface ExerciseTreeProps {
   exercise: Exercise;
@@ -24,9 +25,22 @@ interface ExerciseTreeProps {
   deleteMetric: (exerciseId: number, metricIndex: number) => void;
   onDeleteExercise: () => void;
   deleteExercise: (exerciseId: number) => void;
+  onAddChildExercise: () => void;
+  addChildExercise: (parentId: number) => void;
   activeParentId: number | null;
   activeChildId: number | null;
   onChildExpand: (childId: number, parentId: number) => void;
+  newExercise: {
+    name: string;
+    type: string;
+    parentId: number;
+  } | null;
+  handleNewExerciseNameChange: (name: string) => void;
+  handleNewExerciseTypeChange: (type: string) => void;
+  handleSaveNewExercise: () => void;
+  handleCancelNewExercise: () => void;
+  containerRef: RefObject<HTMLDivElement>;
+  inputRef: RefObject<HTMLInputElement>;
 }
 
 // Create the ExerciseTree component with forwardRef
@@ -49,9 +63,18 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
       deleteMetric,
       onDeleteExercise,
       deleteExercise,
+      onAddChildExercise,
+      addChildExercise,
       activeParentId,
       activeChildId,
       onChildExpand,
+      newExercise,
+      handleNewExerciseNameChange,
+      handleNewExerciseTypeChange,
+      handleSaveNewExercise,
+      handleCancelNewExercise,
+      containerRef,
+      inputRef,
     },
     ref: Ref<HTMLDivElement>,
   ) => {
@@ -70,6 +93,7 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
         onUpdateMetric={onUpdateMetric}
         onDeleteMetric={onDeleteMetric}
         onDeleteExercise={onDeleteExercise}
+        onAddChildExercise={onAddChildExercise}
       >
         {children.length > 0 && isActive && (
           <div className="ml-6 border-l border-gray-600 pl-4">
@@ -94,14 +118,52 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
                 deleteMetric={deleteMetric}
                 onDeleteExercise={() => deleteExercise(child.id)}
                 deleteExercise={deleteExercise}
+                onAddChildExercise={() => addChildExercise(child.id)}
+                addChildExercise={addChildExercise}
                 activeParentId={activeParentId}
                 activeChildId={activeChildId}
                 onChildExpand={onChildExpand}
+                newExercise={newExercise}
+                handleNewExerciseNameChange={handleNewExerciseNameChange}
+                handleNewExerciseTypeChange={handleNewExerciseTypeChange}
+                handleSaveNewExercise={handleSaveNewExercise}
+                handleCancelNewExercise={handleCancelNewExercise}
+                containerRef={containerRef}
+                inputRef={inputRef}
                 ref={null}
               />
             ))}
+            {/* If we are adding a child exercise to this particular parent */}
+            {newExercise && newExercise.parentId === exercise.id && (
+              <NewExercise
+                name={newExercise.name}
+                type={newExercise.type}
+                onNameChange={handleNewExerciseNameChange}
+                onTypeChange={handleNewExerciseTypeChange}
+                onSave={handleSaveNewExercise}
+                onCancel={handleCancelNewExercise}
+                containerRef={containerRef}
+                inputRef={inputRef}
+              />
+            )}
           </div>
         )}
+        {/* If the current node has no children yet, but we are adding one, and it's active */}
+        {isActive &&
+          children.length === 0 &&
+          newExercise &&
+          newExercise.parentId === exercise.id && (
+            <NewExercise
+              name={newExercise.name}
+              type={newExercise.type}
+              onNameChange={handleNewExerciseNameChange}
+              onTypeChange={handleNewExerciseTypeChange}
+              onSave={handleSaveNewExercise}
+              onCancel={handleCancelNewExercise}
+              containerRef={containerRef}
+              inputRef={inputRef}
+            />
+          )}
       </ExerciseSet>
     );
   },
