@@ -34,7 +34,7 @@ export const StepCard: React.FC<StepCardProps> = ({
                         <BackButton onClick={onPrev} />
                     )}
                 </div>
-                <CardTitle className="text-3xl lg:text-5xl text-center w-full">{title}</CardTitle>
+                <CardTitle className="text-3xl lg:text-4xl text-center w-full">{title}</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-6">

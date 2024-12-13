@@ -3,7 +3,19 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, onChange, ...props }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+      // Allow only numbers (filter out non-numeric characters)
+      if (type === "number") {
+        const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+        e.target.value = numericValue;
+      }
+
+      onChange && onChange(e);
+    };
+
     return (
       <input
         type={type}
@@ -12,11 +24,12 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         ref={ref}
+        onChange={handleChange}
         {...props}
       />
-    )
+    );
   }
-)
-Input.displayName = "Input"
+);
+Input.displayName = "Input";
 
-export { Input }
+export { Input };
