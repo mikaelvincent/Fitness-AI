@@ -10,7 +10,7 @@ interface RetrieveActivitiesResponse {
 
 interface RetrieveActivitiesProps {
   token: string | null;
-  date: string;
+  date: Date;
 }
 
 export const RetrieveActivities = async ({
@@ -18,10 +18,14 @@ export const RetrieveActivities = async ({
   date,
 }: RetrieveActivitiesProps): Promise<RetrieveActivitiesResponse> => {
   try {
+    const formattedDate = date.toISOString().split("T")[0];
+
     const url = new URL("/api/activities", ENV.API_URL);
-    url.searchParams.append("from_date", date);
-    url.searchParams.append("to_date", date);
+    url.searchParams.append("from_date", formattedDate);
+    url.searchParams.append("to_date", formattedDate);
     url.searchParams.append("nested", "true"); // Include if needed
+
+    console.log("URL:", url);
 
     const headers = {
       "Content-Type": "application/json",
