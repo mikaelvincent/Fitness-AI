@@ -62,8 +62,10 @@ const Home = () => {
     try {
       const response = await RetrieveActivities({
         token,
-        date: currentDate.toString(),
+        date: currentDate,
       });
+
+      console.log(response.data);
       if (!response?.success) {
         setError();
         setResponseMessage(
@@ -73,8 +75,19 @@ const Home = () => {
         return;
       }
       if (response?.success && response?.data) {
+        const rawData = response.data as any[];
+
+        function convertDates(ex: any): Exercise {
+          return {
+            ...ex,
+            date: new Date(ex.date),
+            children: ex.children ? ex.children.map(convertDates) : [],
+          };
+        }
+
+        const formattedExercises = rawData.map(convertDates);
+        setExercises(formattedExercises);
         setDone();
-        setExercises(response.data as Exercise[]);
         return;
       }
     } catch (error) {
@@ -213,7 +226,7 @@ const Home = () => {
 
   const topLevelExercises = exercises.filter(
     (ex) =>
-      ex.parent_id === 0 &&
+      (ex.parent_id === null || ex.parent_id === 0) &&
       ex.date.toDateString() === currentDate.toDateString(),
   );
 
