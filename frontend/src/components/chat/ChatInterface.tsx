@@ -78,9 +78,9 @@ const ChatInterface: React.FC = () => {
         <div className="min-h-screen flex flex-col bg-background text-foreground">
             {/* Chat Header */}
             <header className="flex flex-col sticky top-0 z-10 p-6 text-center w-full bg-inherit text-foreground">
-                <div>
+                {/* <div>
                     <BackButton onClick={handleBack} />
-                </div>
+                </div> */}
                 {currentView === "chat" ? (
                     <div className="pt-8">
                         <h1 className="text-2xl lg:text-3xl font-bold">What Is Your Goal?</h1>
