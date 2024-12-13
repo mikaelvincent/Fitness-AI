@@ -50,7 +50,7 @@ const SetupWizard = () => {
             };
 
             await updateUserAttributes(payload);
-            navigate("/");
+            navigate("/initial-chat");
         } catch (error: any) {
             console.error("Error:", error.message);
             if (error.message === "Authentication token not found.") {
