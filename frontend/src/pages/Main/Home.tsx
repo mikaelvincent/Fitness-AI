@@ -151,7 +151,14 @@ const Home = () => {
       });
 
       if (!response.success) {
-        throw new Error(response.message || "Failed to toggle activity");
+        setUpdateError();
+        setResponseMessage(response.message || "Failed to toggle activity");
+        toast({
+          variant: "destructive",
+          title: "Failed to toggle activity",
+          description: response.message || "Failed to toggle activity",
+        });
+        return;
       }
 
       setResponseMessage("Activity toggled successfully.");
@@ -326,7 +333,14 @@ const Home = () => {
         });
 
         if (!response.success) {
-          throw new Error(response.message || "Failed to add activity");
+          setUpdateError();
+          setResponseMessage(response.message || "Failed to add activity");
+          toast({
+            variant: "destructive",
+            title: "Failed to add activity",
+            description: response.message || "Failed to add activity",
+          });
+          return;
         }
 
         if (response.success) {
