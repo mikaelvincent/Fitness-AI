@@ -21,13 +21,16 @@ class ChatService
     /**
      * Generate a chat response from the model.
      * If a tool call is requested, execute the tool and provide its result.
+     * Supports optional streaming and tool selection.
      *
      * @param int $userId
      * @param string $message
      * @param array $context
-     * @return string
+     * @param bool $stream
+     * @param array $selectedTools
+     * @return string|iterable
      */
-    public function getResponse(int $userId, string $message, array $context): string
+    public function getResponse(int $userId, string $message, array $context, bool $stream = false, array $selectedTools = [])
     {
         $model = env('GPT_MODEL', 'gpt-4o');
         $fallbackModel = env('GPT_FALLBACK_MODEL', 'gpt-3.5-turbo');
@@ -52,7 +55,7 @@ class ChatService
         ];
 
         // Define available tools
-        $tools = [
+        $allTools = [
             [
                 'type' => 'function',
                 'function' => [
@@ -162,26 +165,60 @@ class ChatService
             ],
         ];
 
+        // Filter tools based on selectedTools
+        $tools = [];
+        if (!empty($selectedTools)) {
+            foreach ($allTools as $tool) {
+                if (in_array($tool['function']['name'], $selectedTools)) {
+                    $tools[] = $tool;
+                }
+            }
+        }
+
         // Initial attempt with the primary model
         try {
-            $response = OpenAI::chat()->create([
-                'model' => $model,
-                'messages' => $messages,
-                'tools' => $tools,
-            ]);
+            if ($stream) {
+                $response = OpenAI::chat()->createStreamed([
+                    'model' => $model,
+                    'messages' => $messages,
+                    'tools' => $tools,
+                ]);
+            } else {
+                $response = OpenAI::chat()->create([
+                    'model' => $model,
+                    'messages' => $messages,
+                    'tools' => $tools,
+                ]);
+            }
         } catch (Exception $e) {
             Log::error('OpenAI request failed: ' . $e->getMessage());
             // Attempt fallback model
             try {
-                $response = OpenAI::chat()->create([
-                    'model' => $fallbackModel,
-                    'messages' => $messages,
-                    'tools' => $tools,
-                ]);
+                if ($stream) {
+                    $response = OpenAI::chat()->createStreamed([
+                        'model' => $fallbackModel,
+                        'messages' => $messages,
+                        'tools' => $tools,
+                    ]);
+                } else {
+                    $response = OpenAI::chat()->create([
+                        'model' => $fallbackModel,
+                        'messages' => $messages,
+                        'tools' => $tools,
+                    ]);
+                }
             } catch (Exception $fallbackException) {
                 Log::error('Fallback model request failed: ' . $fallbackException->getMessage());
                 return 'An error occurred while processing your request. Please try again later.';
             }
+        }
+
+        // Handle streaming response
+        if ($stream) {
+            foreach ($response as $chunk) {
+                yield $chunk;
+            }
+            return;
         }
 
         // Check for tool calls
@@ -203,11 +240,19 @@ class ChatService
             ];
 
             try {
-                $followUpResponse = OpenAI::chat()->create([
-                    'model' => $model,
-                    'messages' => $messages,
-                    'tools' => $tools,
-                ]);
+                if ($stream) {
+                    $followUpResponse = OpenAI::chat()->createStreamed([
+                        'model' => $model,
+                        'messages' => $messages,
+                        'tools' => $tools,
+                    ]);
+                } else {
+                    $followUpResponse = OpenAI::chat()->create([
+                        'model' => $model,
+                        'messages' => $messages,
+                        'tools' => $tools,
+                    ]);
+                }
             } catch (Exception $e) {
                 Log::error('OpenAI follow-up request failed: ' . $e->getMessage());
                 return 'An error occurred while processing your request. Please try again later.';
