@@ -17,7 +17,6 @@ class ActivityTest extends TestCase
     public function test_parent_relationship()
     {
         $user = User::factory()->create();
-
         $parentActivity = Activity::factory()->create(['user_id' => $user->id]);
 
         $childActivity = Activity::factory()->create([
@@ -35,7 +34,6 @@ class ActivityTest extends TestCase
     public function test_children_relationship()
     {
         $user = User::factory()->create();
-
         $parentActivity = Activity::factory()->create(['user_id' => $user->id]);
 
         $childActivity1 = Activity::factory()->create([
@@ -61,7 +59,6 @@ class ActivityTest extends TestCase
     public function test_cascade_delete_on_children()
     {
         $user = User::factory()->create();
-
         $parentActivity = Activity::factory()->create(['user_id' => $user->id]);
 
         $childActivity = Activity::factory()->create([
@@ -81,7 +78,6 @@ class ActivityTest extends TestCase
     public function test_metrics_casting()
     {
         $user = User::factory()->create();
-
         $metrics = ['distance' => 5, 'unit' => 'km'];
 
         $activity = Activity::factory()->create([
@@ -99,11 +95,9 @@ class ActivityTest extends TestCase
     public function test_updating_metrics()
     {
         $user = User::factory()->create();
-
         $activity = Activity::factory()->create(['user_id' => $user->id]);
 
         $newMetrics = ['steps' => 10000, 'calories' => 500];
-
         $activity->metrics = $newMetrics;
         $activity->save();
 
@@ -121,7 +115,6 @@ class ActivityTest extends TestCase
     public function test_sync_descendants_date()
     {
         $user = User::factory()->create();
-
         $parentActivity = Activity::factory()->create([
             'user_id' => $user->id,
             'date' => '2023-12-01',
@@ -151,14 +144,12 @@ class ActivityTest extends TestCase
     public function test_sync_descendants_date_deep_nesting()
     {
         $user = User::factory()->create();
-
         $parentActivity = Activity::factory()->create([
             'user_id' => $user->id,
             'date' => '2023-12-01',
         ]);
 
         $activities = [];
-
         $currentParent = $parentActivity;
         for ($i = 0; $i < 5; $i++) {
             $activity = Activity::factory()->create([
@@ -183,10 +174,41 @@ class ActivityTest extends TestCase
     public function test_user_relationship()
     {
         $user = User::factory()->create();
-
         $activity = Activity::factory()->create(['user_id' => $user->id]);
 
-        $this->assertInstanceOf(User::class, $activity->user);
         $this->assertEquals($user->id, $activity->user->id);
+    }
+
+    /**
+     * Test completion sync: setting parent completed to true sets descendants to true.
+     */
+    public function test_sync_descendants_completion()
+    {
+        $user = User::factory()->create();
+
+        $parent = Activity::factory()->create(['user_id' => $user->id, 'completed' => false]);
+        $child = Activity::factory()->create(['user_id' => $user->id, 'parent_id' => $parent->id, 'completed' => false]);
+
+        $parent->syncDescendantsCompletion(true);
+
+        $this->assertTrue($child->fresh()->completed);
+    }
+
+    /**
+     * Test ancestors completion logic: if all siblings become true, parent is set to true.
+     */
+    public function test_sync_ancestors_completion_if_needed()
+    {
+        $user = User::factory()->create();
+
+        $parent = Activity::factory()->create(['user_id' => $user->id, 'completed' => false]);
+        $child1 = Activity::factory()->create(['user_id' => $user->id, 'parent_id' => $parent->id, 'completed' => true]);
+        $child2 = Activity::factory()->create(['user_id' => $user->id, 'parent_id' => $parent->id, 'completed' => false]);
+
+        $child2->completed = true;
+        $child2->save();
+        $child2->syncAncestorsCompletionIfNeeded();
+
+        $this->assertTrue($parent->fresh()->completed);
     }
 }
