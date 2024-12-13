@@ -17,4 +17,5 @@ export interface Exercise {
   notes: string;
   metrics: Metric[];
   completed: boolean;
+  children: Exercise[];
 }
