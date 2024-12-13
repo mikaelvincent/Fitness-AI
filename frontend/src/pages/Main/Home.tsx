@@ -157,6 +157,7 @@ const Home = () => {
           variant: "destructive",
           title: "Failed to toggle activity",
           description: response.message || "Failed to toggle activity",
+          duration: 500,
         });
         return;
       }
@@ -165,6 +166,7 @@ const Home = () => {
       setUpdateDone();
       toast({
         title: "Activity toggled successfully.",
+        duration: 500,
       });
     } catch (error) {
       console.error("Error toggling activity:", error);
@@ -177,6 +179,7 @@ const Home = () => {
         title: "Failed to toggle activity",
         description:
           "An error occurred while updating the activity. Please try again.",
+        duration: 500,
       });
 
       // Revert the optimistic update
@@ -339,6 +342,7 @@ const Home = () => {
             variant: "destructive",
             title: "Failed to add activity",
             description: response.message || "Failed to add activity",
+            duration: 500,
           });
           return;
         }
@@ -354,6 +358,7 @@ const Home = () => {
           setResponseMessage("Activity added successfully.");
           toast({
             title: "Activity added successfully.",
+            duration: 500,
           });
         }
       } catch (error) {
@@ -367,6 +372,7 @@ const Home = () => {
           title: "Failed to add activity",
           description:
             "An error occurred while adding the activity. Please try again.",
+          duration: 500,
         });
 
         // Revert the optimistic update by removing the temporary exercise
