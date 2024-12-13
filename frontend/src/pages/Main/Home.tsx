@@ -3,12 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import Calendar from "@/components/dashboard/Calendar";
 import { Exercise, Metric } from "@/types/exerciseTypes";
-import { sampleExercises } from "@/utils/exerciseListSample";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button.tsx";
-import { Plus } from "lucide-react";
+import { AlertCircle, Plus } from "lucide-react";
 import NewExercise from "@/components/dashboard/NewExercise.tsx";
 import ExerciseTree from "@/components/dashboard/exerciseSet/ExerciseTree.tsx";
+import useStatus from "@/hooks/useStatus.tsx";
+import { useUser } from "@/hooks/context/UserContext.tsx";
+import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.tsx";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -17,11 +21,16 @@ const Home = () => {
     ? new Date(initialDateParam)
     : new Date();
 
+  const { status, setLoading, setDone, setError } = useStatus();
+  const { token } = useUser();
+
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
-  const [exercises, setExercises] = useState<Exercise[]>(sampleExercises);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
 
   const [activeParentId, setActiveParentId] = useState<number | null>(null);
   const [activeChildId, setActiveChildId] = useState<number | null>(null);
+
+  const [responseMessage, setResponseMessage] = useState<string | null>(null);
 
   const [newExercise, setNewExercise] = useState<{
     name: string;
@@ -44,7 +53,35 @@ const Home = () => {
   useEffect(() => {
     const formattedDate = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
     window.history.replaceState(null, "", `?date=${formattedDate}`);
+
+    fetchExercises().then((r) => r);
   }, [currentDate]);
+
+  const fetchExercises = async () => {
+    setLoading();
+    try {
+      const response = await RetrieveActivities({
+        token,
+        date: currentDate.toString(),
+      });
+      if (!response?.success) {
+        setError();
+        setResponseMessage(
+          "Error " + response.status.toString() + ": " + response?.message ||
+            "Failed to retrieve activities",
+        );
+        return;
+      }
+      if (response?.success && response?.data) {
+        setDone();
+        setExercises(response.data as Exercise[]);
+        return;
+      }
+    } catch (error) {
+      console.error("Error retrieving activities:", error);
+      setError();
+    }
+  };
 
   const toggleExerciseCompletion = (id: number) => {
     setExercises((prev) =>
@@ -179,6 +216,28 @@ const Home = () => {
       ex.parent_id === 0 &&
       ex.date.toDateString() === currentDate.toDateString(),
   );
+
+  if (status === "loading") {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center xl:px-24 2xl:px-32">
+        <Skeleton className="h-[500px] w-[500px] rounded-xl" />
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="flex h-full w-full flex-col justify-center xl:px-24 2xl:px-32">
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {responseMessage || "Failed to retrieve activities"}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
