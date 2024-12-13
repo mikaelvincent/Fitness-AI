@@ -3,18 +3,31 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Services\UserAttributeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class UserAttributeController extends Controller
 {
+    protected UserAttributeService $service;
+
+    /**
+     * Constructor.
+     *
+     * @param UserAttributeService $service
+     */
+    public function __construct(UserAttributeService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Retrieve all attributes for the authenticated user.
      */
     public function index(Request $request)
     {
-        $attributes = $request->user()->attributes()->pluck('value', 'key');
+        $attributes = $this->service->getAttributes($request->user()->id);
 
         return response()->json([
             'data' => $attributes,
@@ -57,9 +70,7 @@ class UserAttributeController extends Controller
         $validated = $validator->validated();
 
         DB::transaction(function () use ($request, $validated) {
-            foreach ($validated['attributes'] as $key => $value) {
-                $request->user()->setAttributeByKey($key, $value);
-            }
+            $this->service->updateAttributes($request->user()->id, $validated['attributes']);
         });
 
         return response()->json([
@@ -79,9 +90,7 @@ class UserAttributeController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated) {
-            foreach ($validated['keys'] as $key) {
-                $request->user()->removeAttributeByKey($key);
-            }
+            $this->service->deleteAttributes($request->user()->id, $validated['keys']);
         });
 
         return response()->json([
