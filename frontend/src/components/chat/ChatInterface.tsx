@@ -1,27 +1,36 @@
 import React, { useState, useRef, useEffect } from "react";
 import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
-import { useTheme } from "@/components/theme/theme-provider";
 import { RiAiGenerate } from "react-icons/ri";
 import BackButton from "../custom-ui/BackButton";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { getUserAttributes } from "@/services/userAttributesService";
 
 const ChatInterface: React.FC = () => {
     const [messages, setMessages] = useState<{ sender: "user" | "ai"; message: string }[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [currentView, setCurrentView] = useState<"chat" | "fitnessProfile">("chat");
+    const [profileInfo, setProfileInfo] = useState<{ label: string; value: string }[]>([]);
     const chatEndRef = useRef<HTMLDivElement | null>(null);
     const navigate = useNavigate();
 
-    const profileInfo = [
-        { label: "Age", value: "28" },
-        { label: "Weight", value: "75 kg" },
-        { label: "Height", value: "5'9\"" },
-        { label: "Fitness Goal", value: "Build muscle and increase endurance." },
-        { label: "Preferred Workout", value: "Strength Training, HIIT, and Core Workouts" },
-        { label: "Weekly Sessions", value: "4-5, depending on availability" },
-    ];
+    const fetchProfileInfo = async () => {
+        try {
+            const response = await getUserAttributes();
+
+            // Transform the response dynamically into { label, value } pairs
+            const formattedProfile = Object.entries(response.data).map(([key, value]) => ({
+                label: key.charAt(0).toUpperCase() + key.slice(1), // Capitalize keys
+                value: String(value),
+            }));
+
+            setProfileInfo(formattedProfile);
+        } catch (error) {
+            console.error("Error fetching profile info:", error);
+        }
+    };
 
     const sendMessage = (userMessage: string) => {
         if (isLoading) return;
@@ -42,6 +51,10 @@ const ChatInterface: React.FC = () => {
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isLoading]);
+
+    useEffect(() => {
+        if (currentView === "fitnessProfile") fetchProfileInfo();
+    }, [currentView]);
 
     const handleBack = () => window.history.back();
     const handleFitnessProfileClick = () => setCurrentView("fitnessProfile");
@@ -119,12 +132,12 @@ const ChatInterface: React.FC = () => {
                                                 key={index}
                                                 className="flex justify-between items-center p-3 rounded-lg bg-background hover:bg-gray-700 transition duration-300"
                                             >
-                                                <span className="text-md">{item.label}: {item.value}</span>
+                                                <span className="text-md font-medium">{item.label}:</span>
+                                                <span className="text-md">{item.value}</span>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
-
                             )}
                             <div ref={chatEndRef} />
                         </div>

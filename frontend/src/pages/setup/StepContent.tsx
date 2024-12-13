@@ -5,7 +5,7 @@ import { MeasurementStep } from "./steps/MeasurementStep";
 import { WeightStep } from "./steps/WeightStep";
 import { HeightStep } from "./steps/HeightStep";
 import { ActivityStep } from "./steps/ActivityStep";
-import { UsernameStep } from "./steps/UsernameStep";
+import { NicknameStep } from "./steps/NicknameStep";
 import { SummaryStep } from "./steps/SummaryStep";
 import { SetupData } from "./SetupContext";
 
@@ -54,8 +54,8 @@ const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => 
             );
         case "activity":
             return <ActivityStep activity={data.activity} onChange={onChange} />;
-        case "username":
-            return <UsernameStep username={data.username} onChange={onChange} />;
+        case "nickname":
+            return <NicknameStep nickname={data.nickname} onChange={onChange} />;
         case "summary":
             return <SummaryStep data={data} />;
         default:
