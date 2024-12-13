@@ -35,8 +35,9 @@ const Home = () => {
   const [currentDate, setcurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>([]);
 
-  const [activeParentId, setActiveParentId] = useState<number | null>(null);
-  const [activeChildId, setActiveChildId] = useState<number | null>(null);
+  const [expandedNodes, setExpandedNodes] = useState<
+    Map<number | null | undefined, number>
+  >(new Map());
 
   const [responseMessage, setResponseMessage] = useState<string | null>(null);
 
@@ -191,36 +192,19 @@ const Home = () => {
     }
   };
 
-  const handleParentExpand = (id: number | null | undefined) => {
-    // Use nullish coalescing to ensure 'id' is either a number or null
-    const safeId = id ?? null;
-
-    setActiveParentId((prev) => (prev === safeId ? null : safeId));
-
-    // If we switch parent or collapse the parent, reset child
-    if (activeParentId !== safeId) {
-      setActiveChildId(null);
-    }
-  };
-
-  // Modify handleChildExpand:
-  const handleChildExpand = (
-    childId: number | null | undefined,
+  const toggleNodeExpansion = (
+    id: number,
     parentId: number | null | undefined,
   ) => {
-    // Use nullish coalescing to ensure values are number or null
-    const safeParentId = parentId ?? null;
-    const safeChildId = childId ?? null;
-
-    // Ensure the parent is active first
-    if (activeParentId !== safeParentId) {
-      // If parent isn't active, activate it now (and reset child)
-      setActiveParentId(safeParentId);
-      setActiveChildId(safeChildId);
-    } else {
-      // If same parent is already active, just toggle the child
-      setActiveChildId((prev) => (prev === safeChildId ? null : safeChildId));
-    }
+    setExpandedNodes((prev) => {
+      const newMap = new Map(prev);
+      if (newMap.get(parentId) === id) {
+        newMap.delete(parentId);
+      } else {
+        newMap.set(parentId, id);
+      }
+      return newMap;
+    });
   };
 
   const updateExerciseNotes = (
@@ -448,8 +432,9 @@ const Home = () => {
               key={exercise.id}
               exercise={exercise}
               exercises={exercises}
-              isActive={activeParentId === exercise.id}
-              onExpand={() => handleParentExpand(exercise.id)}
+              expandedNodes={expandedNodes}
+              onToggleExpansion={toggleNodeExpansion}
+              parentId={0}
               onToggle={() => toggleExerciseCompletion(exercise.id)}
               toggleExerciseCompletion={toggleExerciseCompletion}
               onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
@@ -466,9 +451,6 @@ const Home = () => {
               deleteExercise={deleteExercise}
               onAddChildExercise={() => initiateAddExercise(exercise.id)}
               addChildExercise={initiateAddExercise}
-              activeParentId={activeParentId}
-              activeChildId={activeChildId}
-              onChildExpand={handleChildExpand}
               newExercise={newExercise}
               handleNewExerciseNameChange={handleNewExerciseNameChange}
               handleNewExerciseTypeChange={handleNewExerciseDescriptionChange}
