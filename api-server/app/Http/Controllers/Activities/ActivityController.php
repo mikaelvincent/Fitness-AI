@@ -3,35 +3,32 @@
 namespace App\Http\Controllers\Activities;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activity;
+use App\Services\ActivityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class ActivityController extends Controller
 {
+    protected ActivityService $service;
+
+    /**
+     * Constructor.
+     *
+     * @param ActivityService $service
+     */
+    public function __construct(ActivityService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Retrieve activities with optional nesting and date filtering.
      */
     public function index(Request $request)
     {
-        $query = $request->user()->activities();
-        $fromDate = $request->query('from_date');
-        $toDate = $request->query('to_date');
-
-        if ($fromDate && $toDate) {
-            $query->whereBetween('date', [$fromDate, $toDate]);
-        } elseif ($fromDate) {
-            $query->where('date', '>=', $fromDate);
-        } elseif ($toDate) {
-            $query->where('date', '<=', $toDate);
-        }
-
-        $activities = $query->orderBy('date')
-            ->orderBy('parent_id')
-            ->orderBy('position')
-            ->orderBy('name')
-            ->get();
+        $filters = $request->only(['from_date', 'to_date']);
+        $activities = $this->service->getActivities($request->user()->id, $filters);
 
         if ($request->boolean('nested', false)) {
             $activities = $this->buildNestedStructure($activities);
@@ -64,7 +61,6 @@ class ActivityController extends Controller
             'activities.*.completed' => ['nullable', 'boolean'],
         ]);
 
-        // Custom validation to ensure activity IDs exist and belong to the user
         $validator->after(function ($validator) use ($request, $data) {
             foreach ($data as $key => $activityData) {
                 if (isset($activityData['id'])) {
@@ -86,67 +82,8 @@ class ActivityController extends Controller
             return response()->json(['message' => 'Validation failed.', 'errors' => $validator->errors()], 422);
         }
 
-        $processedActivities = [];
-
-        DB::transaction(function () use ($data, $request, &$processedActivities) {
-            foreach ($data as $activityData) {
-                $activityData['user_id'] = $request->user()->id;
-
-                // Ensure parent's date consistency
-                if (isset($activityData['parent_id'])) {
-                    $parent = $request->user()->activities()->find($activityData['parent_id']);
-                    $parentDate = $parent->date;
-                    if (!isset($activityData['date']) || $activityData['date'] != $parentDate->toDateString()) {
-                        $activityData['date'] = $parentDate->toDateString();
-                    }
-                }
-
-                // Default completed to false if not provided
-                if (!isset($activityData['completed'])) {
-                    $activityData['completed'] = false;
-                }
-
-                if (isset($activityData['id'])) {
-                    $activity = $request->user()->activities()->find($activityData['id']);
-
-                    $oldCompleted = $activity->completed;
-                    $activity->update($activityData);
-                    $processedActivities[] = $activity;
-
-                    // After updating, ensure date and completion propagation
-                    if ($activity->parent_id) {
-                        $parent = $activity->parent;
-                        $activity->syncDescendantsDate($parent->date);
-                    } else {
-                        $activity->syncDescendantsDate($activity->date);
-                    }
-
-                    // Handle completion logic
-                    if ($oldCompleted !== $activity->completed) {
-                        $activity->syncDescendantsCompletion($activity->completed);
-                        if ($activity->completed) {
-                            $activity->syncAncestorsCompletionIfNeeded();
-                        }
-                    }
-                } else {
-                    $newActivity = Activity::create($activityData);
-                    $processedActivities[] = $newActivity;
-
-                    // New activities also respect parent's date
-                    if ($newActivity->parent_id) {
-                        $parent = $newActivity->parent;
-                        $newActivity->syncDescendantsDate($parent->date);
-                    } else {
-                        $newActivity->syncDescendantsDate($newActivity->date);
-                    }
-
-                    // Handle completion logic for new activities
-                    if ($newActivity->completed) {
-                        $newActivity->syncDescendantsCompletion(true);
-                        $newActivity->syncAncestorsCompletionIfNeeded();
-                    }
-                }
-            }
+        DB::transaction(function () use ($request, $data, &$processedActivities) {
+            $processedActivities = $this->service->upsertActivities($request->user()->id, $data);
         });
 
         return response()->json([
@@ -171,7 +108,6 @@ class ActivityController extends Controller
             'ids.*' => ['required', 'integer'],
         ]);
 
-        // Custom validation to ensure activity IDs exist and belong to the user
         $validator->after(function ($validator) use ($request, $data) {
             foreach ($data as $index => $id) {
                 $activity = $request->user()->activities()->find($id);
@@ -186,7 +122,7 @@ class ActivityController extends Controller
         }
 
         DB::transaction(function () use ($request, $data) {
-            $request->user()->activities()->whereIn('id', $data)->delete();
+            $this->service->deleteActivities($request->user()->id, $data);
         });
 
         return response()->json([
@@ -201,23 +137,20 @@ class ActivityController extends Controller
     {
         $activitiesById = [];
 
-        // Convert activities to arrays and initialize children
         foreach ($activities as $activity) {
             $activitiesById[$activity->id] = $activity->toArray();
             $activitiesById[$activity->id]['children'] = [];
         }
 
-        // Build the nested structure
-        foreach ($activitiesById as $id => &$activity) {
+        foreach ($activitiesById as &$activity) {
             if ($activity['parent_id'] && isset($activitiesById[$activity['parent_id']])) {
                 $activitiesById[$activity['parent_id']]['children'][] = &$activity;
             }
         }
         unset($activity);
 
-        // Extract root activities
         $nestedActivities = [];
-        foreach ($activitiesById as $id => $activity) {
+        foreach ($activitiesById as $activity) {
             if (!$activity['parent_id']) {
                 $nestedActivities[] = $activity;
             }
