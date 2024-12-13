@@ -26,6 +26,7 @@ const Home = () => {
   const [newExercise, setNewExercise] = useState<{
     name: string;
     type: string;
+    parentId: number;
   } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -127,8 +128,9 @@ const Home = () => {
     );
   };
 
-  const initiateAddExercise = () => {
-    setNewExercise({ name: "", type: "" });
+  const initiateAddExercise = (parentId: number = 0) => {
+    // If parentId = 0, top-level exercise; otherwise a child exercise
+    setNewExercise({ name: "", type: "", parentId });
   };
 
   const handleNewExerciseNameChange = (name: string) => {
@@ -154,7 +156,7 @@ const Home = () => {
         completed: false,
         notes: "",
         metrics: [],
-        parent_id: 0,
+        parent_id: newExercise.parentId,
         date: currentDate,
       };
       setExercises([...exercises, exerciseToAdd]);
@@ -172,7 +174,6 @@ const Home = () => {
     );
   };
 
-  // Filter top-level exercises for the current date
   const topLevelExercises = exercises.filter(
     (ex) =>
       ex.parent_id === 0 &&
@@ -187,7 +188,7 @@ const Home = () => {
             key={exercise.id}
             exercise={exercise}
             exercises={exercises}
-            isActive={activeParentId === exercise.id} // Check if this parent is active
+            isActive={activeParentId === exercise.id}
             onExpand={() => handleParentExpand(exercise.id)}
             onToggle={() => toggleExerciseCompletion(exercise.id)}
             toggleExerciseCompletion={toggleExerciseCompletion}
@@ -203,15 +204,26 @@ const Home = () => {
             deleteMetric={deleteMetric}
             onDeleteExercise={() => deleteExercise(exercise.id)}
             deleteExercise={deleteExercise}
+            onAddChildExercise={() => initiateAddExercise(exercise.id)}
+            addChildExercise={initiateAddExercise}
             activeParentId={activeParentId}
             activeChildId={activeChildId}
-            onChildExpand={handleChildExpand} // Pass down a function to handle child expansion
+            onChildExpand={handleChildExpand}
+            newExercise={newExercise}
+            handleNewExerciseNameChange={handleNewExerciseNameChange}
+            handleNewExerciseTypeChange={handleNewExerciseTypeChange}
+            handleSaveNewExercise={handleSaveNewExercise}
+            handleCancelNewExercise={handleCancelNewExercise}
+            containerRef={containerRef}
+            inputRef={inputRef}
             ref={
               index === topLevelExercises.length - 1 ? lastExerciseRef : null
             }
           />
         ))}
-        {newExercise && (
+
+        {/* For top-level new exercise (when parentId=0) */}
+        {newExercise && newExercise.parentId === 0 && (
           <NewExercise
             name={newExercise.name}
             type={newExercise.type}
@@ -229,7 +241,7 @@ const Home = () => {
           variant="ghost"
           className="rounded-lg text-lg shadow-lg"
           size="lg"
-          onClick={initiateAddExercise}
+          onClick={() => initiateAddExercise(0)}
           aria-label="Add New Activity"
         >
           <Plus size={24} className="text-primary hover:text-orange-400" />
