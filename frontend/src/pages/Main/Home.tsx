@@ -230,69 +230,60 @@ const Home = () => {
       ex.date.toDateString() === currentDate.toDateString(),
   );
 
-  if (status === "loading") {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center xl:px-24 2xl:px-32">
-        <Skeleton className="h-[500px] w-[500px] rounded-xl" />
-      </div>
-    );
-  }
-
-  if (status === "error") {
-    return (
-      <div className="flex h-full w-full flex-col justify-center xl:px-24 2xl:px-32">
-        <Alert variant="destructive" className="mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {responseMessage || "Failed to retrieve activities"}
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
       <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate}>
-        {topLevelExercises.map((exercise, index) => (
-          <ExerciseTree
-            key={exercise.id}
-            exercise={exercise}
-            exercises={exercises}
-            isActive={activeParentId === exercise.id}
-            onExpand={() => handleParentExpand(exercise.id)}
-            onToggle={() => toggleExerciseCompletion(exercise.id)}
-            toggleExerciseCompletion={toggleExerciseCompletion}
-            onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
-            updateExerciseNotes={updateExerciseNotes}
-            onAddMetric={() => addMetric(exercise.id)}
-            addMetric={addMetric}
-            onUpdateMetric={(idx, updatedMetric) =>
-              updateMetric(exercise.id, idx, updatedMetric)
-            }
-            updateMetric={updateMetric}
-            onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
-            deleteMetric={deleteMetric}
-            onDeleteExercise={() => deleteExercise(exercise.id)}
-            deleteExercise={deleteExercise}
-            onAddChildExercise={() => initiateAddExercise(exercise.id)}
-            addChildExercise={initiateAddExercise}
-            activeParentId={activeParentId}
-            activeChildId={activeChildId}
-            onChildExpand={handleChildExpand}
-            newExercise={newExercise}
-            handleNewExerciseNameChange={handleNewExerciseNameChange}
-            handleNewExerciseTypeChange={handleNewExerciseTypeChange}
-            handleSaveNewExercise={handleSaveNewExercise}
-            handleCancelNewExercise={handleCancelNewExercise}
-            containerRef={containerRef}
-            inputRef={inputRef}
-            ref={
-              index === topLevelExercises.length - 1 ? lastExerciseRef : null
-            }
-          />
-        ))}
+        {status === "loading" && (
+          <Skeleton className="h-[500px] w-[500px] rounded-xl" />
+        )}
+        {status === "error" && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              {responseMessage || "Failed to retrieve activities"}
+            </AlertDescription>
+          </Alert>
+        )}
+        {status === "done" &&
+          topLevelExercises.map((exercise, index) => (
+            <ExerciseTree
+              key={exercise.id}
+              exercise={exercise}
+              exercises={exercises}
+              isActive={activeParentId === exercise.id}
+              onExpand={() => handleParentExpand(exercise.id)}
+              onToggle={() => toggleExerciseCompletion(exercise.id)}
+              toggleExerciseCompletion={toggleExerciseCompletion}
+              onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
+              updateExerciseNotes={updateExerciseNotes}
+              onAddMetric={() => addMetric(exercise.id)}
+              addMetric={addMetric}
+              onUpdateMetric={(idx, updatedMetric) =>
+                updateMetric(exercise.id, idx, updatedMetric)
+              }
+              updateMetric={updateMetric}
+              onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
+              deleteMetric={deleteMetric}
+              onDeleteExercise={() => deleteExercise(exercise.id)}
+              deleteExercise={deleteExercise}
+              onAddChildExercise={() => initiateAddExercise(exercise.id)}
+              addChildExercise={initiateAddExercise}
+              activeParentId={activeParentId}
+              activeChildId={activeChildId}
+              onChildExpand={handleChildExpand}
+              newExercise={newExercise}
+              handleNewExerciseNameChange={handleNewExerciseNameChange}
+              handleNewExerciseTypeChange={handleNewExerciseTypeChange}
+              handleSaveNewExercise={handleSaveNewExercise}
+              handleCancelNewExercise={handleCancelNewExercise}
+              containerRef={containerRef}
+              inputRef={inputRef}
+              ref={
+                index === topLevelExercises.length - 1 ? lastExerciseRef : null
+              }
+            />
+          ))}
 
         {/* For top-level new exercise (when parentId=0) */}
         {newExercise && newExercise.parentId === 0 && (
