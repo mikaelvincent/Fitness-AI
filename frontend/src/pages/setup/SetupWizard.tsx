@@ -4,8 +4,11 @@ import { StepCard } from "@/components/setup/StepCard";
 import StepContent from "./StepContent";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie"; // To fetch the token from cookies
-import { updateUserAttributes, AttributesSchema } from "@/utils/api/updateUserAttributes";
+import Cookies from "js-cookie";
+import {
+    updateUserAttributes,
+    getUserAttributes,
+} from "@/services/userAttributesService";
 
 const steps = [
     { id: "gender", title: "What's your gender?" },
@@ -21,32 +24,20 @@ const steps = [
 const SetupWizard = () => {
     const { data, updateData } = useSetupData();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
     const step = steps[currentStepIndex];
-
     const nextStep = () => setCurrentStepIndex((i) => i + 1);
     const prevStep = () => setCurrentStepIndex((i) => i - 1);
 
-
-
     const finish = async () => {
-        console.log("Submitting user data:", data);
-
-        // Set the submission state to true
         setIsSubmitting(true);
 
         try {
-            // Get token from cookies
             const token = Cookies.get("token");
+            if (!token) throw new Error("Authentication token not found.");
 
-            if (!token) {
-                alert("Authentication token not found. Please log in again.");
-                return;
-            }
-
-            // Prepare the payload as key-value pairs
             const payload = {
                 gender: data.gender,
                 birthdate: `${data.birthdateYear}-${data.birthdateMonth}-${data.birthdateDay}`,
@@ -57,36 +48,15 @@ const SetupWizard = () => {
                 nickname: data.nickname,
             };
 
-            // Validate the payload (optional, ensures correct format)
-            const validationResult = AttributesSchema.safeParse(payload);
-
-            if (!validationResult.success) {
-                console.error("Validation failed:", validationResult.error);
-                alert("Invalid data provided.");
-                return;
-            }
-
-            // Call the API
-            const result = await updateUserAttributes(validationResult.data, token);
-
-            if (result.success) {
-                console.log("Attributes updated:", result.message);
-                alert("User attributes updated successfully!");
-                navigate("/");
-            } else {
-                console.error("Update failed:", result.message);
-                alert(result.message || "Failed to update user attributes.");
-            }
-        } catch (error) {
-            console.error("Unexpected error during submission:", error);
-            alert("An unexpected error occurred. Please try again.");
+            await updateUserAttributes(payload, token);
+            navigate("/");
+        } catch (error: any) {
+            console.error("Error:", error.message);
+            alert(error.message || "Failed to update user attributes.");
         } finally {
-            // Reset the submission state to false
             setIsSubmitting(false);
         }
     };
-
-
 
     const isAtLeast13AtMost100 = (): boolean => {
         const { birthdateDay, birthdateMonth, birthdateYear } = data;
@@ -97,7 +67,6 @@ const SetupWizard = () => {
             Number(birthdateMonth) - 1,
             Number(birthdateDay)
         );
-        if (isNaN(birthDate.getTime())) return false;
 
         const today = new Date();
         const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
@@ -106,19 +75,14 @@ const SetupWizard = () => {
         return birthDate <= thirteenYearsAgo && birthDate >= hundredYearsAgo;
     };
 
-    const canGoNext = (): boolean => {
+    const canGoNext = () => {
         switch (step.id) {
             case "gender":
                 return data.gender.trim() !== "";
             case "birthdate":
-                return (
-                    data.birthdateDay.trim() !== "" &&
-                    data.birthdateMonth.trim() !== "" &&
-                    data.birthdateYear.trim() !== "" &&
-                    isAtLeast13AtMost100()
-                );
+                return isAtLeast13AtMost100();
             case "measurement":
-                return data.measurement === "imperial" || data.measurement === "metric";
+                return ["metric", "imperial"].includes(data.measurement);
             case "weight":
                 return data.weight > 0;
             case "height":
@@ -152,7 +116,7 @@ const SetupWizard = () => {
                         canGoNext={canGoNext()}
                         isFirstStep={currentStepIndex === 0}
                         isLastStep={currentStepIndex === steps.length - 1}
-                        isSubmitting={isSubmitting} // Disable button during submission
+                        isSubmitting={isSubmitting}
                     >
                         <StepContent stepId={step.id} data={data} onChange={handleChange} />
                     </StepCard>
