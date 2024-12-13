@@ -50,7 +50,11 @@ class ChatController extends Controller
         }
 
         $context = $this->chatContextService->getContext($request->user()->id);
-        $response = $this->chatService->getResponse($validator->validated()['message'], $context);
+        $response = $this->chatService->getResponse(
+            $request->user()->id,
+            $validator->validated()['message'],
+            $context
+        );
 
         return response()->json([
             'message' => 'Chat response generated successfully.',
