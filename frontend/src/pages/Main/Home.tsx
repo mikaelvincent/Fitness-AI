@@ -21,6 +21,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -207,17 +208,6 @@ const Home = () => {
     });
   };
 
-  const updateExerciseNotes = (
-    exerciseId: number | null | undefined,
-    notes: string,
-  ) => {
-    setExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === exerciseId ? { ...exercise, notes } : exercise,
-      ),
-    );
-  };
-
   const addMetric = (exerciseId: number | null | undefined) => {
     setExercises((prev) =>
       prev.map((exercise) => {
@@ -381,6 +371,52 @@ const Home = () => {
     return ex.parent_id === null && exerciseDate === exDate;
   });
 
+  const handleUpdateExercise = async (updatedExercise: Exercise) => {
+    try {
+      // Indicate that an update is in progress
+      setUpdateLoading();
+
+      // Attempt to update the exercise on the server
+      const response = await UpdateOrAddActivity({
+        token,
+        activities: updatedExercise,
+      });
+
+      if (!response.success) {
+        // If the update failed, show an error message
+        setUpdateError();
+        setResponseMessage(response.message || "Failed to update activity");
+        toast({
+          variant: "destructive",
+          title: "Failed to update activity",
+          description: response.message || "Failed to update activity",
+          duration: 500,
+        });
+        return;
+      }
+
+      // If successful, update the exercise in local state recursively
+      setExercises((prev) => updateExerciseInTree(prev, updatedExercise));
+
+      // Indicate that the update is done and show success message
+      setUpdateDone();
+      setResponseMessage("Activity updated successfully.");
+    } catch (error) {
+      console.error("Error updating activity:", error);
+      setUpdateError();
+      setResponseMessage(
+        "An unexpected error occurred while updating the activity.",
+      );
+      toast({
+        variant: "destructive",
+        title: "Failed to update activity",
+        description:
+          "An error occurred while updating the activity. Please try again.",
+        duration: 500,
+      });
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
       <Calendar currentDate={currentDate} setCurrentDate={setcurrentDate}>
@@ -437,8 +473,6 @@ const Home = () => {
               parentId={0}
               onToggle={() => toggleExerciseCompletion(exercise.id)}
               toggleExerciseCompletion={toggleExerciseCompletion}
-              onUpdateNotes={(notes) => updateExerciseNotes(exercise.id, notes)}
-              updateExerciseNotes={updateExerciseNotes}
               onAddMetric={() => addMetric(exercise.id)}
               addMetric={addMetric}
               onUpdateMetric={(idx, updatedMetric) =>
@@ -461,6 +495,7 @@ const Home = () => {
               ref={
                 index === topLevelExercises.length - 1 ? lastExerciseRef : null
               }
+              onUpdateExercise={handleUpdateExercise}
             />
           ))}
         {newExercise && newExercise.parentId === null && (
