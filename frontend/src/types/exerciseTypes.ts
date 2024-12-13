@@ -9,13 +9,14 @@ export interface Metric {
 
 // Update the Exercise interface with 'type' as a string
 export interface Exercise {
-  id: number;
-  date: Date;
-  parent_id: number;
-  name: string;
-  description: string;
-  notes: string;
-  metrics: Metric[];
-  completed: boolean;
-  children: Exercise[];
+  id?: number | null;
+  date?: Date;
+  parent_id?: number | null;
+  name?: string;
+  description?: string;
+  notes?: string;
+  position?: number;
+  metrics?: Metric[];
+  completed?: boolean;
+  children?: Exercise[];
 }
