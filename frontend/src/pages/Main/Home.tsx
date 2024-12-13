@@ -3,18 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Calendar from "@/components/dashboard/Calendar";
 import { Exercise, Metric } from "@/types/exerciseTypes";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button.tsx";
-import { AlertCircle, Plus } from "lucide-react";
+import { AlertCircle, BotMessageSquare, Plus } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import NewExercise from "@/components/dashboard/NewExercise.tsx";
 import ExerciseTree from "@/components/dashboard/exerciseSet/ExerciseTree.tsx";
 import useStatus from "@/hooks/useStatus.tsx";
 import { useUser } from "@/hooks/context/UserContext.tsx";
 import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.tsx";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UpdateOrAddActivity } from "@/services/exercises/UpdateOrAddActivity.tsx";
 import { toast } from "@/hooks/use-toast.tsx";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -44,6 +50,7 @@ const Home = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const lastExerciseRef = useRef<HTMLDivElement>(null);
   const prevNewExerciseRef = useRef<typeof newExercise>(null);
+  const [noExercises, setNoExercises] = useState<boolean>(false);
 
   const generateTempId = () => -Date.now();
 
@@ -89,6 +96,11 @@ const Home = () => {
       }
       if (response?.success && response?.data) {
         const rawData = response.data as any[];
+        if (rawData.length === 0) {
+          setNoExercises(true);
+          setDone();
+          return;
+        }
 
         function convertDates(ex: any): Exercise {
           return {
@@ -323,6 +335,7 @@ const Home = () => {
             prev.map((ex) => (ex.id === tempId ? exerciseToAdd : ex)),
           );
 
+          setNoExercises(false);
           setUpdateDone();
           setResponseMessage("Activity added successfully.");
           toast({
@@ -358,11 +371,11 @@ const Home = () => {
     );
   };
 
-  const topLevelExercises = exercises.filter(
-    (ex) =>
-      (ex.parent_id === null || ex.parent_id === 0) &&
-      ex.date?.toDateString() === currentDate.toDateString(),
-  );
+  const exDate = currentDate.toISOString().split("T")[0];
+  const topLevelExercises = exercises.filter((ex) => {
+    const exerciseDate = ex.date?.toISOString().split("T")[0];
+    return ex.parent_id === null && exerciseDate === exDate;
+  });
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
@@ -378,6 +391,35 @@ const Home = () => {
               {responseMessage || "Failed to retrieve activities"}
             </AlertDescription>
           </Alert>
+        )}
+        {noExercises && (
+          <Card>
+            <CardHeader>
+              <h1 className="text-center text-2xl font-semibold">
+                No activities found
+              </h1>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center">No activities found for today.</p>
+            </CardContent>
+            <CardFooter className="flex flex-col justify-center gap-2">
+              <Button
+                onClick={() => initiateAddExercise()}
+                className="self-center"
+              >
+                <Plus size={24} className="mr-2" />
+                Add Activity
+              </Button>
+              <p className="text-2xl font-semibold">OR</p>
+              <Button
+                variant="ghost"
+                className="text-primary hover:text-orange-400"
+              >
+                <BotMessageSquare />
+                <Link to="/chat">Chat with Genie to generate workout</Link>
+              </Button>
+            </CardFooter>
+          </Card>
         )}
         {/* For top-level new exercise (when parentId=0) */}
         {status === "done" &&
