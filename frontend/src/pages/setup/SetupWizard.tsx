@@ -5,6 +5,7 @@ import StepContent from "./StepContent";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { toast } from "@/hooks/use-toast";
 import {
     updateUserAttributes,
     getUserAttributes,
@@ -52,7 +53,17 @@ const SetupWizard = () => {
             navigate("/");
         } catch (error: any) {
             console.error("Error:", error.message);
-            alert(error.message || "Failed to update user attributes.");
+            if (error.message === "Authentication token not found.") {
+                toast({
+                    title: "Error",
+                    description: "You are not authenticated. Please log in.",
+                })
+            } else {
+                toast({
+                    title: "Error",
+                    description: error.message || "Failed to update user attributes.",
+                });
+            }
         } finally {
             setIsSubmitting(false);
         }
