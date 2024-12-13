@@ -29,6 +29,7 @@ class ActivityFactory extends Factory
                 $count = $this->faker->numberBetween(1, 3),
                 $preserveKeys = true
             ),
+            'completed' => false,
         ];
     }
 }
