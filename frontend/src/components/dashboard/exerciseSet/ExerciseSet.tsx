@@ -1,6 +1,6 @@
-// frontend/src/components/dashboard/ExerciseSet.tsx
+// frontend/src/components/dashboard/exerciseSet/ExerciseSet.tsx
 
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, ReactNode, useEffect, useState } from "react";
 import {
   Check,
   ChevronDown,
@@ -26,6 +26,7 @@ interface ExerciseSetProps {
   onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
   onDeleteMetric: (metricIndex: number) => void;
   onDeleteExercise: () => void;
+  children?: ReactNode;
 }
 
 export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
@@ -40,41 +41,41 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       onUpdateMetric,
       onDeleteMetric,
       onDeleteExercise,
+      children
     },
-    ref, // Accept ref as the second argument
+    ref
   ) => {
     const [isEditingNotes, setIsEditingNotes] = useState(false);
     const [tempNotes, setTempNotes] = useState(exercise.notes);
-
-    // For editing metrics
+    
     const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(
-      null,
+      null
     );
     const [tempMetricName, setTempMetricName] = useState("");
     const [tempMetricValue, setTempMetricValue] = useState<number>(0);
     const [tempMetricUnit, setTempMetricUnit] = useState("");
-
+    
     useEffect(() => {
       setTempNotes(exercise.notes);
     }, [exercise.notes]);
-
+    
     useEffect(() => {
       if (!isActive) {
         setIsEditingNotes(false);
         setEditingMetricIndex(null);
       }
     }, [isActive]);
-
+    
     const handleNotesSave = () => {
       onUpdateNotes(tempNotes);
       setIsEditingNotes(false);
     };
-
+    
     const handleNotesCancel = () => {
       setTempNotes(exercise.notes);
       setIsEditingNotes(false);
     };
-
+    
     const handleMetricClick = (index: number, metric: Metric) => {
       if (editingMetricIndex === index) {
         setEditingMetricIndex(null);
@@ -85,27 +86,27 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
         setTempMetricUnit(metric.unit);
       }
     };
-
+    
     const handleSaveMetric = (index: number) => {
       const updatedMetric: Metric = {
         name: tempMetricName,
         value: tempMetricValue,
-        unit: tempMetricUnit,
+        unit: tempMetricUnit
       };
       onUpdateMetric(index, updatedMetric);
       setEditingMetricIndex(null);
     };
-
+    
     const handleCancelMetricEdit = () => {
       setEditingMetricIndex(null);
     };
-
+    
     const detailsVariants = {
       hidden: { opacity: 0, height: 0 },
       visible: { opacity: 1, height: "auto" },
-      exit: { opacity: 0, height: 0 },
+      exit: { opacity: 0, height: 0 }
     };
-
+    
     return (
       <div ref={ref} className="border-b-2 border-b-primary p-4">
         <div className="mb-2 flex items-center gap-3" onClick={onExpand}>
@@ -117,25 +118,25 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
             }}
             size="icon"
             className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${
-              exercise.isCompleted ? "border-green-700 bg-green-700" : ""
+              exercise.completed ? "border-green-700 bg-green-700" : ""
             }`}
             aria-label={
-              exercise.isCompleted
+              exercise.completed
                 ? "Mark exercise as incomplete"
                 : "Mark exercise as complete"
             }
           >
             <motion.span
-              key={exercise.isCompleted ? "completed" : "incomplete"}
+              key={exercise.completed ? "completed" : "incomplete"}
               initial={{
-                rotate: exercise.isCompleted ? 0 : 180,
-                scale: exercise.isCompleted ? 1 : 0.8,
-                opacity: exercise.isCompleted ? 1 : 0,
+                rotate: exercise.completed ? 0 : 180,
+                scale: exercise.completed ? 1 : 0.8,
+                opacity: exercise.completed ? 1 : 0
               }}
               animate={{
-                rotate: exercise.isCompleted ? 0 : 180,
-                scale: exercise.isCompleted ? 1 : 0.8,
-                opacity: exercise.isCompleted ? 1 : 0,
+                rotate: exercise.completed ? 0 : 180,
+                scale: exercise.completed ? 1 : 0.8,
+                opacity: exercise.completed ? 1 : 0
               }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="inline-block"
@@ -145,7 +146,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
           </Button>
           <h3 className="flex-grow text-xl font-semibold">
             {exercise.name}{" "}
-            <span className="text-sm text-primary">({exercise.type})</span>
+            <span className="text-sm text-primary">{exercise.description}</span>
           </h3>
           <div
             className="text-primary transition-colors hover:text-orange-400"
@@ -215,7 +216,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     </Button>
                   )}
                 </div>
-
+                
                 {/* Metrics Section */}
                 <div className="space-y-2">
                   <h4 className="font-semibold">Metrics:</h4>
@@ -231,7 +232,6 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div className="grid grid-cols-3 gap-2">
-                            {/* Metric Name */}
                             <div className="flex flex-col">
                               <label
                                 htmlFor={`metric-name-${index}`}
@@ -250,7 +250,6 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                                 placeholder="Metric Name"
                               />
                             </div>
-                            {/* Metric Value */}
                             <div className="flex flex-col">
                               <label
                                 htmlFor={`metric-value-${index}`}
@@ -264,7 +263,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                                 value={tempMetricValue}
                                 onChange={(e) =>
                                   setTempMetricValue(
-                                    parseFloat(e.target.value) || 0,
+                                    parseFloat(e.target.value) || 0
                                   )
                                 }
                                 className="w-full rounded px-2 py-1 text-sm"
@@ -273,7 +272,6 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                                 placeholder="Value"
                               />
                             </div>
-                            {/* Metric Unit */}
                             <div className="flex flex-col">
                               <label
                                 htmlFor={`metric-unit-${index}`}
@@ -357,7 +355,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                       )}
                     </div>
                   ))}
-
+                  
                   <div className="flex w-full justify-between">
                     <Button
                       variant="destructive"
@@ -386,10 +384,15 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                   </div>
                 </div>
               </div>
+              
+              {/* Render children (if any) under the metrics section */}
+              {children}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     );
-  },
+  }
 );
+
+ExerciseSet.displayName = "ExerciseSet"; // Optional: Helps with debugging
