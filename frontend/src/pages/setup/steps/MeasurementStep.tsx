@@ -1,21 +1,38 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
+import { SetupData } from "../SetupContext";
 
 interface MeasurementStepProps {
-    measurement: "metric" | "imperial"; // Current selected value
-    onChange: (key: string, value: string) => void; // Function to handle selection changes
+    data: SetupData;
+    onChange: (key: string, value: any) => void; // Function to handle selection changes
 };
 
-export const MeasurementStep: React.FC<MeasurementStepProps> = ({ measurement, onChange }) => {
+export const MeasurementStep: React.FC<MeasurementStepProps> = ({ data, onChange }) => {
+    const measurement = data.measurement;
     const updateData = (measurement: string) => {
-        onChange("measurement", measurement);
-        if (measurement === "metric") {
+        if (measurement === data.measurement) return;
+        if (measurement === "metric" && data.measurement === "imperial") {
+            // Convert weight from lbs to kg
+            const weightInKg = Math.round(data.weight * 0.453592);
+            onChange("weight", weightInKg);
             onChange("weightUnit", "kg");
+
+            // Convert height from inches to cm
+            const heightInCm = Math.round(data.height * 2.54);
+            onChange("height", heightInCm);
             onChange("heightUnit", "cm");
-        } else {
+        } else if (measurement === "imperial" && data.measurement === "metric") {
+            // Convert weight from kg to lbs
+            const weightInLbs = Math.round(data.weight * 2.20462);
+            onChange("weight", weightInLbs);
             onChange("weightUnit", "lbs");
+
+            // Convert height from cm to inches
+            const heightInInches = Math.round(data.height / 2.54);
+            onChange("height", heightInInches);
             onChange("heightUnit", "in");
         }
+        onChange("measurement", measurement);
     }
 
     return (
