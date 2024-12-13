@@ -79,7 +79,7 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
     ref: Ref<HTMLDivElement>,
   ) => {
     // Get the children of the current exercise
-    const children = exercises.filter((e) => e.parent_id === exercise.id);
+    const children = exercise.children || [];
 
     return (
       <ExerciseSet
