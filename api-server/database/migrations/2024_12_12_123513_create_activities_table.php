@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->text('notes')->nullable();
             $table->json('metrics')->nullable();
+            $table->boolean('completed')->default(false);
             $table->timestamps();
 
             $table->foreign('parent_id')
