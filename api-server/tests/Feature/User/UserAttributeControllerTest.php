@@ -1,9 +1,9 @@
 <?php
-
 namespace Tests\Feature\User;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class UserAttributeControllerTest extends TestCase
@@ -66,7 +66,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_update_user_attributes_success()
     {
         $user = User::factory()->create();
-
         $payload = [
             'attributes' => [
                 'attribute1' => 'value1',
@@ -157,7 +156,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_update_attributes_with_invalid_data()
     {
         $user = User::factory()->create();
-
         $payload = [
             'attributes' => 'invalid_data',
         ];
@@ -175,7 +173,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_update_attributes_with_non_string_keys_or_values()
     {
         $user = User::factory()->create();
-
         $payload = [
             'attributes' => [
                 123 => 'value1',
@@ -228,7 +225,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_delete_attributes_non_existent_keys()
     {
         $user = User::factory()->create();
-
         $payload = [
             'keys' => ['non_existent_key'],
         ];
@@ -267,7 +263,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_delete_attributes_with_invalid_keys()
     {
         $user = User::factory()->create();
-
         $payload = [
             'keys' => [123, 'valid_key'],
         ];
@@ -285,7 +280,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_update_attributes_empty_payload()
     {
         $user = User::factory()->create();
-
         $payload = [
             'attributes' => [],
         ];
@@ -303,7 +297,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_delete_attributes_empty_keys_array()
     {
         $user = User::factory()->create();
-
         $payload = [
             'keys' => [],
         ];
@@ -323,7 +316,6 @@ class UserAttributeControllerTest extends TestCase
         $user = User::factory()->create();
         $longKey = str_repeat('a', 256);
         $longValue = str_repeat('b', 256);
-
         $payload = [
             'attributes' => [
                 $longKey => $longValue,
@@ -343,7 +335,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_delete_attributes_with_invalid_data_types()
     {
         $user = User::factory()->create();
-
         $payload = [
             'keys' => [123, 'valid_key'],
         ];
@@ -361,7 +352,6 @@ class UserAttributeControllerTest extends TestCase
     public function test_update_attributes_sql_injection_attempt()
     {
         $user = User::factory()->create();
-
         $payload = [
             'attributes' => [
                 'key; DROP TABLE users;' => 'value',
@@ -413,7 +403,134 @@ class UserAttributeControllerTest extends TestCase
         $response2->assertStatus(200);
 
         $finalValue = $user->fresh()->getAttributeByKey('shared_key');
-
         $this->assertTrue(in_array($finalValue, ['value1', 'value2']));
+    }
+
+    /**
+     * Test that multiple attribute updates within a transaction are all applied or all rolled back if one fails.
+     */
+    public function test_atomic_update_all_or_nothing()
+    {
+        $user = User::factory()->create();
+
+        $user->attributes()->create(['key' => 'attribute1', 'value' => 'initial_value1']);
+        $user->attributes()->create(['key' => 'attribute2', 'value' => 'initial_value2']);
+
+        // Payload with one invalid attribute (key too long)
+        $longKey = str_repeat('a', 256);
+        $payload = [
+            'attributes' => [
+                'attribute1' => 'new_value1',
+                'attribute2' => 'new_value2',
+                $longKey => 'value_with_long_key',
+            ],
+        ];
+
+        $response = $this->actingAs($user)
+            ->putJson('/api/user/attributes', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['attributes.' . $longKey]);
+
+        // Ensure that neither attribute1 nor attribute2 was updated
+        $this->assertDatabaseHas('user_attributes', [
+            'user_id' => $user->id,
+            'key' => 'attribute1',
+            'value' => 'initial_value1',
+        ]);
+
+        $this->assertDatabaseHas('user_attributes', [
+            'user_id' => $user->id,
+            'key' => 'attribute2',
+            'value' => 'initial_value2',
+        ]);
+    }
+
+    /**
+     * Test that invalid updates rolled back in a transaction do not leave partial changes in the database.
+     */
+    public function test_invalid_update_does_not_leave_partial_changes()
+    {
+        $user = User::factory()->create();
+
+        // Initial attributes
+        $user->attributes()->create(['key' => 'attribute1', 'value' => 'initial_value1']);
+        $user->attributes()->create(['key' => 'attribute2', 'value' => 'initial_value2']);
+
+        $payload = [
+            'attributes' => [
+                'attribute1' => 'new_value1',
+                'attribute2' => ['invalid_value'], // Invalid value
+            ],
+        ];
+
+        $response = $this->actingAs($user)
+            ->putJson('/api/user/attributes', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['attributes.attribute2']);
+
+        // Ensure neither attribute was updated
+        $this->assertDatabaseHas('user_attributes', [
+            'user_id' => $user->id,
+            'key' => 'attribute1',
+            'value' => 'initial_value1',
+        ]);
+
+        $this->assertDatabaseHas('user_attributes', [
+            'user_id' => $user->id,
+            'key' => 'attribute2',
+            'value' => 'initial_value2',
+        ]);
+    }
+
+    /**
+     * Test that concurrent updates to the same attribute do not result in partial writes.
+     */
+    public function test_concurrent_updates_do_not_cause_partial_writes()
+    {
+        $user = User::factory()->create();
+        $user->attributes()->create(['key' => 'shared_key', 'value' => 'initial_value']);
+
+        $payload1 = [
+            'attributes' => [
+                'shared_key' => 'value1',
+                'another_key' => 'value2',
+            ],
+        ];
+
+        $payload2 = [
+            'attributes' => [
+                'shared_key' => 'value3',
+                'another_key' => 'value4',
+            ],
+        ];
+
+        // Simulate concurrent requests
+        DB::beginTransaction();
+
+        $response1 = $this->actingAs($user)
+            ->putJson('/api/user/attributes', $payload1);
+
+        DB::rollBack();
+
+        $response2 = $this->actingAs($user)
+            ->putJson('/api/user/attributes', $payload2);
+
+        $response1->assertStatus(200);
+        $response2->assertStatus(200);
+
+        // Ensure database reflects one of the updates entirely
+        $finalValues = $user->fresh()->attributes()->pluck('value', 'key')->toArray();
+
+        $possibleResults = [
+            'shared_key' => 'value1',
+            'another_key' => 'value2',
+        ];
+
+        $this->assertTrue(
+            ($finalValues['shared_key'] === 'value1' && $finalValues['another_key'] === 'value2') ||
+            ($finalValues['shared_key'] === 'value3' && $finalValues['another_key'] === 'value4')
+        );
     }
 }

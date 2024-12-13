@@ -209,7 +209,7 @@ paths:
     put:
       summary: 'Add or update attributes for the authenticated user.'
       operationId: addOrUpdateAttributesForTheAuthenticatedUser
-      description: ''
+      description: 'Wrapped in a transaction to ensure atomicity.'
       parameters: []
       responses: {  }
       tags:
@@ -232,7 +232,7 @@ paths:
     delete:
       summary: 'Delete specified attributes for the authenticated user.'
       operationId: deleteSpecifiedAttributesForTheAuthenticatedUser
-      description: ''
+      description: 'Wrapped in a transaction to ensure atomicity.'
       parameters: []
       responses: {  }
       tags:
@@ -251,6 +251,128 @@ paths:
                     - mcjanyizogah
                   items:
                     type: string
+      security: []
+  /api/activities:
+    get:
+      summary: 'Retrieve activities with optional nesting and date filtering.'
+      operationId: retrieveActivitiesWithOptionalNestingAndDateFiltering
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Add or update activities.'
+      operationId: addOrUpdateActivities
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                activities:
+                  type: array
+                  description: ''
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: ''
+                        example: 10
+                        nullable: true
+                      date:
+                        type: string
+                        description: 'Must be a valid date.'
+                        example: '2024-12-13T06:59:32'
+                        nullable: false
+                      parent_id:
+                        type: integer
+                        description: ''
+                        example: 10
+                        nullable: true
+                      position:
+                        type: integer
+                        description: ''
+                        example: 10
+                        nullable: true
+                      name:
+                        type: string
+                        description: 'Must not be greater than 255 characters.'
+                        example: cjanyizogaho
+                        nullable: false
+                      description:
+                        type: string
+                        description: ''
+                        example: 'Explicabo ex accusantium excepturi tenetur voluptas.'
+                        nullable: true
+                      notes:
+                        type: string
+                        description: ''
+                        example: voluptatum
+                        nullable: true
+                      metrics:
+                        type: object
+                        description: ''
+                        example: null
+                        nullable: true
+                        properties: {  }
+                      completed:
+                        type: boolean
+                        description: ''
+                        example: true
+                        nullable: true
+                    required:
+                      - date
+                      - name
+              required:
+                - activities
+      security: []
+    delete:
+      summary: 'Delete activities by ID.'
+      operationId: deleteActivitiesByID
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: ''
+                  example:
+                    - 10
+                  items:
+                    type: integer
+              required:
+                - ids
       security: []
   /api/password/forgot:
     post:
