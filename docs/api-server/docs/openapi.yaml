@@ -209,7 +209,7 @@ paths:
     put:
       summary: 'Add or update attributes for the authenticated user.'
       operationId: addOrUpdateAttributesForTheAuthenticatedUser
-      description: ''
+      description: 'Wrapped in a transaction to ensure atomicity.'
       parameters: []
       responses: {  }
       tags:
@@ -232,7 +232,7 @@ paths:
     delete:
       summary: 'Delete specified attributes for the authenticated user.'
       operationId: deleteSpecifiedAttributesForTheAuthenticatedUser
-      description: ''
+      description: 'Wrapped in a transaction to ensure atomicity.'
       parameters: []
       responses: {  }
       tags:
@@ -252,10 +252,10 @@ paths:
                   items:
                     type: string
       security: []
-  /api/user/activities:
+  /api/activities:
     get:
-      summary: 'Retrieve all activities for the authenticated user.'
-      operationId: retrieveAllActivitiesForTheAuthenticatedUser
+      summary: 'Retrieve activities with optional nesting and date filtering.'
+      operationId: retrieveActivitiesWithOptionalNestingAndDateFiltering
       description: ''
       parameters: []
       responses:
@@ -275,9 +275,9 @@ paths:
         - Endpoints
       security: []
     put:
-      summary: 'Add or update activities for the authenticated user.'
-      operationId: addOrUpdateActivitiesForTheAuthenticatedUser
-      description: "Expects an 'activities' array in the request.\nIf 'id' is provided, the corresponding activity is updated; otherwise, a new one is created."
+      summary: 'Add or update activities.'
+      operationId: addOrUpdateActivities
+      description: ''
       parameters: []
       responses: {  }
       tags:
@@ -299,12 +299,22 @@ paths:
                     properties:
                       id:
                         type: integer
-                        description: 'The <code>id</code> of an existing record in the activities table.'
+                        description: ''
                         example: 10
                         nullable: true
+                      date:
+                        type: string
+                        description: 'Must be a valid date.'
+                        example: '2024-12-13T06:59:32'
+                        nullable: false
                       parent_id:
                         type: integer
-                        description: 'The <code>id</code> of an existing record in the activities table.'
+                        description: ''
+                        example: 10
+                        nullable: true
+                      position:
+                        type: integer
+                        description: ''
                         example: 10
                         nullable: true
                       name:
@@ -328,21 +338,27 @@ paths:
                         example: null
                         nullable: true
                         properties: {  }
+                      completed:
+                        type: boolean
+                        description: ''
+                        example: true
+                        nullable: true
                     required:
+                      - date
                       - name
               required:
                 - activities
       security: []
     delete:
-      summary: 'Delete specified activities for the authenticated user.'
-      operationId: deleteSpecifiedActivitiesForTheAuthenticatedUser
-      description: 'Expects an ''ids'' array of activity IDs to delete.'
+      summary: 'Delete activities by ID.'
+      operationId: deleteActivitiesByID
+      description: ''
       parameters: []
       responses: {  }
       tags:
         - Endpoints
       requestBody:
-        required: false
+        required: true
         content:
           application/json:
             schema:
@@ -350,11 +366,13 @@ paths:
               properties:
                 ids:
                   type: array
-                  description: 'The <code>id</code> of an existing record in the activities table.'
+                  description: ''
                   example:
                     - 10
                   items:
                     type: integer
+              required:
+                - ids
       security: []
   /api/password/forgot:
     post:
