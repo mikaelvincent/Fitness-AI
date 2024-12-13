@@ -18,11 +18,13 @@ class Activity extends Model
         'description',
         'notes',
         'metrics',
+        'completed',
     ];
 
     protected $casts = [
         'metrics' => 'array',
         'date' => 'date',
+        'completed' => 'boolean',
     ];
 
     public function parent()
@@ -49,6 +51,45 @@ class Activity extends Model
             $child->date = $date;
             $child->save();
             $child->syncDescendantsDate($date);
+        }
+    }
+
+    /**
+     * Recursively set all descendants' completed status.
+     */
+    public function syncDescendantsCompletion(bool $completed)
+    {
+        foreach ($this->children as $child) {
+            $child->completed = $completed;
+            $child->save();
+            $child->syncDescendantsCompletion($completed);
+        }
+    }
+
+    /**
+     * Check ancestors and update their completed status if needed.
+     * If all siblings are completed, set the parent's completed to true.
+     * Propagate upward until reaching an ancestor that should not change.
+     */
+    public function syncAncestorsCompletionIfNeeded()
+    {
+        $parent = $this->parent;
+        if (!$parent) {
+            return;
+        }
+
+        // Determine if all siblings are completed
+        $allSiblingsCompleted = $parent->children()
+            ->where('id', '!=', $this->id)
+            ->where('completed', false)
+            ->count() === 0;
+
+        // If all siblings are completed and this activity is completed,
+        // set the parent's completed to true.
+        if ($this->completed && $allSiblingsCompleted && !$parent->completed) {
+            $parent->completed = true;
+            $parent->save();
+            $parent->syncAncestorsCompletionIfNeeded();
         }
     }
 }
