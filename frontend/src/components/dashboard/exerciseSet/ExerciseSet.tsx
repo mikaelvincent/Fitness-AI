@@ -26,6 +26,7 @@ interface ExerciseSetProps {
   onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
   onDeleteMetric: (metricIndex: number) => void;
   onDeleteExercise: () => void;
+  onAddChildExercise: () => void;
   children?: ReactNode;
 }
 
@@ -41,6 +42,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       onUpdateMetric,
       onDeleteMetric,
       onDeleteExercise,
+      onAddChildExercise,
       children
     },
     ref
@@ -358,12 +360,12 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                   
                   <div className="flex w-full justify-between">
                     <Button
-                      variant="destructive"
+                      variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDeleteExercise();
                       }}
-                      className="mt-2 flex items-center rounded p-2"
+                      className="mt-2 flex text-red-500 items-center rounded p-2 hover:text-red-400"
                       aria-label="Delete exercise"
                     >
                       <Trash2 strokeWidth={2.75} />
@@ -380,6 +382,20 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     >
                       <Plus strokeWidth={2.75} />
                       Add Metric
+                    </Button>
+                  </div>
+                  <div className="flex w-full justify-end">
+                    <Button
+                      variant="default"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAddChildExercise();
+                      }}
+                      className="mt-2 flex items-center rounded p-2 hover:bg-muted hover:text-orange-400 self-end"
+                      aria-label="Add child exercise"
+                    >
+                      <Plus strokeWidth={2.75} />
+                      Add Exercise
                     </Button>
                   </div>
                 </div>
