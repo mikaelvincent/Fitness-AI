@@ -22,6 +22,8 @@ import SetupWizard from "./pages/setup/SetupWizard";
 import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
 import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
 
+import ChatPage from "./pages/ChatPage.tsx";
+
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
@@ -113,6 +115,8 @@ const App = () => {
           >
             <Route index element={<SetupWizard />} />
           </Route>
+
+          <Route path="/initial-chat" element={<ChatPage />} />
 
           {/* Authentication layout routes */}
           <Route path="/" element={<AuthLayout />}>

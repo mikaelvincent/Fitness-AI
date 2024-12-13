@@ -5,6 +5,7 @@ export interface SetupData {
     birthdateDay: string;
     birthdateMonth: string;
     birthdateYear: string;
+    measurement: "imperial" | "metric";
     weight: number; // We'll store in a base unit, e.g. kg if metric chosen, else lbs.
     weightUnit: "kg" | "lbs";
     height: number; // Store in a base unit, e.g. cm if metric chosen, else inches.
@@ -26,6 +27,7 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         birthdateDay: "",
         birthdateMonth: "",
         birthdateYear: "",
+        measurement: "metric",
         weight: 70, // default weight in kg
         weightUnit: "kg",
         height: 170, // default height in cm
