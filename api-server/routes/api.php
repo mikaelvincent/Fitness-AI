@@ -58,3 +58,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/activities', [ActivityController::class, 'update']);
     Route::delete('/activities', [ActivityController::class, 'destroy']);
 });
+
+// Chat Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/chat', [ChatController::class, 'handle']);
+});
