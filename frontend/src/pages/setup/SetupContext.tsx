@@ -32,7 +32,7 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         weightUnit: "kg",
         height: 170, // default height in cm
         heightUnit: "cm",
-        activity: "",
+        activity: "sedentary",
         nickname: "",
     });
 

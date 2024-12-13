@@ -16,7 +16,6 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({ data }) => {
 
     return (
         <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-center mb-4">Review Your Information</h2>
             <div className="grid gap-4">
                 <div className="p-4 border rounded-lg">
                     <strong>Gender:</strong> {data.gender}

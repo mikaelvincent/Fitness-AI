@@ -15,7 +15,7 @@ const BackButton: React.FC<BackButtonProps> = ({
     return (
         <button
             onClick={onClick}
-            className={`flex items-center text-gray-500 hover:text-gray-800 transition-colors ${className}`}
+            className={`flex items-center text-primary hover:text-[#FF7F32] transition-colors ${className}`}
         >
             <MdArrowBack size={24} />
             <span className="ml-2 text-sm font-medium">{text}</span>

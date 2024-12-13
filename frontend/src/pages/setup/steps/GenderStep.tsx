@@ -1,5 +1,4 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
 import { FaMars, FaVenus } from "react-icons/fa";
 
 interface GenderStepProps {
@@ -10,7 +9,6 @@ interface GenderStepProps {
 export const GenderStep: React.FC<GenderStepProps> = ({ gender, onChange }) => {
     return (
         <div className="space-y-6">
-            <Label htmlFor="Gender">Select your gender</Label>
             <div className="flex justify-center gap-6">
                 {/* Male Button */}
                 <button
