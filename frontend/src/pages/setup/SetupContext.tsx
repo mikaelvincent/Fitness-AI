@@ -11,7 +11,7 @@ export interface SetupData {
     height: number; // Store in a base unit, e.g. cm if metric chosen, else inches.
     heightUnit: "cm" | "in";
     activity: string;
-    username: string;
+    nickname: string;
 }
 
 interface SetupContextType {
@@ -33,7 +33,7 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         height: 170, // default height in cm
         heightUnit: "cm",
         activity: "",
-        username: "",
+        nickname: "",
     });
 
     const updateData = (partial: Partial<SetupData>) => {

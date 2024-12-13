@@ -37,7 +37,7 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({ data }) => {
                     <strong>Activity Level:</strong> {data.activity}
                 </div>
                 <div className="p-4 border rounded-lg">
-                    <strong>Username:</strong> {data.username}
+                    <strong>Nickname:</strong> {data.nickname}
                 </div>
             </div>
         </div>

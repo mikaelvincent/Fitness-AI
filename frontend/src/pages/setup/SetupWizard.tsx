@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useSetupData } from "./SetupContext";
 import { StepCard } from "@/components/setup/StepCard";
 import StepContent from "./StepContent";
-// import StepFooter from "./StepFooter.tsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie"; // To fetch the token from cookies
+import { updateUserAttributes, AttributesSchema } from "@/utils/api/updateUserAttributes";
 
 const steps = [
     { id: "gender", title: "What's your gender?" },
@@ -13,13 +14,14 @@ const steps = [
     { id: "weight", title: "What's your weight?" },
     { id: "height", title: "What's your height?" },
     { id: "activity", title: "What's your level of physical activity?" },
-    { id: "username", title: "Choose a username" },
+    { id: "nickname", title: "Set your nickname" },
     { id: "summary", title: "Review Your Information" },
 ];
 
 const SetupWizard = () => {
     const { data, updateData } = useSetupData();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
     const navigate = useNavigate();
 
     const step = steps[currentStepIndex];
@@ -27,10 +29,64 @@ const SetupWizard = () => {
     const nextStep = () => setCurrentStepIndex((i) => i + 1);
     const prevStep = () => setCurrentStepIndex((i) => i - 1);
 
-    const finish = () => {
-        console.log("User data submitted:", data);
-        navigate("/");
+
+
+    const finish = async () => {
+        console.log("Submitting user data:", data);
+
+        // Set the submission state to true
+        setIsSubmitting(true);
+
+        try {
+            // Get token from cookies
+            const token = Cookies.get("token");
+
+            if (!token) {
+                alert("Authentication token not found. Please log in again.");
+                return;
+            }
+
+            // Prepare the payload as key-value pairs
+            const payload = {
+                gender: data.gender,
+                birthdate: `${data.birthdateYear}-${data.birthdateMonth}-${data.birthdateDay}`,
+                measurement: data.measurement,
+                weight: `${data.weight} ${data.measurement === "metric" ? "kg" : "lbs"}`,
+                height: `${data.height} ${data.measurement === "metric" ? "cm" : "inches"}`,
+                activity: data.activity,
+                nickname: data.nickname,
+            };
+
+            // Validate the payload (optional, ensures correct format)
+            const validationResult = AttributesSchema.safeParse(payload);
+
+            if (!validationResult.success) {
+                console.error("Validation failed:", validationResult.error);
+                alert("Invalid data provided.");
+                return;
+            }
+
+            // Call the API
+            const result = await updateUserAttributes(validationResult.data, token);
+
+            if (result.success) {
+                console.log("Attributes updated:", result.message);
+                alert("User attributes updated successfully!");
+                navigate("/");
+            } else {
+                console.error("Update failed:", result.message);
+                alert(result.message || "Failed to update user attributes.");
+            }
+        } catch (error) {
+            console.error("Unexpected error during submission:", error);
+            alert("An unexpected error occurred. Please try again.");
+        } finally {
+            // Reset the submission state to false
+            setIsSubmitting(false);
+        }
     };
+
+
 
     const isAtLeast13AtMost100 = (): boolean => {
         const { birthdateDay, birthdateMonth, birthdateYear } = data;
@@ -50,7 +106,6 @@ const SetupWizard = () => {
         return birthDate <= thirteenYearsAgo && birthDate >= hundredYearsAgo;
     };
 
-
     const canGoNext = (): boolean => {
         switch (step.id) {
             case "gender":
@@ -60,23 +115,22 @@ const SetupWizard = () => {
                     data.birthdateDay.trim() !== "" &&
                     data.birthdateMonth.trim() !== "" &&
                     data.birthdateYear.trim() !== "" &&
-                    isAtLeast13AtMost100() // Ensure the user is at least 13
+                    isAtLeast13AtMost100()
                 );
             case "measurement":
                 return data.measurement === "imperial" || data.measurement === "metric";
             case "weight":
-                return data.weight > 0; // Ensure weight is a positive number
+                return data.weight > 0;
             case "height":
-                return data.height > 0; // Ensure height is a positive number
+                return data.height > 0;
             case "activity":
-                return data.activity.trim() !== ""; // Check if activity is non-empty
-            case "username":
-                return data.username.trim() !== ""; // Check if username is non-empty
+                return data.activity.trim() !== "";
+            case "nickname":
+                return data.nickname.trim() !== "";
             default:
                 return true;
         }
     };
-
 
     const handleChange = (key: string, value: any) => updateData({ [key]: value });
 
@@ -98,15 +152,14 @@ const SetupWizard = () => {
                         canGoNext={canGoNext()}
                         isFirstStep={currentStepIndex === 0}
                         isLastStep={currentStepIndex === steps.length - 1}
+                        isSubmitting={isSubmitting} // Disable button during submission
                     >
-                        {/* StepContent now passed as children */}
                         <StepContent stepId={step.id} data={data} onChange={handleChange} />
                     </StepCard>
                 </motion.div>
             </AnimatePresence>
         </div>
     );
-
 };
 
 export default SetupWizard;
