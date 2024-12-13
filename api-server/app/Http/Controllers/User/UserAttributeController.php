@@ -28,8 +28,8 @@ class UserAttributeController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'attributes' => ['required', 'array'],
-            'attributes.*' => 'string|max:255',
+            'attributes'     => ['required', 'array'],
+            'attributes.*'   => 'string|max:255',
         ]);
 
         $validator->after(function ($validator) use ($request) {
@@ -40,6 +40,9 @@ class UserAttributeController extends Controller
                         $validator->errors()->add('attributes', 'All attribute keys must be strings.');
                         break;
                     }
+                    if (mb_strlen($key) > 255) {
+                        $validator->errors()->add('attributes.' . $key, 'Attribute keys may not be greater than 255 characters.');
+                    }
                 }
             }
         });
@@ -47,7 +50,7 @@ class UserAttributeController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors(),
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
@@ -71,7 +74,7 @@ class UserAttributeController extends Controller
     public function destroy(Request $request)
     {
         $validated = $request->validate([
-            'keys' => 'required|array',
+            'keys'   => 'required|array',
             'keys.*' => 'string|max:255',
         ]);
 
