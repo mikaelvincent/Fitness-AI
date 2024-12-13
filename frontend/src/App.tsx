@@ -9,7 +9,6 @@ import Register from "./pages/Auth/Register.tsx";
 import ForgotPassword from "./pages/Auth/ForgotPassword.tsx";
 import VerifyEmail from "./pages/Auth/VerifyEmail.tsx";
 import Progress from "./pages/Main/Progress.tsx";
-import Chat from "./pages/Chat.tsx";
 import Profile from "./pages/Main/Profile/Profile.tsx";
 
 import { ThemeProvider } from "./components/theme/theme-provider.tsx";
@@ -61,7 +60,7 @@ const App = () => {
         {/*  </Route>*/}
         {/*</Route>*/}
 
-        {/*<Route path="chat" element={<ProtectedRoute><Chat/></ProtectedRoute>}>}/>*/}
+        {/*<Route path="chat" element={<ProtectedRoute><ChatPage/></ProtectedRoute>}>}/>*/}
 
         {/*    /!* Authentication layout routes *!/*/}
         {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
@@ -101,7 +100,7 @@ const App = () => {
             </Route>
           </Route>
 
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat" element={<ChatPage />} />
 
           {/* Setup process with its own context and layout */}
           {/* Single route for setup wizard */}
