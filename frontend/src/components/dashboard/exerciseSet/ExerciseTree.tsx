@@ -12,11 +12,6 @@ interface ExerciseTreeProps {
   parentId: number | null | undefined;
   onToggle: () => void;
   toggleExerciseCompletion: (id: number | null | undefined) => void;
-  onUpdateNotes: (notes: string) => void;
-  updateExerciseNotes: (
-    exerciseId: number | null | undefined,
-    notes: string,
-  ) => void;
   onAddMetric: () => void;
   addMetric: (exerciseId: number | null | undefined) => void;
   onUpdateMetric: (idx: number, updatedMetric: Metric) => void;
@@ -45,6 +40,7 @@ interface ExerciseTreeProps {
   handleCancelNewExercise: () => void;
   containerRef: RefObject<HTMLDivElement>;
   inputRef: RefObject<HTMLInputElement>;
+  onUpdateExercise: (exercise: Exercise) => void;
 }
 
 // Create the ExerciseTree component with forwardRef
@@ -58,8 +54,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
       parentId,
       onToggle,
       toggleExerciseCompletion,
-      onUpdateNotes,
-      updateExerciseNotes,
       onAddMetric,
       addMetric,
       onUpdateMetric,
@@ -77,6 +71,7 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
       handleCancelNewExercise,
       containerRef,
       inputRef,
+      onUpdateExercise,
     },
     ref: Ref<HTMLDivElement>,
   ) => {
@@ -98,12 +93,12 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
           }
         }}
         onToggle={onToggle}
-        onUpdateNotes={onUpdateNotes}
         onAddMetric={onAddMetric}
         onUpdateMetric={onUpdateMetric}
         onDeleteMetric={onDeleteMetric}
         onDeleteExercise={onDeleteExercise}
         onAddChildExercise={onAddChildExercise}
+        onUpdateExercise={onUpdateExercise}
       >
         {children.length > 0 && isExpanded && (
           <div className="ml-6 border-l border-gray-600 pl-4">
@@ -117,8 +112,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
                 onToggleExpansion={onToggleExpansion}
                 onToggle={() => toggleExerciseCompletion(child.id)}
                 toggleExerciseCompletion={toggleExerciseCompletion}
-                onUpdateNotes={(notes) => updateExerciseNotes(child.id, notes)}
-                updateExerciseNotes={updateExerciseNotes}
                 onAddMetric={() => addMetric(child.id)}
                 addMetric={addMetric}
                 onUpdateMetric={(idx, updatedMetric) =>
@@ -139,6 +132,7 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
                 containerRef={containerRef}
                 inputRef={inputRef}
                 ref={null}
+                onUpdateExercise={onUpdateExercise}
               />
             ))}
             {/* If we are adding a child exercise to this particular parent */}

@@ -21,12 +21,12 @@ interface ExerciseSetProps {
   isActive: boolean;
   onExpand: () => void;
   onToggle: () => void;
-  onUpdateNotes: (newNotes: string) => void;
   onAddMetric: () => void;
   onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
   onDeleteMetric: (metricIndex: number) => void;
   onDeleteExercise: () => void;
   onAddChildExercise: () => void;
+  onUpdateExercise: (updatedExercise: Exercise) => void;
   children?: ReactNode;
 }
 
@@ -37,12 +37,12 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       isActive,
       onExpand,
       onToggle,
-      onUpdateNotes,
       onAddMetric,
       onUpdateMetric,
       onDeleteMetric,
       onDeleteExercise,
       onAddChildExercise,
+      onUpdateExercise,
       children
     },
     ref
@@ -57,6 +57,12 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     const [tempMetricValue, setTempMetricValue] = useState<number>(0);
     const [tempMetricUnit, setTempMetricUnit] = useState("");
     
+    const [editingExercise, setEditingExercise] = useState(false);
+    const [tempExerciseName, setTempExerciseName] = useState(exercise.name);
+    const [tempExerciseDescription, setTempExerciseDescription] = useState(
+      exercise.description
+    );
+    
     useEffect(() => {
       setTempNotes(exercise.notes);
     }, [exercise.notes]);
@@ -69,7 +75,11 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     }, [isActive]);
     
     const handleNotesSave = () => {
-      onUpdateNotes(tempNotes?.trim() || "");
+      const updatedExercise: Exercise = {
+        ...exercise,
+        notes: tempNotes
+      };
+      onUpdateExercise(updatedExercise);
       setIsEditingNotes(false);
     };
     
@@ -103,6 +113,16 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       setEditingMetricIndex(null);
     };
     
+    const handleSaveExercise = () => {
+      const updatedExercise: Exercise = {
+        ...exercise,
+        name: tempExerciseName,
+        description: tempExerciseDescription
+      };
+      onUpdateExercise(updatedExercise);
+      setEditingExercise(false);
+    };
+    
     const detailsVariants = {
       hidden: { opacity: 0, height: 0 },
       visible: { opacity: 1, height: "auto" },
@@ -111,60 +131,119 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     
     return (
       <div ref={ref} className="border-b-2 border-b-primary p-4">
-        <div className="mb-2 flex items-center gap-3 justify-between">
-          <div className="flex gap-2 items-center">
-            <Button
-              variant="ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggle();
-              }}
-              size="icon"
-              className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${
-                exercise.completed ? "border-green-700 bg-green-700" : ""
-              }`}
-              aria-label={
-                exercise.completed
-                  ? "Mark exercise as incomplete"
-                  : "Mark exercise as complete"
-              }
-            >
-              <motion.span
-                key={exercise.completed ? "completed" : "incomplete"}
-                initial={{
-                  rotate: exercise.completed ? 0 : 180,
-                  scale: exercise.completed ? 1 : 0.8,
-                  opacity: exercise.completed ? 1 : 0
-                }}
-                animate={{
-                  rotate: exercise.completed ? 0 : 180,
-                  scale: exercise.completed ? 1 : 0.8,
-                  opacity: exercise.completed ? 1 : 0
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="inline-block"
-              >
-                <Check size={20} strokeWidth={3} className="text-background" />
-              </motion.span>
-            </Button>
-            <h3 className="text-xl font-semibold" onClick={onExpand}>
-              {exercise.name}{" "}
-              <span className="text-sm text-primary">{exercise.description}</span>
-            </h3>
-          </div>
-          <div
-            className="text-primary transition-colors hover:text-orange-400"
-            aria-label={
-              isActive ? "Collapse exercise details" : "Expand exercise details"
-            }
-            onClick={onExpand}
-          >
-            {isActive ? (
-              <ChevronUp className="h-6 w-6" />
-            ) : (
-              <ChevronDown className="h-6 w-6" />
-            )}
-          </div>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          {!editingExercise && (
+            <>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  size="icon"
+                  className={`h-8 w-8 rounded-full border-2 border-secondary text-primary hover:bg-green-700 ${
+                    exercise.completed ? "border-green-700 bg-green-700" : ""
+                  }`}
+                  aria-label={
+                    exercise.completed
+                      ? "Mark exercise as incomplete"
+                      : "Mark exercise as complete"
+                  }
+                >
+                  <motion.span
+                    key={exercise.completed ? "completed" : "incomplete"}
+                    initial={{
+                      rotate: exercise.completed ? 0 : 180,
+                      scale: exercise.completed ? 1 : 0.8,
+                      opacity: exercise.completed ? 1 : 0
+                    }}
+                    animate={{
+                      rotate: exercise.completed ? 0 : 180,
+                      scale: exercise.completed ? 1 : 0.8,
+                      opacity: exercise.completed ? 1 : 0
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="inline-block"
+                  >
+                    <Check
+                      size={20}
+                      strokeWidth={3}
+                      className="text-background"
+                    />
+                  </motion.span>
+                </Button>
+                <h3 className="text-xl font-semibold" onClick={onExpand}>
+                  {exercise.name}{" "}
+                  <span className="text-sm text-primary">
+                    {exercise.description}
+                  </span>
+                </h3>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                {!isActive && (
+                  <Button
+                    variant="ghost"
+                    className="text-primary hover:text-orange-400"
+                    onClick={() => setEditingExercise(true)}
+                  >
+                    <Edit />
+                  </Button>
+                )}
+                <div
+                  className="text-primary transition-colors hover:text-orange-400"
+                  aria-label={
+                    isActive
+                      ? "Collapse exercise details"
+                      : "Expand exercise details"
+                  }
+                  onClick={onExpand}
+                >
+                  {isActive ? (
+                    <ChevronUp className="h-6 w-6" />
+                  ) : (
+                    <ChevronDown className="h-6 w-6" />
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+          {editingExercise && (
+            <>
+              <div className="flex items-center gap-2 1/2 w-10/12">
+                <Input
+                  type="text"
+                  value={tempExerciseName}
+                  onChange={(e) => setTempExerciseName(e.target.value)}
+                  className="rounded px-2 py-1 text-sm"
+                  placeholder="Exercise Name"
+                />
+                <Input
+                  type="text"
+                  value={tempExerciseDescription}
+                  onChange={(e) => setTempExerciseDescription(e.target.value)}
+                  className="rounded px-2 py-1 text-sm"
+                  placeholder="Description"
+                />
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="text-primary hover:text-orange-400"
+                  onClick={handleSaveExercise}
+                >
+                  <Save />
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => setEditingExercise(false)}
+                >
+                  <X />
+                </Button>
+              </div>
+            </>
+          )}
         </div>
         <AnimatePresence>
           {isActive && (
@@ -368,7 +447,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                         e.stopPropagation();
                         onDeleteExercise();
                       }}
-                      className="mt-2 flex text-red-500 items-center rounded p-2 hover:text-red-400"
+                      className="mt-2 flex items-center rounded p-2 text-red-500 hover:text-red-400"
                       aria-label="Delete exercise"
                     >
                       <Trash2 strokeWidth={2.75} />
@@ -394,7 +473,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                         e.stopPropagation();
                         onAddChildExercise();
                       }}
-                      className="mt-2 flex items-center rounded p-2 hover:bg-muted hover:text-orange-400 self-end"
+                      className="mt-2 flex items-center self-end rounded p-2 hover:bg-muted hover:text-orange-400"
                       aria-label="Add child exercise"
                     >
                       <Plus strokeWidth={2.75} />
