@@ -30,7 +30,7 @@ export const MeasurementStep: React.FC<MeasurementStepProps> = ({ data, onChange
             // Convert height from cm to inches
             const heightInInches = Math.round(data.height / 2.54);
             onChange("height", heightInInches);
-            onChange("heightUnit", heightInInches);
+            onChange("heightUnit", "in");
         }
         onChange("measurement", measurement);
     }
