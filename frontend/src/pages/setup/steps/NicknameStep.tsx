@@ -2,22 +2,22 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-interface UsernameStepProps {
-    username: string;
+interface NicknameProps {
+    nickname: string;
     onChange: (key: string, value: any) => void;
 }
 
-export const UsernameStep: React.FC<UsernameStepProps> = ({ username, onChange }) => {
+export const NicknameStep: React.FC<NicknameProps> = ({ nickname, onChange }) => {
     return (
         <div className="space-y-2">
-            <Label htmlFor="username">Enter your preferred username</Label>
+            <Label htmlFor="nickname">Enter your preferred nickname</Label>
             <div className="flex justify-center">
                 <Input
                     className="w-3/4"
-                    id="username"
+                    id="nickname"
                     type="text"
-                    value={username}
-                    onChange={(e) => onChange("username", e.target.value)}
+                    value={nickname}
+                    onChange={(e) => onChange("nickname", e.target.value)}
                 />
             </div>
         </div>
