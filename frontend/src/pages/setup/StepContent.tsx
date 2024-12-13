@@ -32,7 +32,7 @@ const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => 
         case "measurement":
             return (
                 <MeasurementStep
-                    measurement={data.measurement}
+                    data={data}
                     onChange={onChange}
                 />
             );
