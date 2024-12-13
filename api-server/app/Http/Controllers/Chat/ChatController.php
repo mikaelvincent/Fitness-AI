@@ -1,13 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Chat;
 
+use App\Http\Controllers\Controller;
+use App\Services\ChatContextService;
 use Illuminate\Http\Request;
-use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\Log;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class ChatController extends Controller
 {
+    protected ChatContextService $chatContextService;
+
+    public function __construct(ChatContextService $chatContextService)
+    {
+        $this->chatContextService = $chatContextService;
+    }
+
     /**
      * Handle a chat request to the chatbot endpoint.
      * Expects a JSON payload:
@@ -37,10 +46,22 @@ class ChatController extends Controller
         // Retrieve model from environment-driven configuration
         $model = config('openai.default_model', 'gpt-4o');
 
+        // Retrieve context for the authenticated user
+        $userId = $request->user()->id;
+        $context = $this->chatContextService->getContextForUser($userId);
+
+        // Attach context as system message
+        $systemMessage = [
+            'role' => 'system',
+            'content' => 'User context: ' . json_encode($context),
+        ];
+
+        $messages = array_merge([$systemMessage], $validated['messages']);
+
         try {
             $response = OpenAI::chat()->create([
                 'model' => $model,
-                'messages' => $validated['messages'],
+                'messages' => $messages,
             ]);
 
             return response()->json([
