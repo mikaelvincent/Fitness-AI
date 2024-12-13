@@ -1,5 +1,4 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
 
 interface ActivityStepProps {
     activity: string;
@@ -16,7 +15,6 @@ const activities = [
 export const ActivityStep: React.FC<ActivityStepProps> = ({ activity, onChange }) => {
     return (
         <div className="space-y-4">
-            <Label>Select your activity level</Label>
             <div className="grid grid-cols-1 gap-4">
                 {activities.map((act) => (
                     <button

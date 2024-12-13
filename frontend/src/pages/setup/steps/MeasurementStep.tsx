@@ -1,5 +1,4 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
 import { SetupData } from "../SetupContext";
 
 interface MeasurementStepProps {
@@ -37,7 +36,6 @@ export const MeasurementStep: React.FC<MeasurementStepProps> = ({ data, onChange
 
     return (
         <div className="space-y-6">
-            <Label htmlFor="Measurement">Select your measurement system</Label>
             <div className="flex justify-center gap-6">
                 <button
                     className={`flex flex-col items-center justify-center p-4 rounded-lg w-28 h-28 border-2 transition-all ${measurement === "metric"

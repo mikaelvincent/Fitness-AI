@@ -17,7 +17,6 @@ export const BirthdateStep: React.FC<BirthdateStepProps> = ({
 }) => {
     return (
         <div className="space-y-4">
-            <Label>Enter your birthdate</Label>
             <div className="flex space-x-2 justify-center">
                 <div>
                     <Label htmlFor="day">Day</Label>
