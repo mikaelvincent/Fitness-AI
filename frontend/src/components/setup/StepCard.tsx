@@ -29,19 +29,19 @@ export const StepCard: React.FC<StepCardProps> = ({
     return (
         <Card className="w-full mx-auto border-0">
             <CardHeader className="flex justify-center p-4">
-                <div className="flex items-cente justify-start p-4">
+                <div className="flex items-cente justify-start p-2">
                     {!isFirstStep && (
                         <BackButton onClick={onPrev} />
                     )}
                 </div>
-                <CardTitle className="text-3xl lg:text-4xl text-center w-full p-4">{title}</CardTitle>
+                <CardTitle className="text-3xl lg:text-4xl text-center w-full p-2">{title}</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-6 p-4">
                 {children}
             </CardContent>
 
-            <CardFooter className="flex justify-center space-x-2 p-6">
+            <CardFooter className="flex justify-center space-x-2 p-4">
                 {!isLastStep && (
                     <Button onClick={onNext} disabled={!canGoNext}>
                         Next
