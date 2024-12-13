@@ -7,8 +7,9 @@ import NewExercise from "@/components/dashboard/NewExercise.tsx";
 interface ExerciseTreeProps {
   exercise: Exercise;
   exercises: Exercise[];
-  isActive: boolean;
-  onExpand: () => void;
+  expandedNodes: Map<number | null | undefined, number>;
+  onToggleExpansion: (id: number, parentId: number | null | undefined) => void;
+  parentId: number | null | undefined;
   onToggle: () => void;
   toggleExerciseCompletion: (id: number | null | undefined) => void;
   onUpdateNotes: (notes: string) => void;
@@ -33,12 +34,6 @@ interface ExerciseTreeProps {
   deleteExercise: (exerciseId: number | null | undefined) => void;
   onAddChildExercise: () => void;
   addChildExercise: (parentId: number | null | undefined) => void;
-  activeParentId: number | null;
-  activeChildId: number | null;
-  onChildExpand: (
-    childId: number | null | undefined,
-    parentId: number | null | undefined,
-  ) => void;
   newExercise: {
     name: string;
     type: string;
@@ -58,8 +53,9 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
     {
       exercise,
       exercises,
-      isActive,
-      onExpand,
+      expandedNodes,
+      onToggleExpansion,
+      parentId,
       onToggle,
       toggleExerciseCompletion,
       onUpdateNotes,
@@ -74,9 +70,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
       deleteExercise,
       onAddChildExercise,
       addChildExercise,
-      activeParentId,
-      activeChildId,
-      onChildExpand,
       newExercise,
       handleNewExerciseNameChange,
       handleNewExerciseTypeChange,
@@ -89,13 +82,21 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
   ) => {
     // Get the children of the current exercise
     const children = exercise.children || [];
+    const isExpanded =
+      typeof exercise.id === "number" &&
+      typeof parentId === "number" &&
+      expandedNodes.get(parentId) === exercise.id;
 
     return (
       <ExerciseSet
         ref={ref}
         exercise={exercise}
-        isActive={isActive}
-        onExpand={onExpand}
+        isActive={isExpanded}
+        onExpand={() => {
+          if (typeof exercise.id === "number") {
+            onToggleExpansion(exercise.id, parentId);
+          }
+        }}
         onToggle={onToggle}
         onUpdateNotes={onUpdateNotes}
         onAddMetric={onAddMetric}
@@ -104,15 +105,16 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
         onDeleteExercise={onDeleteExercise}
         onAddChildExercise={onAddChildExercise}
       >
-        {children.length > 0 && isActive && (
+        {children.length > 0 && isExpanded && (
           <div className="ml-6 border-l border-gray-600 pl-4">
             {children.map((child) => (
               <ExerciseTree
                 key={child.id}
                 exercise={child}
                 exercises={exercises}
-                isActive={activeChildId === child.id} // Check child's active state
-                onExpand={() => onChildExpand(child.id, exercise.id)}
+                expandedNodes={expandedNodes}
+                parentId={exercise.id}
+                onToggleExpansion={onToggleExpansion}
                 onToggle={() => toggleExerciseCompletion(child.id)}
                 toggleExerciseCompletion={toggleExerciseCompletion}
                 onUpdateNotes={(notes) => updateExerciseNotes(child.id, notes)}
@@ -129,9 +131,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
                 deleteExercise={deleteExercise}
                 onAddChildExercise={() => addChildExercise(child.id)}
                 addChildExercise={addChildExercise}
-                activeParentId={activeParentId}
-                activeChildId={activeChildId}
-                onChildExpand={onChildExpand}
                 newExercise={newExercise}
                 handleNewExerciseNameChange={handleNewExerciseNameChange}
                 handleNewExerciseTypeChange={handleNewExerciseTypeChange}
@@ -158,7 +157,7 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
           </div>
         )}
         {/* If the current node has no children yet, but we are adding one, and it's active */}
-        {isActive &&
+        {isExpanded &&
           children.length === 0 &&
           newExercise &&
           newExercise.parentId === exercise.id && (
