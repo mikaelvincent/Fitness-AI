@@ -35,10 +35,11 @@ class ChatService
         $model = env('GPT_MODEL', 'gpt-4o');
         $fallbackModel = env('GPT_FALLBACK_MODEL', 'gpt-3.5-turbo');
 
+        // System messages provide the assistant with context, encouraging user detail for better personalization.
         $messages = [
             [
                 'role' => 'system',
-                'content' => 'You are a helpful assistant. Use the provided context to answer user queries.',
+                'content' => 'You are "Genie," a helpful fitness assistant for GymGenie. Utilize the provided context (user attributes, recent activities) to tailor personalized suggestions and respond to user inquiries. Gently encourage users to share more details (such as age, weight, preferences, location, or available equipment) if it can help improve the quality of your advice. Avoid being intrusive or repetitive. Always maintain a helpful and professional tone.',
             ],
             [
                 'role' => 'system',
@@ -57,12 +58,13 @@ class ChatService
             ];
         }
 
+        // Tool definitions with comprehensive descriptions.
         $allTools = [
             [
                 'type' => 'function',
                 'function' => [
                     'name' => 'updateUserAttributes',
-                    'description' => 'Add or update the authenticated user attributes',
+                    'description' => 'Add or update user attributes. This tool accepts a set of key-value pairs representing user characteristics (e.g., weight, preferred workouts, dietary restrictions). By sharing more personal details, users can receive more tailored activity suggestions, nutritional guidance, or motivational tips.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -79,7 +81,7 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'deleteUserAttributes',
-                    'description' => 'Remove specified attributes from the authenticated user',
+                    'description' => 'Remove specified user attributes. Provide an array of attribute keys that should be removed from the user’s profile. This can help the user keep their profile accurate and up-to-date as their preferences or conditions change.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -98,7 +100,7 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'getActivities',
-                    'description' => 'Retrieve the authenticated user activities with optional filtering',
+                    'description' => 'Retrieve activities based on optional date filters (from_date, to_date). This helps in understanding the user’s recent fitness routine, progress, and preferences. Data from these activities can inform better workout suggestions, progression plans, or modifications to improve overall fitness outcomes.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -119,7 +121,7 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'updateActivities',
-                    'description' => 'Add or update the authenticated user activities',
+                    'description' => 'Add or update user activities. This tool accepts an array of activity objects (e.g., running, bench press) along with their details (date, name, completion status). By keeping activities updated, the user can track progress, build routines, or receive more accurate and personalized suggestions for future workouts or improvements.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -138,7 +140,7 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'deleteActivities',
-                    'description' => 'Remove specified activities from the authenticated user',
+                    'description' => 'Remove specified activities by their IDs. This tool helps maintain an accurate and current log of the user’s activity history, removing outdated or incorrect entries for better long-term planning and analysis of the user’s fitness journey.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -225,7 +227,6 @@ class ChatService
             $toolName = $toolCall->function->name;
             $arguments = json_decode($toolCall->function->arguments, true);
 
-            // Log tool call
             Log::info('Executing tool call.', [
                 'user_id' => $userId,
                 'tool_name' => $toolName,
@@ -284,7 +285,6 @@ class ChatService
             return 'No response generated. Please try again.';
         }
 
-        // Log successful completion without tool calls
         Log::info('Response generated successfully without tool calls.', [
             'user_id' => $userId,
         ]);
