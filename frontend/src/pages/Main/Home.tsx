@@ -208,23 +208,6 @@ const Home = () => {
     });
   };
 
-  const deleteMetric = (
-    exerciseId: number | null | undefined,
-    metricIndex: number,
-  ) => {
-    setExercises((prev) =>
-      prev.map((exercise) => {
-        if (exercise.id === exerciseId) {
-          const updatedMetrics = exercise.metrics?.filter(
-            (_, idx) => idx !== metricIndex,
-          );
-          return { ...exercise, metrics: updatedMetrics };
-        }
-        return exercise;
-      }),
-    );
-  };
-
   const initiateAddExercise = (parentId: number | null = null) => {
     // If parentId = 0, top-level exercise; otherwise a child exercise
     setNewExercise({ name: "", type: "", parentId });
@@ -444,8 +427,6 @@ const Home = () => {
               parentId={0}
               onToggle={() => toggleExerciseCompletion(exercise.id)}
               toggleExerciseCompletion={toggleExerciseCompletion}
-              onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
-              deleteMetric={deleteMetric}
               onDeleteExercise={() => deleteExercise(exercise.id)}
               deleteExercise={deleteExercise}
               onAddChildExercise={() => initiateAddExercise(exercise.id)}
