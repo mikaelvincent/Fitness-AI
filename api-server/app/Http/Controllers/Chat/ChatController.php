@@ -27,24 +27,30 @@ class ChatController extends Controller
 
     /**
      * Handle chat requests.
+     * @authenticated
      *
      * Expected request format:
      * {
-     *   "message": "User query...",
+     *   "messages": [
+     *     {"role": "user", "content": "User query..."},
+     *     {"role": "assistant", "content": "Previous assistant response"}
+     *   ],
      *   "stream": true, // Optional: Enable streaming
-     *   "tools": ["getUserAttributes", "updateActivities"] // Optional: Specify tools
+     *   "tools": ["updateActivities"] // Optional: Specify tools
      * }
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function handle(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'message' => ['required', 'string'],
+            'messages' => ['required', 'array'],
+            'messages.*.role' => ['required', 'string', 'in:user,assistant'],
+            'messages.*.content' => ['required', 'string'],
             'stream' => ['sometimes', 'boolean'],
             'tools' => ['sometimes', 'array'],
-            'tools.*' => ['string', 'in:getUserAttributes,updateUserAttributes,deleteUserAttributes,getActivities,updateActivities,deleteActivities'],
+            'tools.*' => ['string', 'in:updateUserAttributes,deleteUserAttributes,getActivities,updateActivities,deleteActivities'],
         ]);
 
         if ($validator->fails()) {
@@ -59,10 +65,11 @@ class ChatController extends Controller
         $context = $this->chatContextService->getContext($request->user()->id);
         $stream = $validated['stream'] ?? false;
         $tools = $validated['tools'] ?? [];
+        $userMessages = $validated['messages'];
 
         $response = $this->chatService->getResponse(
             $request->user()->id,
-            $validated['message'],
+            $userMessages,
             $context,
             $stream,
             $tools
