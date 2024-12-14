@@ -20,22 +20,30 @@ class ChatService
 
     /**
      * Generate a chat response from the model.
-     * If a tool call is requested, execute the tool and provide its result.
-     * Supports optional streaming and tool selection.
      *
-     * @param int $userId
-     * @param array $userMessages Array of messages [{role: user|assistant, content: string}, ...]
-     * @param array $context
-     * @param bool $stream
-     * @param array $selectedTools
-     * @return string|iterable
+     * This method communicates with the configured language model (e.g., GPT-4o) to generate a response
+     * based on user messages and contextual data. It can optionally stream responses and call predefined tools.
+     * If a tool call is requested by the model, this method executes the tool and then prompts the model again
+     * for a follow-up response.
+     *
+     * @param int $userId The authenticated user's ID.
+     * @param array $userMessages A list of messages sent by the user and/or assistant. Each element is an associative array:
+     *                            [
+     *                              'role' => 'user'|'assistant',
+     *                              'content' => string
+     *                            ]
+     * @param array $context Contextual data (user attributes and recent activities) retrieved by ChatContextService.
+     * @param bool $stream If true, enables streaming responses.
+     * @param array $selectedTools A list of tool names that the assistant can use.
+     *
+     * @return string|iterable The response from the model, or an iterable if streaming is enabled.
      */
     public function getResponse(int $userId, array $userMessages, array $context, bool $stream = false, array $selectedTools = [])
     {
         $model = env('GPT_MODEL', 'gpt-4o');
         $fallbackModel = env('GPT_FALLBACK_MODEL', 'gpt-3.5-turbo');
 
-        // System messages provide the assistant with context, encouraging user detail for better personalization.
+        // System messages to provide context.
         $messages = [
             [
                 'role' => 'system',
@@ -58,18 +66,33 @@ class ChatService
             ];
         }
 
-        // Tool definitions with comprehensive descriptions.
+        /**
+         * Refined tool definitions:
+         *
+         * These tools are available for the assistant to perform certain actions on behalf of the user.
+         * Each tool has a "function" definition that includes:
+         * - name: The tool's identifier.
+         * - description: A detailed explanation of what the tool does, when it should be used, and how it behaves.
+         * - parameters: The schema defining the expected input parameters for the tool. This includes the types, formats,
+         *   and requirements of each parameter. These parameters dictate what data the assistant can and should provide
+         *   when invoking the tool.
+         *
+         * The tools manage user attributes and activities, enabling the assistant to help the user update their profile,
+         * view and record their fitness activities, and maintain an accurate fitness log.
+         */
+
         $allTools = [
             [
                 'type' => 'function',
                 'function' => [
                     'name' => 'updateUserAttributes',
-                    'description' => 'Add or update user attributes. This tool accepts a set of key-value pairs representing user characteristics (e.g., weight, preferred workouts, dietary restrictions). By sharing more personal details, users can receive more tailored activity suggestions, nutritional guidance, or motivational tips.',
+                    'description' => 'Use this tool to add or update user attributes. This function modifies user-specific data points, such as "height", "weight", "preferred_exercises", or "dietary_restrictions". Maintaining accurate attributes helps the user receive more tailored activity suggestions, nutritional guidance, and motivational tips. For example, if the user shares their new weight or dietary preference, these attributes can be updated to refine future suggestions. This tool expects a set of key-value pairs, where keys are attribute names (strings) and values are attribute values (strings). Keys and values should be concise and descriptive. Avoid overly long or complex keys. Use this tool whenever the user provides new or updated attribute information, or requests to modify their stored attributes.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'attributes' => [
                                 'type' => 'object',
+                                'description' => 'An object where each key is the attribute name and each value is a string representing the attribute\'s value. For example: {"weight": "75kg", "preferred_exercises": "yoga, cycling"}',
                                 'additionalProperties' => ['type' => 'string']
                             ]
                         ],
@@ -81,12 +104,13 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'deleteUserAttributes',
-                    'description' => 'Remove specified user attributes. Provide an array of attribute keys that should be removed from the user’s profile. This can help the user keep their profile accurate and up-to-date as their preferences or conditions change.',
+                    'description' => 'Use this tool to remove specific attributes from the user\'s profile. This may be needed when the user wants to clear outdated or irrelevant information. For instance, if a user previously stored a "temporary_injury" attribute but has now recovered, you can remove it. The tool expects an array of attribute keys (strings) to be deleted. Upon completion, these attributes no longer appear in the user\'s profile.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'keys' => [
                                 'type' => 'array',
+                                'description' => 'A list of attribute keys to remove. Each key should be a string that corresponds to an existing user attribute.',
                                 'items' => [
                                     'type' => 'string'
                                 ]
@@ -100,17 +124,19 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'getActivities',
-                    'description' => 'Retrieve activities based on optional date filters (from_date, to_date). This helps in understanding the user’s recent fitness routine, progress, and preferences. Data from these activities can inform better workout suggestions, progression plans, or modifications to improve overall fitness outcomes.',
+                    'description' => 'Use this tool to retrieve the user\'s activities over a specified period. This helps review the user\'s recent fitness routines, progress, and patterns. You may specify optional "from_date" and "to_date" parameters to filter results. If no dates are provided, the tool returns activities covering the entire available record. Activities are objects representing entries such as exercises or health-related tasks, each with properties: "id" (int), "date" (string, YYYY-MM-DD), "parent_id" (int or null, indicating hierarchy), "position" (int, ordering in a list), "name" (string), "description" (string), "notes" (string), "metrics" (object with custom metrics like repetitions, duration, etc.), and "completed" (bool). Use this tool to understand the user\'s past three months of activities or to narrow down activities by date to provide relevant suggestions.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'from_date' => [
                                 'type' => 'string',
-                                'format' => 'date'
+                                'format' => 'date',
+                                'description' => 'Optional. Start date (inclusive) in YYYY-MM-DD format. If provided, only activities on or after this date are returned.'
                             ],
                             'to_date' => [
                                 'type' => 'string',
-                                'format' => 'date'
+                                'format' => 'date',
+                                'description' => 'Optional. End date (inclusive) in YYYY-MM-DD format. If provided, only activities on or before this date are returned.'
                             ]
                         ],
                         'required' => []
@@ -121,14 +147,55 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'updateActivities',
-                    'description' => 'Add or update user activities. This tool accepts an array of activity objects (e.g., running, bench press) along with their details (date, name, completion status). By keeping activities updated, the user can track progress, build routines, or receive more accurate and personalized suggestions for future workouts or improvements.',
+                    'description' => 'Use this tool to add new activities or update existing ones in the user\'s activity log. Activities represent any recorded fitness-related action, such as "running", "bench press", or "meditation session". Each activity object must include "date" (a string in YYYY-MM-DD format) and "name" (a short, descriptive string, e.g., "Morning Run"). Optional fields include "id" (if updating an existing activity), "parent_id" (if this activity is grouped under another activity), "position" (an integer ordering within a set), "description" (a longer text), "notes" (additional user comments), "metrics" (an object storing numerical or descriptive measures like {"distance_km": 5, "duration_min": 30}), and "completed" (a boolean to indicate whether the user considers this activity done). If "completed" is true, related hierarchical updates may propagate to parent or child activities. Use this tool when the user provides new activities to log or updates details of existing activities.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'activities' => [
                                 'type' => 'array',
+                                'description' => 'An array of activity objects, each representing an activity to add or update.',
                                 'items' => [
-                                    'type' => 'object'
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'id' => [
+                                            'type' => 'integer',
+                                            'description' => 'Optional. If provided, updates the activity with this ID; otherwise, a new activity is created.'
+                                        ],
+                                        'date' => [
+                                            'type' => 'string',
+                                            'description' => 'Required. The date of the activity in YYYY-MM-DD format.'
+                                        ],
+                                        'parent_id' => [
+                                            'type' => ['integer', 'null'],
+                                            'description' => 'Optional. The ID of a parent activity if this activity is part of a hierarchical structure. Use null if there is no parent.'
+                                        ],
+                                        'position' => [
+                                            'type' => ['integer', 'null'],
+                                            'description' => 'Optional. The position/order of this activity relative to siblings.'
+                                        ],
+                                        'name' => [
+                                            'type' => 'string',
+                                            'description' => 'Required. A short descriptive name for the activity, e.g., "Yoga Session".'
+                                        ],
+                                        'description' => [
+                                            'type' => ['string', 'null'],
+                                            'description' => 'Optional. A longer explanation of the activity, e.g., "Morning routine focusing on stretching."'
+                                        ],
+                                        'notes' => [
+                                            'type' => ['string', 'null'],
+                                            'description' => 'Optional. Additional user comments or notes about the activity.'
+                                        ],
+                                        'metrics' => [
+                                            'type' => ['object', 'null'],
+                                            'description' => 'Optional. Key-value pairs containing activity-specific metrics, e.g., {"repetitions": 20, "sets": 3}. Keys should be strings, values can be strings or numbers.',
+                                            'additionalProperties' => true
+                                        ],
+                                        'completed' => [
+                                            'type' => ['boolean', 'null'],
+                                            'description' => 'Optional. Indicates if the activity is completed. If true, completion may propagate up or down the activity hierarchy.'
+                                        ]
+                                    ],
+                                    'required' => ['date', 'name']
                                 ]
                             ]
                         ],
@@ -140,12 +207,13 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'deleteActivities',
-                    'description' => 'Remove specified activities by their IDs. This tool helps maintain an accurate and current log of the user’s activity history, removing outdated or incorrect entries for better long-term planning and analysis of the user’s fitness journey.',
+                    'description' => 'Use this tool to remove specified activities from the user\'s log. The user might remove activities that are mistakenly logged, duplicated, or no longer relevant. Provide an array of activity IDs to be deleted. Once deleted, these activities will not appear in future activity retrievals.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'activityIds' => [
                                 'type' => 'array',
+                                'description' => 'A list of integers representing the IDs of the activities to remove.',
                                 'items' => [
                                     'type' => 'integer'
                                 ]
@@ -293,12 +361,13 @@ class ChatService
     }
 
     /**
-     * Execute a tool based on the provided name and arguments.
+     * Execute a specific tool based on provided arguments.
      *
-     * @param int $userId
-     * @param string $toolName
-     * @param array $arguments
-     * @return array
+     * @param int $userId The ID of the current user.
+     * @param string $toolName The name of the tool to be executed.
+     * @param array $arguments The arguments to pass to the tool.
+     *
+     * @return array The result returned by the executed tool.
      */
     protected function executeTool(int $userId, string $toolName, array $arguments): array
     {
