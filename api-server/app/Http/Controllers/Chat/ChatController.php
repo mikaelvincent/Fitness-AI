@@ -7,6 +7,8 @@ use App\Services\ChatService;
 use App\Services\ChatContextService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class ChatController extends Controller
 {
@@ -54,6 +56,11 @@ class ChatController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::warning('Chat request validation failed.', [
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'errors' => $validator->errors()->toArray()
+            ]);
+
             return response()->json([
                 'message' => 'Validation failed.',
                 'errors' => $validator->errors(),
@@ -62,38 +69,65 @@ class ChatController extends Controller
 
         $validated = $validator->validated();
 
-        $context = $this->chatContextService->getContext($request->user()->id);
-        $stream = $validated['stream'] ?? false;
-        $tools = $validated['tools'] ?? [];
-        $userMessages = $validated['messages'];
+        // Log the incoming request data for monitoring and debugging
+        Log::info('Received chat request.', [
+            'user_id' => $request->user() ? $request->user()->id : null,
+            'messages' => $validated['messages'],
+            'stream' => $validated['stream'] ?? false,
+            'tools' => $validated['tools'] ?? []
+        ]);
 
-        $response = $this->chatService->getResponse(
-            $request->user()->id,
-            $userMessages,
-            $context,
-            $stream,
-            $tools
-        );
+        try {
+            $context = $this->chatContextService->getContext($request->user()->id);
+            $stream = $validated['stream'] ?? false;
+            $tools = $validated['tools'] ?? [];
+            $userMessages = $validated['messages'];
 
-        if ($stream) {
-            return response()->stream(function () use ($response) {
-                foreach ($response as $chunk) {
-                    echo $chunk;
-                    ob_flush();
-                    flush();
-                }
-            }, 200, [
-                'Content-Type' => 'text/event-stream',
-                'Cache-Control' => 'no-cache',
-                'Connection' => 'keep-alive',
+            $response = $this->chatService->getResponse(
+                $request->user()->id,
+                $userMessages,
+                $context,
+                $stream,
+                $tools
+            );
+
+            if ($stream) {
+                return response()->stream(function () use ($response) {
+                    foreach ($response as $chunk) {
+                        echo $chunk;
+                        ob_flush();
+                        flush();
+                    }
+                }, 200, [
+                    'Content-Type' => 'text/event-stream',
+                    'Cache-Control' => 'no-cache',
+                    'Connection' => 'keep-alive',
+                ]);
+            }
+
+            // Log successful response generation
+            Log::info('Chat response generated successfully.', [
+                'user_id' => $request->user()->id,
             ]);
-        }
 
-        return response()->json([
-            'message' => 'Chat response generated successfully.',
-            'data' => [
-                'response' => $response,
-            ],
-        ], 200);
+            return response()->json([
+                'message' => 'Chat response generated successfully.',
+                'data' => [
+                    'response' => $response,
+                ],
+            ], 200);
+
+        } catch (Exception $e) {
+            // Log the error details for troubleshooting
+            Log::error('Chat request processing failed.', [
+                'user_id' => $request->user() ? $request->user()->id : null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'An error occurred while processing your request. Please try again later.'
+            ], 500);
+        }
     }
 }
