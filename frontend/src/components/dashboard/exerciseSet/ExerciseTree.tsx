@@ -12,11 +12,6 @@ interface ExerciseTreeProps {
   parentId: number | null | undefined;
   onToggle: () => void;
   toggleExerciseCompletion: (id: number | null | undefined) => void;
-  onDeleteMetric: (idx: number) => void;
-  deleteMetric: (
-    exerciseId: number | null | undefined,
-    metricIndex: number,
-  ) => void;
   onDeleteExercise: () => void;
   deleteExercise: (exerciseId: number | null | undefined) => void;
   onAddChildExercise: () => void;
@@ -46,8 +41,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
       parentId,
       onToggle,
       toggleExerciseCompletion,
-      onDeleteMetric,
-      deleteMetric,
       onDeleteExercise,
       deleteExercise,
       onAddChildExercise,
@@ -81,7 +74,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
           }
         }}
         onToggle={onToggle}
-        onDeleteMetric={onDeleteMetric}
         onDeleteExercise={onDeleteExercise}
         onAddChildExercise={onAddChildExercise}
         onUpdateExercise={onUpdateExercise}
@@ -98,8 +90,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
                 onToggleExpansion={onToggleExpansion}
                 onToggle={() => toggleExerciseCompletion(child.id)}
                 toggleExerciseCompletion={toggleExerciseCompletion}
-                onDeleteMetric={(idx) => deleteMetric(child.id, idx)}
-                deleteMetric={deleteMetric}
                 onDeleteExercise={() => deleteExercise(child.id)}
                 deleteExercise={deleteExercise}
                 onAddChildExercise={() => addChildExercise(child.id)}
