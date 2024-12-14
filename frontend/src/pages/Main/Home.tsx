@@ -208,18 +208,6 @@ const Home = () => {
     });
   };
 
-  const addMetric = (exerciseId: number | null | undefined) => {
-    setExercises((prev) =>
-      prev.map((exercise) => {
-        if (exercise.id === exerciseId) {
-          const newMetric: Metric = { name: "New Metric", value: 0, unit: "" };
-          return { ...exercise, metrics: [...exercise.metrics, newMetric] };
-        }
-        return exercise;
-      }),
-    );
-  };
-
   const updateMetric = (
     exerciseId: number | null | undefined,
     metricIndex: number,
@@ -473,8 +461,6 @@ const Home = () => {
               parentId={0}
               onToggle={() => toggleExerciseCompletion(exercise.id)}
               toggleExerciseCompletion={toggleExerciseCompletion}
-              onAddMetric={() => addMetric(exercise.id)}
-              addMetric={addMetric}
               onUpdateMetric={(idx, updatedMetric) =>
                 updateMetric(exercise.id, idx, updatedMetric)
               }
