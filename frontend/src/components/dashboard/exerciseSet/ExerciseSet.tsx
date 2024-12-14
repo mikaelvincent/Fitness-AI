@@ -21,7 +21,6 @@ interface ExerciseSetProps {
   isActive: boolean;
   onExpand: () => void;
   onToggle: () => void;
-  onDeleteMetric: (metricIndex: number) => void;
   onDeleteExercise: () => void;
   onAddChildExercise: () => void;
   onUpdateExercise: (updatedExercise: Exercise) => void;
@@ -35,7 +34,6 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       isActive,
       onExpand,
       onToggle,
-      onDeleteMetric,
       onDeleteExercise,
       onAddChildExercise,
       onUpdateExercise,
@@ -152,6 +150,18 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       setNewMetricValue(0);
       setNewMetricUnit("");
     };
+    
+    const handleDeleteMetric = (index: number) => {
+      const updatedMetrics = (exercise.metrics || []).filter(
+        (_, i) => i !== index
+      );
+      const updatedExercise: Exercise = {
+        ...exercise,
+        metrics: updatedMetrics
+      };
+      onUpdateExercise(updatedExercise);
+    };
+    
     
     const handleSaveExercise = () => {
       const updatedExercise: Exercise = {
@@ -444,7 +454,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                               variant="ghost"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onDeleteMetric(index);
+                                handleDeleteMetric(index);
                               }}
                               className="text-red-500 transition-colors hover:text-red-700"
                               aria-label="Delete metric"
@@ -467,7 +477,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                             variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onDeleteMetric(index);
+                              handleDeleteMetric(index);
                             }}
                             className="text-red-500 transition-colors hover:text-red-700"
                             aria-label="Delete metric"
