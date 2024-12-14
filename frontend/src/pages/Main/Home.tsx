@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Calendar from "@/components/dashboard/Calendar";
-import { Exercise, Metric } from "@/types/exerciseTypes";
+import { Exercise } from "@/types/exerciseTypes";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button.tsx";
 import { AlertCircle, BotMessageSquare, Plus } from "lucide-react";
@@ -206,23 +206,6 @@ const Home = () => {
       }
       return newMap;
     });
-  };
-
-  const updateMetric = (
-    exerciseId: number | null | undefined,
-    metricIndex: number,
-    updatedMetric: Metric,
-  ) => {
-    setExercises((prev) =>
-      prev.map((exercise) => {
-        if (exercise.id === exerciseId) {
-          const updatedMetrics = [...exercise.metrics];
-          updatedMetrics[metricIndex] = updatedMetric;
-          return { ...exercise, metrics: updatedMetrics };
-        }
-        return exercise;
-      }),
-    );
   };
 
   const deleteMetric = (
@@ -461,10 +444,6 @@ const Home = () => {
               parentId={0}
               onToggle={() => toggleExerciseCompletion(exercise.id)}
               toggleExerciseCompletion={toggleExerciseCompletion}
-              onUpdateMetric={(idx, updatedMetric) =>
-                updateMetric(exercise.id, idx, updatedMetric)
-              }
-              updateMetric={updateMetric}
               onDeleteMetric={(idx) => deleteMetric(exercise.id, idx)}
               deleteMetric={deleteMetric}
               onDeleteExercise={() => deleteExercise(exercise.id)}

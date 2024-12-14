@@ -1,6 +1,6 @@
 // Define the props for ExerciseTree
 import { forwardRef, Ref, RefObject } from "react";
-import { Exercise, Metric } from "@/types/exerciseTypes.ts";
+import { Exercise } from "@/types/exerciseTypes.ts";
 import { ExerciseSet } from "@/components/dashboard/exerciseSet/ExerciseSet.tsx";
 import NewExercise from "@/components/dashboard/NewExercise.tsx";
 
@@ -12,12 +12,6 @@ interface ExerciseTreeProps {
   parentId: number | null | undefined;
   onToggle: () => void;
   toggleExerciseCompletion: (id: number | null | undefined) => void;
-  onUpdateMetric: (idx: number, updatedMetric: Metric) => void;
-  updateMetric: (
-    exerciseId: number | null | undefined,
-    metricIndex: number,
-    updatedMetric: Metric,
-  ) => void;
   onDeleteMetric: (idx: number) => void;
   deleteMetric: (
     exerciseId: number | null | undefined,
@@ -52,8 +46,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
       parentId,
       onToggle,
       toggleExerciseCompletion,
-      onUpdateMetric,
-      updateMetric,
       onDeleteMetric,
       deleteMetric,
       onDeleteExercise,
@@ -89,7 +81,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
           }
         }}
         onToggle={onToggle}
-        onUpdateMetric={onUpdateMetric}
         onDeleteMetric={onDeleteMetric}
         onDeleteExercise={onDeleteExercise}
         onAddChildExercise={onAddChildExercise}
@@ -107,10 +98,6 @@ const ExerciseTree = forwardRef<HTMLDivElement, ExerciseTreeProps>(
                 onToggleExpansion={onToggleExpansion}
                 onToggle={() => toggleExerciseCompletion(child.id)}
                 toggleExerciseCompletion={toggleExerciseCompletion}
-                onUpdateMetric={(idx, updatedMetric) =>
-                  updateMetric(child.id, idx, updatedMetric)
-                }
-                updateMetric={updateMetric}
                 onDeleteMetric={(idx) => deleteMetric(child.id, idx)}
                 deleteMetric={deleteMetric}
                 onDeleteExercise={() => deleteExercise(child.id)}
