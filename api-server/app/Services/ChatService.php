@@ -24,17 +24,18 @@ class ChatService
      * Supports optional streaming and tool selection.
      *
      * @param int $userId
-     * @param string $message
+     * @param array $userMessages Array of messages [{role: user|assistant, content: string}, ...]
      * @param array $context
      * @param bool $stream
      * @param array $selectedTools
      * @return string|iterable
      */
-    public function getResponse(int $userId, string $message, array $context, bool $stream = false, array $selectedTools = [])
+    public function getResponse(int $userId, array $userMessages, array $context, bool $stream = false, array $selectedTools = [])
     {
         $model = env('GPT_MODEL', 'gpt-4o');
         $fallbackModel = env('GPT_FALLBACK_MODEL', 'gpt-3.5-turbo');
 
+        // System context messages
         $messages = [
             [
                 'role' => 'system',
@@ -48,26 +49,18 @@ class ChatService
                 'role' => 'system',
                 'content' => 'Recent Activities: ' . json_encode($context['activities']),
             ],
-            [
-                'role' => 'user',
-                'content' => $message,
-            ],
         ];
 
-        // Define available tools
+        // Append the provided messages to the message array
+        foreach ($userMessages as $msg) {
+            $messages[] = [
+                'role' => $msg['role'],
+                'content' => $msg['content'],
+            ];
+        }
+
+        // Define available tools (excluding getUserAttributes as requested)
         $allTools = [
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'getUserAttributes',
-                    'description' => 'Retrieve the authenticated user attributes',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [],
-                        'required' => []
-                    ],
-                ],
-            ],
             [
                 'type' => 'function',
                 'function' => [
@@ -224,7 +217,6 @@ class ChatService
         // Check for tool calls
         $choice = $response->choices[0];
         if (!empty($choice->message->toolCalls)) {
-            // Handle the first tool call
             $toolCall = $choice->message->toolCalls[0];
             $toolName = $toolCall->function->name;
             $arguments = json_decode($toolCall->function->arguments, true);
@@ -232,7 +224,7 @@ class ChatService
             // Execute the tool
             $toolResult = $this->executeTool($userId, $toolName, $arguments);
 
-            // Send the tool result back to the model to continue the conversation
+            // Send the tool result back to the model
             $messages[] = [
                 'role' => 'tool',
                 'name' => $toolName,
@@ -283,9 +275,6 @@ class ChatService
     protected function executeTool(int $userId, string $toolName, array $arguments): array
     {
         switch ($toolName) {
-            case 'getUserAttributes':
-                return $this->chatToolService->getUserAttributes($userId);
-
             case 'updateUserAttributes':
                 return $this->chatToolService->updateUserAttributes($userId, $arguments['attributes']);
 
@@ -293,7 +282,6 @@ class ChatService
                 return $this->chatToolService->deleteUserAttributes($userId, $arguments['keys']);
 
             case 'getActivities':
-                // Filters are optional
                 $filters = [];
                 if (isset($arguments['from_date'])) {
                     $filters['from_date'] = $arguments['from_date'];
