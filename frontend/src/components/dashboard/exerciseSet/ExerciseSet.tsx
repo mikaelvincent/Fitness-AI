@@ -21,7 +21,6 @@ interface ExerciseSetProps {
   isActive: boolean;
   onExpand: () => void;
   onToggle: () => void;
-  onAddMetric: () => void;
   onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
   onDeleteMetric: (metricIndex: number) => void;
   onDeleteExercise: () => void;
@@ -37,7 +36,6 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       isActive,
       onExpand,
       onToggle,
-      onAddMetric,
       onUpdateMetric,
       onDeleteMetric,
       onDeleteExercise,
@@ -63,6 +61,13 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       exercise.description
     );
     
+    // State for adding a new metric
+    const [isAddingMetric, setIsAddingMetric] = useState(false);
+    const [newMetricName, setNewMetricName] = useState("");
+    const [newMetricValue, setNewMetricValue] = useState<number>(0);
+    const [newMetricUnit, setNewMetricUnit] = useState("");
+    
+    
     useEffect(() => {
       setTempNotes(exercise.notes);
     }, [exercise.notes]);
@@ -71,6 +76,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       if (!isActive) {
         setIsEditingNotes(false);
         setEditingMetricIndex(null);
+        setIsAddingMetric(false);
       }
     }, [isActive]);
     
@@ -109,8 +115,30 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       setEditingMetricIndex(null);
     };
     
+    
     const handleCancelMetricEdit = () => {
       setEditingMetricIndex(null);
+    };
+    
+    const handleAddMetricSubmit = () => {
+      // Create the new metric
+      const newMetric: Metric = {
+        name: newMetricName.trim(),
+        value: newMetricValue,
+        unit: newMetricUnit.trim()
+      };
+      
+      const updatedExercise: Exercise = {
+        ...exercise,
+        metrics: [...(exercise.metrics || []), newMetric]
+      };
+      
+      onUpdateExercise(updatedExercise);
+      // Reset the form and close it
+      setIsAddingMetric(false);
+      setNewMetricName("");
+      setNewMetricValue(0);
+      setNewMetricUnit("");
     };
     
     const handleSaveExercise = () => {
@@ -440,6 +468,74 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     </div>
                   ))}
                   
+                  {/* Add new metric form */}
+                  {isAddingMetric && (
+                    <div className="space-y-2 rounded bg-muted p-4">
+                      <h4 className="font-semibold">New Metric</h4>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="flex flex-col">
+                          <label className="text-xs text-gray-300">
+                            Name
+                          </label>
+                          <Input
+                            type="text"
+                            value={newMetricName}
+                            onChange={(e) => setNewMetricName(e.target.value)}
+                            placeholder="Metric Name"
+                            className="rounded px-2 py-1 text-sm"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <label className="text-xs text-gray-300">
+                            Value
+                          </label>
+                          <Input
+                            type="number"
+                            value={newMetricValue}
+                            onChange={(e) => setNewMetricValue(parseFloat(e.target.value) || 0)}
+                            min="0"
+                            step="0.1"
+                            placeholder="Value"
+                            className="rounded px-2 py-1 text-sm"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <label className="text-xs text-gray-300">
+                            Unit
+                          </label>
+                          <Input
+                            type="text"
+                            value={newMetricUnit}
+                            onChange={(e) => setNewMetricUnit(e.target.value)}
+                            placeholder="Unit"
+                            className="rounded px-2 py-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-end gap-2 mt-2">
+                        <Button
+                          variant="default"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddMetricSubmit();
+                          }}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsAddingMetric(false);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="flex w-full justify-between">
                     <Button
                       variant="ghost"
@@ -453,18 +549,20 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                       <Trash2 strokeWidth={2.75} />
                       Exercise
                     </Button>
-                    <Button
-                      variant="link"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddMetric();
-                      }}
-                      className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
-                      aria-label="Add new metric"
-                    >
-                      <Plus strokeWidth={2.75} />
-                      Add Metric
-                    </Button>
+                    {!isAddingMetric && (
+                      <Button
+                        variant="link"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsAddingMetric(true);
+                        }}
+                        className="mt-2 flex items-center rounded p-2 text-primary transition-colors hover:bg-muted hover:text-orange-400"
+                        aria-label="Add new metric"
+                      >
+                        <Plus strokeWidth={2.75} />
+                        Add Metric
+                      </Button>
+                    )}
                   </div>
                   <div className="flex w-full justify-end">
                     <Button
