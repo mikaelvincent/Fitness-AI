@@ -96,7 +96,8 @@ class ChatService
                                 'additionalProperties' => ['type' => 'string']
                             ]
                         ],
-                        'required' => ['attributes']
+                        'required' => ['attributes'],
+                        'additionalProperties' => false
                     ],
                 ],
             ],
@@ -116,7 +117,8 @@ class ChatService
                                 ]
                             ]
                         ],
-                        'required' => ['keys']
+                        'required' => ['keys'],
+                        'additionalProperties' => false
                     ],
                 ],
             ],
@@ -139,7 +141,8 @@ class ChatService
                                 'description' => 'Optional. End date (inclusive) in YYYY-MM-DD format. If provided, only activities on or before this date are returned.'
                             ]
                         ],
-                        'required' => []
+                        'required' => [],
+                        'additionalProperties' => false
                     ],
                 ],
             ],
@@ -199,7 +202,8 @@ class ChatService
                                 ]
                             ]
                         ],
-                        'required' => ['activities']
+                        'required' => ['activities'],
+                        'additionalProperties' => false
                     ],
                 ],
             ],
@@ -219,7 +223,8 @@ class ChatService
                                 ]
                             ]
                         ],
-                        'required' => ['activityIds']
+                        'required' => ['activityIds'],
+                        'additionalProperties' => true
                     ],
                 ],
             ],
@@ -304,7 +309,7 @@ class ChatService
             $toolResult = $this->executeTool($userId, $toolName, $arguments);
 
             $messages[] = [
-                'role' => 'tool',
+                'role' => 'function',
                 'name' => $toolName,
                 'content' => json_encode($toolResult),
             ];
@@ -373,26 +378,19 @@ class ChatService
     {
         switch ($toolName) {
             case 'updateUserAttributes':
-                return $this->chatToolService->updateUserAttributes($userId, $arguments['attributes']);
+                return $this->chatToolService->updateUserAttributes($userId, $arguments);
 
             case 'deleteUserAttributes':
-                return $this->chatToolService->deleteUserAttributes($userId, $arguments['keys']);
+                return $this->chatToolService->deleteUserAttributes($userId, $arguments);
 
             case 'getActivities':
-                $filters = [];
-                if (isset($arguments['from_date'])) {
-                    $filters['from_date'] = $arguments['from_date'];
-                }
-                if (isset($arguments['to_date'])) {
-                    $filters['to_date'] = $arguments['to_date'];
-                }
-                return $this->chatToolService->getActivities($userId, $filters);
+                return $this->chatToolService->getActivities($userId, $arguments);
 
             case 'updateActivities':
-                return $this->chatToolService->updateActivities($userId, $arguments['activities']);
+                return $this->chatToolService->updateActivities($userId, $arguments);
 
             case 'deleteActivities':
-                return $this->chatToolService->deleteActivities($userId, $arguments['activityIds']);
+                return $this->chatToolService->deleteActivities($userId, $arguments);
 
             default:
                 Log::warning('Tool not recognized.', [
