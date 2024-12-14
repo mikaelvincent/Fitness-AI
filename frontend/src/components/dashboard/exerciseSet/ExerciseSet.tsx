@@ -21,7 +21,6 @@ interface ExerciseSetProps {
   isActive: boolean;
   onExpand: () => void;
   onToggle: () => void;
-  onUpdateMetric: (metricIndex: number, updatedMetric: Metric) => void;
   onDeleteMetric: (metricIndex: number) => void;
   onDeleteExercise: () => void;
   onAddChildExercise: () => void;
@@ -36,7 +35,6 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       isActive,
       onExpand,
       onToggle,
-      onUpdateMetric,
       onDeleteMetric,
       onDeleteExercise,
       onAddChildExercise,
@@ -48,13 +46,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     const [isEditingNotes, setIsEditingNotes] = useState(false);
     const [tempNotes, setTempNotes] = useState(exercise.notes);
     
-    const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(
-      null
-    );
-    const [tempMetricName, setTempMetricName] = useState("");
-    const [tempMetricValue, setTempMetricValue] = useState<number>(0);
-    const [tempMetricUnit, setTempMetricUnit] = useState("");
-    
+    // States for editing the exercise itself
     const [editingExercise, setEditingExercise] = useState(false);
     const [tempExerciseName, setTempExerciseName] = useState(exercise.name);
     const [tempExerciseDescription, setTempExerciseDescription] = useState(
@@ -66,6 +58,14 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     const [newMetricName, setNewMetricName] = useState("");
     const [newMetricValue, setNewMetricValue] = useState<number>(0);
     const [newMetricUnit, setNewMetricUnit] = useState("");
+    
+    // State for editing an existing metric by index
+    const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(
+      null
+    );
+    const [tempMetricName, setTempMetricName] = useState("");
+    const [tempMetricValue, setTempMetricValue] = useState<number>(0);
+    const [tempMetricUnit, setTempMetricUnit] = useState("");
     
     
     useEffect(() => {
@@ -79,6 +79,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
         setIsAddingMetric(false);
       }
     }, [isActive]);
+    
     
     const handleNotesSave = () => {
       const updatedExercise: Exercise = {
@@ -95,9 +96,11 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     };
     
     const handleMetricClick = (index: number, metric: Metric) => {
+      // If we're already editing this metric, clicking again cancels editing
       if (editingMetricIndex === index) {
         setEditingMetricIndex(null);
       } else {
+        // Start editing this metric
         setEditingMetricIndex(index);
         setTempMetricName(metric.name);
         setTempMetricValue(metric.value);
@@ -105,13 +108,22 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       }
     };
     
-    const handleSaveMetric = (index: number) => {
-      const updatedMetric: Metric = {
+    const handleSaveMetric = () => {
+      if (editingMetricIndex === null) return;
+      
+      const updatedMetrics = [...(exercise.metrics || [])];
+      updatedMetrics[editingMetricIndex] = {
         name: tempMetricName,
         value: tempMetricValue,
         unit: tempMetricUnit
       };
-      onUpdateMetric(index, updatedMetric);
+      
+      const updatedExercise: Exercise = {
+        ...exercise,
+        metrics: updatedMetrics
+      };
+      
+      onUpdateExercise(updatedExercise);
       setEditingMetricIndex(null);
     };
     
@@ -408,7 +420,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                               variant="ghost"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleSaveMetric(index);
+                                handleSaveMetric();
                               }}
                               className="text-primary transition-colors hover:text-orange-400"
                               aria-label="Save metric"
