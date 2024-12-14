@@ -35,7 +35,6 @@ class ChatService
         $model = env('GPT_MODEL', 'gpt-4o');
         $fallbackModel = env('GPT_FALLBACK_MODEL', 'gpt-3.5-turbo');
 
-        // System context messages
         $messages = [
             [
                 'role' => 'system',
@@ -51,7 +50,6 @@ class ChatService
             ],
         ];
 
-        // Append the provided messages to the message array
         foreach ($userMessages as $msg) {
             $messages[] = [
                 'role' => $msg['role'],
@@ -59,7 +57,6 @@ class ChatService
             ];
         }
 
-        // Define available tools (excluding getUserAttributes as requested)
         $allTools = [
             [
                 'type' => 'function',
@@ -158,7 +155,6 @@ class ChatService
             ],
         ];
 
-        // Filter tools based on selectedTools
         $tools = [];
         if (!empty($selectedTools)) {
             foreach ($allTools as $tool) {
@@ -168,7 +164,6 @@ class ChatService
             }
         }
 
-        // Initial attempt with the primary model
         try {
             if ($stream) {
                 $response = OpenAI::chat()->createStreamed([
@@ -184,7 +179,12 @@ class ChatService
                 ]);
             }
         } catch (Exception $e) {
-            Log::error('OpenAI request failed: ' . $e->getMessage());
+            Log::error('OpenAI primary model request failed.', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             // Attempt fallback model
             try {
                 if ($stream) {
@@ -200,31 +200,40 @@ class ChatService
                         'tools' => $tools,
                     ]);
                 }
+
+                Log::info('Fallback model used successfully.', [
+                    'user_id' => $userId
+                ]);
             } catch (Exception $fallbackException) {
-                Log::error('Fallback model request failed: ' . $fallbackException->getMessage());
+                Log::error('Fallback model request failed.', [
+                    'user_id' => $userId,
+                    'error' => $fallbackException->getMessage(),
+                    'trace' => $fallbackException->getTraceAsString()
+                ]);
+
                 return 'An error occurred while processing your request. Please try again later.';
             }
         }
 
-        // Handle streaming response
         if ($stream) {
-            foreach ($response as $chunk) {
-                yield $chunk;
-            }
-            return;
+            return $response;
         }
 
-        // Check for tool calls
         $choice = $response->choices[0];
         if (!empty($choice->message->toolCalls)) {
             $toolCall = $choice->message->toolCalls[0];
             $toolName = $toolCall->function->name;
             $arguments = json_decode($toolCall->function->arguments, true);
 
-            // Execute the tool
+            // Log tool call
+            Log::info('Executing tool call.', [
+                'user_id' => $userId,
+                'tool_name' => $toolName,
+                'arguments' => $arguments
+            ]);
+
             $toolResult = $this->executeTool($userId, $toolName, $arguments);
 
-            // Send the tool result back to the model
             $messages[] = [
                 'role' => 'tool',
                 'name' => $toolName,
@@ -232,6 +241,10 @@ class ChatService
             ];
 
             try {
+                if (!isset($toolResult['message'])) {
+                    $toolResult['message'] = 'Tool call completed.';
+                }
+
                 if ($stream) {
                     $followUpResponse = OpenAI::chat()->createStreamed([
                         'model' => $model,
@@ -245,21 +258,36 @@ class ChatService
                         'tools' => $tools,
                     ]);
                 }
+
+                if (!isset($followUpResponse->choices[0]->message->content)) {
+                    return 'No response generated. Please try again.';
+                }
+
+                Log::info('Response generated after tool call.', [
+                    'user_id' => $userId,
+                ]);
+
+                return trim($followUpResponse->choices[0]->message->content);
+
             } catch (Exception $e) {
-                Log::error('OpenAI follow-up request failed: ' . $e->getMessage());
+                Log::error('OpenAI follow-up request after tool call failed.', [
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+
                 return 'An error occurred while processing your request. Please try again later.';
             }
-
-            if (!isset($followUpResponse->choices[0]->message->content)) {
-                return 'No response generated. Please try again.';
-            }
-
-            return trim($followUpResponse->choices[0]->message->content);
         }
 
         if (!isset($choice->message->content)) {
             return 'No response generated. Please try again.';
         }
+
+        // Log successful completion without tool calls
+        Log::info('Response generated successfully without tool calls.', [
+            'user_id' => $userId,
+        ]);
 
         return trim($choice->message->content);
     }
@@ -298,6 +326,10 @@ class ChatService
                 return $this->chatToolService->deleteActivities($userId, $arguments['activityIds']);
 
             default:
+                Log::warning('Tool not recognized.', [
+                    'user_id' => $userId,
+                    'tool_name' => $toolName
+                ]);
                 return ['message' => 'Tool not recognized.'];
         }
     }
