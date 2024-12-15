@@ -1,3 +1,4 @@
+// src/pages/setup/steps/BirthdateStep.tsx
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -13,10 +14,14 @@ export const BirthdateStep: React.FC<BirthdateStepProps> = ({
     birthdateDay,
     birthdateMonth,
     birthdateYear,
-    onChange
+    onChange,
 }) => {
+    const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange(field, e.target.value);
+    };
+
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 text-center">
             <div className="flex space-x-2 justify-center">
                 <div>
                     <Label htmlFor="day">Day</Label>
@@ -25,7 +30,7 @@ export const BirthdateStep: React.FC<BirthdateStepProps> = ({
                         type="number"
                         placeholder="DD"
                         value={birthdateDay}
-                        onChange={(e) => onChange("birthdateDay", e.target.value)}
+                        onChange={handleInputChange("birthdateDay")}
                         min="1"
                         max="31"
                     />
@@ -37,7 +42,7 @@ export const BirthdateStep: React.FC<BirthdateStepProps> = ({
                         type="number"
                         placeholder="MM"
                         value={birthdateMonth}
-                        onChange={(e) => onChange("birthdateMonth", e.target.value)}
+                        onChange={handleInputChange("birthdateMonth")}
                         min="1"
                         max="12"
                     />
@@ -49,15 +54,15 @@ export const BirthdateStep: React.FC<BirthdateStepProps> = ({
                         type="number"
                         placeholder="YYYY"
                         value={birthdateYear}
-                        onChange={(e) => onChange("birthdateYear", e.target.value)}
+                        onChange={handleInputChange("birthdateYear")}
                         min="1900"
                         max={new Date().getFullYear()}
                     />
                 </div>
             </div>
-            <div className="flex justify-center">
-                <p className="text-sm text-gray-500">You must be at least 13 years old to continue.</p>
-            </div>
+            <p className="text-sm text-gray-500">
+                You must be at least 13 years old to continue.
+            </p>
         </div>
     );
 };

@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+// src/pages/setup/steps/WeightStep.tsx
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { kgToLbs, lbsToKg } from "../../../pages/setup/utils";
+import clsx from "clsx";
 
 interface WeightStepProps {
     weight: number;
@@ -12,40 +15,31 @@ export const WeightStep: React.FC<WeightStepProps> = ({ weight, weightUnit, onCh
     const maxWeightKg = 200;
     const stepKg = 1;
 
-    // Precise conversion functions
-    const toLbs = (kg: number) => Math.round(kg * 2.20462);
-    const toKg = (lbs: number) => Math.round(lbs / 2.20462);
+    const [currentWeightKg, setCurrentWeightKg] = useState(() =>
+        weightUnit === "kg" ? weight : lbsToKg(weight)
+    );
 
-    // Determine initial state based on input props
-    const [currentWeightKg, setCurrentWeightKg] = useState(() => {
-        return weightUnit === "kg" ? weight : toKg(weight);
-    });
-
-    // Conversion and display function
-    const getDisplayWeight = (weightInKg: number) => {
-        return weightUnit === "kg" ? Math.round(weightInKg) : toLbs(weightInKg);
-    };
-
-    // Update parent component when weight or unit changes
     useEffect(() => {
-        onChange("weight", getDisplayWeight(currentWeightKg));
+        const displayWeight = weightUnit === "kg" ? currentWeightKg : kgToLbs(currentWeightKg);
+        onChange("weight", displayWeight);
     }, [currentWeightKg, weightUnit]);
 
     const changeWeightBy = (amount: number) => {
-        setCurrentWeightKg(current => {
+        setCurrentWeightKg((current) => {
             const newVal = current + amount;
             return Math.min(Math.max(newVal, minWeightKg), maxWeightKg);
         });
     };
 
     const handleUnitChange = (unit: "kg" | "lbs") => {
-        if (unit !== weightUnit) {
-            onChange("weightUnit", unit);
-        }
+        if (unit !== weightUnit) onChange("weightUnit", unit);
     };
+
+    const displayedWeight = weightUnit === "kg" ? currentWeightKg : kgToLbs(currentWeightKg);
 
     return (
         <div className="flex flex-col items-center space-y-4">
+            {/* Unit Selection */}
             <div className="flex gap-4 mb-4">
                 <Button
                     variant={weightUnit === "kg" ? "default" : "outline"}
@@ -60,8 +54,9 @@ export const WeightStep: React.FC<WeightStepProps> = ({ weight, weightUnit, onCh
                     LB
                 </Button>
             </div>
-            <div className="flex items-center justify-center">
-                {/* Double decrement by 10 */}
+
+            {/* Increment/Decrement */}
+            <div className="flex items-center justify-center space-x-2">
                 <Button
                     onClick={() => changeWeightBy(-10 * stepKg)}
                     variant="ghost"
@@ -69,7 +64,6 @@ export const WeightStep: React.FC<WeightStepProps> = ({ weight, weightUnit, onCh
                 >
                     &#171;
                 </Button>
-                {/* Single decrement by 1 */}
                 <Button
                     onClick={() => changeWeightBy(-1 * stepKg)}
                     variant="ghost"
@@ -77,12 +71,11 @@ export const WeightStep: React.FC<WeightStepProps> = ({ weight, weightUnit, onCh
                 >
                     &#8249;
                 </Button>
-                <div className="flex items-center space-x-6">
-                    <div className="text-6xl font-bold text-orange-500 scale-110">
-                        {getDisplayWeight(currentWeightKg)}
-                    </div>
+
+                <div className="text-6xl font-bold text-orange-500 scale-110 mx-4">
+                    {displayedWeight}
                 </div>
-                {/* Single increment by 1 */}
+
                 <Button
                     onClick={() => changeWeightBy(1 * stepKg)}
                     variant="ghost"
@@ -90,7 +83,6 @@ export const WeightStep: React.FC<WeightStepProps> = ({ weight, weightUnit, onCh
                 >
                     &#8250;
                 </Button>
-                {/* Double increment by 10 */}
                 <Button
                     onClick={() => changeWeightBy(10 * stepKg)}
                     variant="ghost"

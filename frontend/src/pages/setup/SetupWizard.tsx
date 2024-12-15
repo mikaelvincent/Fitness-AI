@@ -1,50 +1,46 @@
+// src/pages/setup/SetupWizard.tsx
 import React, { useState } from "react";
-import { useSetupData } from "./SetupContext";
-import { StepCard } from "@/components/setup/StepCard";
-import StepContent from "./StepContent";
-import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
-import {
-    updateUserAttributes,
-    getUserAttributes,
-} from "@/services/userAttributesService";
+import { useSetupData } from "../../components/setup/SetupContext.tsx";
+import { updateUserAttributes } from "@/services/userAttributesService";
+import { steps } from "./stepsConfig";
+import StepContent from "../../components/setup/StepContent.tsx";
+import { StepCard } from "../../components/setup/StepCard.tsx";
+import { isAtLeast13AtMost100 } from "./utils";
 
-const steps = [
-    { id: "gender", title: "What's your gender?" },
-    { id: "birthdate", title: "When's your birthdate?" },
-    { id: "measurement", title: "Preferred Measurement" },
-    { id: "weight", title: "What's your weight?" },
-    { id: "height", title: "What's your height?" },
-    { id: "activity", title: "What's your level of physical activity?" },
-    { id: "nickname", title: "Set your nickname" },
-    { id: "summary", title: "Review Your Information" },
-];
-
-const SetupWizard = () => {
+export const SetupWizard: React.FC = () => {
     const { data, updateData } = useSetupData();
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
-    const step = steps[currentStepIndex];
-    const nextStep = () => setCurrentStepIndex((i) => i + 1);
-    const prevStep = () => setCurrentStepIndex((i) => i - 1);
+    const currentStep = steps[currentStepIndex];
 
-    const finish = async () => {
+    const handleNext = () => setCurrentStepIndex(i => i + 1);
+    const handlePrev = () => setCurrentStepIndex(i => i - 1);
+
+    const handleFinish = async () => {
         setIsSubmitting(true);
 
         try {
             const token = Cookies.get("token");
-            if (!token) throw new Error("Authentication token not found.");
+            if (!token) {
+                throw new Error("Authentication token not found.");
+            }
+
+            const birthdate = `${data.birthdateYear}-${data.birthdateMonth}-${data.birthdateDay}`;
+            const weightString = `${data.weight} ${data.measurement === "metric" ? "kg" : "lbs"}`;
+            const heightString = `${data.height} ${data.measurement === "metric" ? "cm" : "inches"}`;
 
             const payload = {
                 gender: data.gender,
-                birthdate: `${data.birthdateYear}-${data.birthdateMonth}-${data.birthdateDay}`,
+                birthdate,
                 measurement: data.measurement,
-                weight: `${data.weight} ${data.measurement === "metric" ? "kg" : "lbs"}`,
-                height: `${data.height} ${data.measurement === "metric" ? "cm" : "inches"}`,
+                weight: weightString,
+                height: heightString,
                 activity: data.activity,
                 nickname: data.nickname,
             };
@@ -53,45 +49,21 @@ const SetupWizard = () => {
             navigate("/initial-chat");
         } catch (error: any) {
             console.error("Error:", error.message);
-            if (error.message === "Authentication token not found.") {
-                toast({
-                    title: "Error",
-                    description: "You are not authenticated. Please log in.",
-                })
-            } else {
-                toast({
-                    title: "Error",
-                    description: error.message || "Failed to update user attributes.",
-                });
-            }
+            const errorMsg = error.message === "Authentication token not found."
+                ? "You are not authenticated. Please log in."
+                : error.message || "Failed to update user attributes.";
+            toast({ title: "Error", description: errorMsg });
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const isAtLeast13AtMost100 = (): boolean => {
-        const { birthdateDay, birthdateMonth, birthdateYear } = data;
-        if (!birthdateDay || !birthdateMonth || !birthdateYear) return false;
-
-        const birthDate = new Date(
-            Number(birthdateYear),
-            Number(birthdateMonth) - 1,
-            Number(birthdateDay)
-        );
-
-        const today = new Date();
-        const thirteenYearsAgo = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
-        const hundredYearsAgo = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
-
-        return birthDate <= thirteenYearsAgo && birthDate >= hundredYearsAgo;
-    };
-
-    const canGoNext = () => {
-        switch (step.id) {
+    const canGoNext = (): boolean => {
+        switch (currentStep.id) {
             case "gender":
-                return data.gender.trim() !== "";
+                return !!data.gender.trim();
             case "birthdate":
-                return isAtLeast13AtMost100();
+                return isAtLeast13AtMost100(data.birthdateDay, data.birthdateMonth, data.birthdateYear);
             case "measurement":
                 return ["metric", "imperial"].includes(data.measurement);
             case "weight":
@@ -99,9 +71,9 @@ const SetupWizard = () => {
             case "height":
                 return data.height > 0;
             case "activity":
-                return data.activity.trim() !== "";
+                return !!data.activity.trim();
             case "nickname":
-                return data.nickname.trim() !== "";
+                return !!data.nickname.trim();
             default:
                 return true;
         }
@@ -109,27 +81,30 @@ const SetupWizard = () => {
 
     const handleChange = (key: string, value: any) => updateData({ [key]: value });
 
+    const isFirstStep = currentStepIndex === 0;
+    const isLastStep = currentStepIndex === steps.length - 1;
+
     return (
         <div className="w-full max-w-lg mx-auto">
             <AnimatePresence mode="wait">
                 <motion.div
-                    key={step.id}
+                    key={currentStep.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                 >
                     <StepCard
-                        title={step.title}
-                        onPrev={prevStep}
-                        onNext={nextStep}
-                        onFinish={finish}
+                        title={currentStep.title}
+                        onPrev={handlePrev}
+                        onNext={handleNext}
+                        onFinish={handleFinish}
                         canGoNext={canGoNext()}
-                        isFirstStep={currentStepIndex === 0}
-                        isLastStep={currentStepIndex === steps.length - 1}
+                        isFirstStep={isFirstStep}
+                        isLastStep={isLastStep}
                         isSubmitting={isSubmitting}
                     >
-                        <StepContent stepId={step.id} data={data} onChange={handleChange} />
+                        <StepContent stepId={currentStep.id} data={data} onChange={handleChange} />
                     </StepCard>
                 </motion.div>
             </AnimatePresence>
