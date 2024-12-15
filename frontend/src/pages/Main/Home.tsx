@@ -90,6 +90,15 @@ const Home = () => {
     setNewExercise(null);
   }, [currentDate]);
 
+  useEffect(() => {
+    const topLevelExercises = exercises.filter((ex) => {
+      const exerciseDate = ex.date?.toISOString().split("T")[0];
+      return ex.parent_id === null && exerciseDate === exDate;
+    });
+
+    setNoExercises(topLevelExercises.length === 0);
+  }, [exercises]);
+
   const fetchExercises = async () => {
     setLoading();
     try {
@@ -370,11 +379,22 @@ const Home = () => {
   const deleteExercise = async (exerciseId: number | null | undefined) => {
     try {
       // Optimistically update the frontend state
-      setExercises((prev) => removeExerciseFromTree(prev, exerciseId));
+      setExercises((prev) => {
+        const updatedExercises = removeExerciseFromTree(prev, exerciseId);
 
-      if (exercises.length === 1) {
-        setNoExercises(true);
-      }
+        // Filter top-level exercises for the current date
+        const updatedTopLevelExercises = updatedExercises.filter((ex) => {
+          const exerciseDate = ex.date?.toISOString().split("T")[0];
+          return ex.parent_id === null && exerciseDate === exDate;
+        });
+
+        // If no top-level exercises remain, set noExercises to true
+        if (updatedTopLevelExercises.length === 0) {
+          setNoExercises(true);
+        }
+
+        return updatedExercises;
+      });
 
       // Send the delete request to the server
       const response = await DeleteActivities({
