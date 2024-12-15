@@ -1,3 +1,4 @@
+// src/pages/setup/SetupContext.tsx
 import React, { createContext, useContext, useState } from "react";
 
 export interface SetupData {
@@ -6,9 +7,9 @@ export interface SetupData {
     birthdateMonth: string;
     birthdateYear: string;
     measurement: "imperial" | "metric";
-    weight: number; // We'll store in a base unit, e.g. kg if metric chosen, else lbs.
+    weight: number;
     weightUnit: "kg" | "lbs";
-    height: number; // Store in a base unit, e.g. cm if metric chosen, else inches.
+    height: number;
     heightUnit: "cm" | "in";
     activity: string;
     nickname: string;
@@ -28,16 +29,16 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         birthdateMonth: "",
         birthdateYear: "",
         measurement: "metric",
-        weight: 70, // default weight in kg
+        weight: 70,
         weightUnit: "kg",
-        height: 170, // default height in cm
+        height: 170,
         heightUnit: "cm",
         activity: "sedentary",
         nickname: "",
     });
 
     const updateData = (partial: Partial<SetupData>) => {
-        setData((prev) => ({ ...prev, ...partial }));
+        setData(prev => ({ ...prev, ...partial }));
     };
 
     return (
