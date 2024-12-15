@@ -1,4 +1,3 @@
-// src/pages/setup/steps/BirthdateStep.tsx
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";

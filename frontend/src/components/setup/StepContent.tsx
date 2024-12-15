@@ -1,4 +1,3 @@
-// src/pages/setup/StepContent.tsx
 import React from "react";
 import { SetupData } from "@/types/setupTypes";
 import { GenderStep } from "./steps/GenderStep";

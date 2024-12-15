@@ -3,20 +3,19 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
-import { useSetupData } from "../../components/setup/SetupContext.tsx";
+import { useSetupData } from "@/components/setup/SetupContext";
 import { updateUserAttributes } from "@/services/userAttributesService";
 import { steps } from "./stepsConfig";
-import StepContent from "../../components/setup/StepContent.tsx";
-import { StepCard } from "../../components/setup/StepCard.tsx";
-import { isAtLeast13AtMost100 } from "../../utils/setupUtils.ts";
+import StepContent from "@/components/setup/StepContent";
+import { StepCard } from "@/components/setup/StepCard";
+import { isAtLeast13AtMost100 } from "@/utils/setupUtils";
 
 export const SetupWizard: React.FC = () => {
     const { data, updateData } = useSetupData();
-    const [currentStepIndex, setCurrentStepIndex] = useState<number>(0); // Step index
+    const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
-    // Retrieve step index and data from localStorage on component mount
     useEffect(() => {
         const savedStep = localStorage.getItem("currentStepIndex");
         const savedData = localStorage.getItem("setupData");
