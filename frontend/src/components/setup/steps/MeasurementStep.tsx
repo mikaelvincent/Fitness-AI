@@ -1,7 +1,7 @@
 // src/pages/setup/steps/MeasurementStep.tsx
 import React from "react";
 import clsx from "clsx";
-import { SetupData } from "../SetupContext";
+import { SetupData } from "@/types/setupTypes";
 import { kgToLbs, lbsToKg, cmToInches, inchesToCm } from "../../../utils/setupUtils";
 
 interface MeasurementStepProps {
