@@ -321,6 +321,10 @@ const Home = () => {
         prev.filter((exercise) => exercise.id !== exerciseId),
       );
 
+      if (exercises.length === 1) {
+        setNoExercises(true);
+      }
+
       // Send the delete request to the server
       const response = await DeleteActivities({
         token,
