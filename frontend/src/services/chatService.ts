@@ -1,7 +1,5 @@
 import { ENV } from "@/utils/env";
 import Cookies from "js-cookie";
-import { update } from "lodash";
-import { MdUpdateDisabled } from "react-icons/md";
 
 const dummyMessage = `# Welcome to Your AI Chat Interface 🚀
 

@@ -5,9 +5,9 @@ import { RiAiGenerate } from "react-icons/ri";
 import BackButton from "../custom-ui/BackButton";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { getUserAttributes } from "@/services/userAttributesService";
 import { postChatMessage } from "@/services/chatService";
+import { capitalizeFirstLetter } from "@/utils/utils";
 
 const ChatInterface: React.FC = () => {
     const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string, tools?: string[] }[]>([]);
@@ -20,12 +20,8 @@ const ChatInterface: React.FC = () => {
     const fetchProfileInfo = async () => {
         try {
             const response = await getUserAttributes();
-
-            // Transform the response dynamically into { label, value } pairs
-            const formattedProfile = Object.entries(response.data).map(([key, value]) => ({
-                label: key.charAt(0).toUpperCase() + key.slice(1), // Capitalize keys
-                value: String(value),
-            }));
+            console.log(response)
+            const formattedProfile = capitalizeFirstLetter(response.data);
 
             setProfileInfo(formattedProfile);
         } catch (error) {
