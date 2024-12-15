@@ -1,4 +1,5 @@
 import { Exercise } from "@/types/exerciseTypes.ts";
+import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
 
 export function addChildToParent(
   exercises: Exercise[],
@@ -96,4 +97,102 @@ export function removeExerciseFromTree(
       return exercise;
     })
     .filter((exercise) => exercise !== null) as Exercise[];
+}
+
+// A helper function to recursively set completed on an exercise and all its descendants
+export function toggleCompletionRecursive(
+  exercise: Exercise,
+  completed: boolean,
+): Exercise {
+  return {
+    ...exercise,
+    completed,
+    children: exercise.children
+      ? exercise.children.map((child) =>
+          toggleCompletionRecursive(child, completed),
+        )
+      : [],
+  };
+}
+
+// Checks if all children of an exercise are completed
+export function allChildrenCompleted(exercise: Exercise): boolean {
+  return (
+    !exercise.children || exercise.children.every((child) => child.completed)
+  );
+}
+
+// Helper function to find an exercise by ID anywhere in the tree
+export function getExerciseById(
+  exercises: Exercise[],
+  id: number,
+): Exercise | undefined {
+  for (const ex of exercises) {
+    if (ex.id === id) {
+      return ex;
+    }
+    if (ex.children && ex.children.length > 0) {
+      const found = getExerciseById(ex.children, id);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
+
+export function getAncestorChainExercises(
+  exercises: Exercise[],
+  parentId: number | null | undefined,
+): Exercise[] {
+  if (parentId == null) return [];
+  const parent = getExerciseById(exercises, parentId);
+  if (!parent) return [];
+  return [parent, ...getAncestorChainExercises(exercises, parent.parent_id)];
+}
+
+// Recalculates the completion state of all ancestors up the chain
+export function recalculateAncestorsCompletion(
+  exercises: Exercise[],
+  parentId: number | null | undefined,
+): Exercise[] {
+  if (parentId === null || parentId === undefined) return exercises;
+
+  const parent = getExerciseById(exercises, parentId);
+  if (!parent) return exercises;
+
+  // Check if all children of the parent are completed
+  const childrenCompleted =
+    parent.children?.every((child) => child.completed) ?? true;
+  const updatedParent = { ...parent, completed: childrenCompleted };
+
+  const updatedExercises = updateExerciseInTree(exercises, updatedParent);
+
+  // Recursively move up the chain
+  return recalculateAncestorsCompletion(
+    updatedExercises,
+    updatedParent.parent_id,
+  );
+}
+
+// Helper function to flatten exercises and remove children fields
+export function flattenExercises(
+  exerciseOrExercises: Exercise | Exercise[],
+): Exercise[] {
+  const exercisesArray = Array.isArray(exerciseOrExercises)
+    ? exerciseOrExercises
+    : [exerciseOrExercises];
+
+  const flattened: Exercise[] = [];
+
+  const recurse = (exList: Exercise[]) => {
+    for (const ex of exList) {
+      const { children, ...rest } = ex;
+      flattened.push(rest);
+      if (children && children.length > 0) {
+        recurse(children);
+      }
+    }
+  };
+
+  recurse(exercisesArray);
+  return flattened;
 }

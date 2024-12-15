@@ -13,7 +13,7 @@ import useStatus from "@/hooks/useStatus.tsx";
 import { useUser } from "@/hooks/context/UserContext.tsx";
 import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.tsx";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UpdateOrAddActivity } from "@/services/exercises/UpdateOrAddActivity.tsx";
+import { AddOrUpdateActivities } from "@/services/exercises/AddOrUpdateActivities.tsx";
 import { toast } from "@/hooks/use-toast.tsx";
 import {
   Card,
@@ -26,8 +26,13 @@ import { convertDates } from "@/utils/convertDates.ts";
 import { DeleteActivities } from "@/services/exercises/DeleteActivities.tsx";
 import {
   addChildToParent,
+  flattenExercises,
+  getAncestorChainExercises,
+  getExerciseById,
+  recalculateAncestorsCompletion,
   removeExerciseFromTree,
   replaceExerciseByPosition,
+  toggleCompletionRecursive,
 } from "@/utils/ExerciseHelperFunction.ts";
 
 const Home = () => {
@@ -125,42 +130,80 @@ const Home = () => {
   const toggleExerciseCompletion = async (id: number | null | undefined) => {
     if (id === null || id === undefined) return;
 
-    // Find the exercise to toggle
-    const exercise = exercises.find((ex) => ex.id === id);
+    const originalExercises = exercises;
+    const exercise = getExerciseById(exercises, id);
     if (!exercise) return;
 
-    // Optimistically update the frontend state
-    setExercises((prev) =>
-      prev.map((ex) =>
-        ex.id === id ? { ...ex, completed: !ex.completed } : ex,
-      ),
+    const newCompletedState = !exercise.completed;
+    // Toggle the exercise and all descendants first
+    const updatedExerciseTree = toggleCompletionRecursive(
+      exercise,
+      newCompletedState,
     );
+
+    // Integrate the updated node back into the tree (optimistically)
+    let updatedExercises = updateExerciseInTree(exercises, updatedExerciseTree);
+
+    // Recalculate ancestors completion states
+    updatedExercises = recalculateAncestorsCompletion(
+      updatedExercises,
+      updatedExerciseTree.parent_id,
+    );
+
+    // Optimistic update
+    setExercises(updatedExercises);
 
     try {
       setUpdateLoading();
 
-      // Prepare the updated exercise data
-      const updatedExercise: Exercise = {
-        ...exercise,
-        completed: !exercise.completed,
-      };
-
-      // Send the update to the backend
-      const response = await UpdateOrAddActivity({
-        token,
-        activities: updatedExercise,
-      });
-
-      if (!response.success) {
+      // Gather the toggled exercise plus its ancestor chain
+      const exerciseToSend = getExerciseById(updatedExercises, id);
+      if (!exerciseToSend) {
+        // If not found, revert
+        setExercises(originalExercises);
         setUpdateError();
-        setResponseMessage(response.message || "Failed to toggle activity");
+        setResponseMessage("Failed to toggle activity - exercise not found.");
         toast({
           variant: "destructive",
           title: "Failed to toggle activity",
-          description: response.message || "Failed to toggle activity",
+          description: "Could not find the exercise after update.",
           duration: 500,
         });
         return;
+      }
+
+      const ancestorsToUpdate = getAncestorChainExercises(
+        updatedExercises,
+        exerciseToSend.parent_id,
+      );
+      // Flatten all exercises that need to be updated
+      const activitiesToUpdate = flattenExercises([
+        exerciseToSend,
+        ...ancestorsToUpdate,
+      ]);
+
+      console.log("Activities to update:", activitiesToUpdate);
+
+      // Send updates to backend one by one
+      for (const activity of activitiesToUpdate) {
+        const response = await AddOrUpdateActivities({
+          token,
+          activities: activity, // Single activity per request
+        });
+
+        if (!response.success) {
+          // Revert if backend fails
+          setExercises(originalExercises);
+          setUpdateError();
+          setResponseMessage(response.message || "Failed to toggle activity");
+          toast({
+            variant: "destructive",
+            title: "Failed to toggle activity",
+            description: response.message || "Failed to toggle activity",
+            duration: 500,
+          });
+          return;
+        }
       }
 
       setResponseMessage("Activity toggled successfully.");
@@ -171,6 +214,8 @@ const Home = () => {
       });
     } catch (error) {
       console.error("Error toggling activity:", error);
+      // Revert on error
+      setExercises(originalExercises);
       setUpdateError();
       setResponseMessage(
         "An unexpected error occurred while updating the activity.",
@@ -182,13 +227,6 @@ const Home = () => {
           "An error occurred while updating the activity. Please try again.",
         duration: 500,
       });
-
-      // Revert the optimistic update
-      setExercises((prev) =>
-        prev.map((ex) =>
-          ex.id === id ? { ...ex, completed: exercise.completed } : ex,
-        ),
-      );
     }
   };
 
@@ -263,7 +301,7 @@ const Home = () => {
         setUpdateLoading();
 
         // Call the UpdateOrAddActivity service
-        const response = await UpdateOrAddActivity({
+        const response = await AddOrUpdateActivities({
           token,
           activities: {
             ...exerciseToAdd,
@@ -395,7 +433,7 @@ const Home = () => {
       setUpdateLoading();
 
       // Attempt to update the exercise on the server
-      const response = await UpdateOrAddActivity({
+      const response = await AddOrUpdateActivities({
         token,
         activities: updatedExercise,
       });
