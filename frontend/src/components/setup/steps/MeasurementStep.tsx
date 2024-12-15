@@ -2,7 +2,7 @@
 import React from "react";
 import clsx from "clsx";
 import { SetupData } from "../SetupContext";
-import { kgToLbs, lbsToKg, cmToInches, inchesToCm } from "../../../pages/setup/utils";
+import { kgToLbs, lbsToKg, cmToInches, inchesToCm } from "../../../utils/setupUtils";
 
 interface MeasurementStepProps {
     data: SetupData;

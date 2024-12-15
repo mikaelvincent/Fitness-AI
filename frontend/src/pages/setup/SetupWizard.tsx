@@ -9,7 +9,7 @@ import { updateUserAttributes } from "@/services/userAttributesService";
 import { steps } from "./stepsConfig";
 import StepContent from "../../components/setup/StepContent.tsx";
 import { StepCard } from "../../components/setup/StepCard.tsx";
-import { isAtLeast13AtMost100 } from "./utils";
+import { isAtLeast13AtMost100 } from "../../utils/setupUtils.ts";
 
 export const SetupWizard: React.FC = () => {
     const { data, updateData } = useSetupData();
