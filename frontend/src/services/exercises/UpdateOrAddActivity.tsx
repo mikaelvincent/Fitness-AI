@@ -8,6 +8,7 @@ interface AddOrUpdateActivitiesResponse {
   message: string;
   status: number;
   retry_after?: number;
+  data?: Exercise;
 }
 
 interface AddOrUpdateActivitiesProps {
@@ -76,6 +77,7 @@ export const UpdateOrAddActivity = async ({
       message:
         responseData.message || "Activities added or updated successfully",
       status: response.status,
+      data: responseData.data[0],
     };
   } catch (error) {
     console.log("Error during submission:", error);
