@@ -56,7 +56,7 @@ export const SetupWizard: React.FC = () => {
                 throw new Error("Authentication token not found.");
             }
 
-            const birthdate = `${data.birthdateYear}-${data.birthdateMonth}-${data.birthdateDay}`;
+            const birthdate = `${data.birthdate}`;
             const weightString = `${data.weight} ${data.measurement === "metric" ? "kg" : "lbs"}`;
             const heightString = `${data.height} ${data.measurement === "metric" ? "cm" : "inches"}`;
 
@@ -93,7 +93,7 @@ export const SetupWizard: React.FC = () => {
             case "gender":
                 return !!data.gender.trim();
             case "birthdate":
-                return isAtLeast13AtMost100(data.birthdateDay, data.birthdateMonth, data.birthdateYear);
+                return !!data.birthdate;
             case "measurement":
                 return ["metric", "imperial"].includes(data.measurement);
             case "weight":
