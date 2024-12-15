@@ -86,6 +86,7 @@ const Home = () => {
     window.history.replaceState(null, "", `?date=${formattedDate}`);
 
     fetchExercises().then((r) => r);
+    setNoExercises(false);
     setNewExercise(null);
   }, [currentDate]);
 
