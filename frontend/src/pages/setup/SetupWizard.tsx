@@ -1,5 +1,4 @@
-// src/pages/setup/SetupWizard.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { AnimatePresence, motion } from "framer-motion";
@@ -13,14 +12,41 @@ import { isAtLeast13AtMost100 } from "../../utils/setupUtils.ts";
 
 export const SetupWizard: React.FC = () => {
     const { data, updateData } = useSetupData();
-    const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [currentStepIndex, setCurrentStepIndex] = useState<number>(0); // Step index
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
+    // Retrieve step index and data from localStorage on component mount
+    useEffect(() => {
+        const savedStep = localStorage.getItem("currentStepIndex");
+        const savedData = localStorage.getItem("setupData");
+
+        if (savedStep) {
+            setCurrentStepIndex(Number(savedStep));
+        }
+        if (savedData) {
+            updateData(JSON.parse(savedData)); // Restore form data
+        }
+    }, [updateData]);
+
     const currentStep = steps[currentStepIndex];
 
-    const handleNext = () => setCurrentStepIndex(i => i + 1);
-    const handlePrev = () => setCurrentStepIndex(i => i - 1);
+    const saveProgress = (index: number, newData: any) => {
+        localStorage.setItem("currentStepIndex", index.toString());
+        localStorage.setItem("setupData", JSON.stringify(newData));
+    };
+
+    const handleNext = () => {
+        const nextStep = currentStepIndex + 1;
+        setCurrentStepIndex(nextStep);
+        saveProgress(nextStep, data);
+    };
+
+    const handlePrev = () => {
+        const prevStep = currentStepIndex - 1;
+        setCurrentStepIndex(prevStep);
+        saveProgress(prevStep, data);
+    };
 
     const handleFinish = async () => {
         setIsSubmitting(true);
@@ -46,6 +72,11 @@ export const SetupWizard: React.FC = () => {
             };
 
             await updateUserAttributes(payload);
+
+            // Clear localStorage on success
+            localStorage.removeItem("currentStepIndex");
+            localStorage.removeItem("setupData");
+
             navigate("/initial-chat");
         } catch (error: any) {
             console.error("Error:", error.message);
@@ -79,7 +110,11 @@ export const SetupWizard: React.FC = () => {
         }
     };
 
-    const handleChange = (key: string, value: any) => updateData({ [key]: value });
+    const handleChange = (key: string, value: any) => {
+        const updatedData = { ...data, [key]: value };
+        updateData(updatedData);
+        saveProgress(currentStepIndex, updatedData); // Save updated data
+    };
 
     const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStepIndex === steps.length - 1;
@@ -105,6 +140,11 @@ export const SetupWizard: React.FC = () => {
                         isSubmitting={isSubmitting}
                     >
                         <StepContent stepId={currentStep.id} data={data} onChange={handleChange} />
+                        {isSubmitting && (
+                            <div className="text-center mt-4 text-sm text-gray-500">
+                                Submitting your information...
+                            </div>
+                        )}
                     </StepCard>
                 </motion.div>
             </AnimatePresence>

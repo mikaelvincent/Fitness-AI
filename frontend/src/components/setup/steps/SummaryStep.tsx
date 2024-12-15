@@ -1,6 +1,6 @@
 // src/pages/setup/steps/SummaryStep.tsx
 import React from "react";
-import { SetupData } from "../SetupContext";
+import { SetupData } from "@/types/setupTypes";
 
 interface SummaryStepProps {
     data: SetupData;

@@ -1,6 +1,6 @@
 // src/pages/setup/StepContent.tsx
 import React from "react";
-import { SetupData } from "./SetupContext";
+import { SetupData } from "@/types/setupTypes";
 import { GenderStep } from "./steps/GenderStep";
 import { BirthdateStep } from "./steps/BirthdateStep";
 import { MeasurementStep } from "./steps/MeasurementStep";
