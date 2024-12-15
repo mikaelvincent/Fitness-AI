@@ -143,6 +143,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
         metrics: [...(exercise.metrics || []), newMetric]
       };
       
+      
       onUpdateExercise(updatedExercise);
       // Reset the form and close it
       setIsAddingMetric(false);
@@ -311,7 +312,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                   {isEditingNotes ? (
                     <div className="mr-2 flex-grow">
                       <textarea
-                        value={tempNotes}
+                        value={tempNotes || ""}
                         onChange={(e) => setTempNotes(e.target.value)}
                         className="w-full rounded bg-zinc-700 px-2 py-1 text-sm"
                         placeholder="Add notes..."
