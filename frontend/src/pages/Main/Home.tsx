@@ -241,7 +241,7 @@ const Home = () => {
         parent_id: newExercise.parentId, // Parent node
         date: currentDate, // Current date
         children: [], // Initialize children if necessary
-        position: exercises.length, // Position in the list
+        position: exercises.length + 1, // Position in the list
       };
 
       // Optimistically update the frontend state
