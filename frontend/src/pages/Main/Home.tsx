@@ -26,8 +26,9 @@ import { convertDates } from "@/utils/convertDates.ts";
 import { DeleteActivities } from "@/services/exercises/DeleteActivities.tsx";
 import {
   addChildToParent,
+  removeExerciseFromTree,
   replaceExerciseByPosition,
-} from "@/utils/addChildToParent.ts";
+} from "@/utils/ExerciseHelperFunction.ts";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -291,6 +292,7 @@ const Home = () => {
           setExercises((prev) =>
             replaceExerciseByPosition(
               prev,
+              formattedSavedExercise.parent_id,
               formattedSavedExercise.position,
               formattedSavedExercise,
             ),
@@ -331,9 +333,7 @@ const Home = () => {
   const deleteExercise = async (exerciseId: number | null | undefined) => {
     try {
       // Optimistically update the frontend state
-      setExercises((prev) =>
-        prev.filter((exercise) => exercise.id !== exerciseId),
-      );
+      setExercises((prev) => removeExerciseFromTree(prev, exerciseId));
 
       if (exercises.length === 1) {
         setNoExercises(true);
@@ -353,6 +353,9 @@ const Home = () => {
           description: response.message || "Failed to delete activity",
           duration: 500,
         });
+
+        // Revert the optimistic update
+        fetchExercises().then((r) => r);
         return;
       }
 
