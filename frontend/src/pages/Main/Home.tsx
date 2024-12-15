@@ -66,8 +66,6 @@ const Home = () => {
   const prevNewExerciseRef = useRef<typeof newExercise>(null);
   const [noExercises, setNoExercises] = useState<boolean>(false);
 
-  const generateTempId = () => -Date.now();
-
   // Separate useStatus for updating activities
   const {
     status: updateStatus,
@@ -266,7 +264,7 @@ const Home = () => {
       newExercise.type.trim() !== ""
     ) {
       // Generate a temporary ID
-      const tempId = generateTempId();
+      const tempId = Math.max(0, ...exercises.map((ex) => ex.id || 0)) + 1;
 
       // Create a new exercise object with the temporary ID
       const exerciseToAdd: Exercise = {
