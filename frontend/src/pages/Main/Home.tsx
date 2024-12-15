@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/card";
 import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
 import { convertDates } from "@/utils/convertDates.ts";
+import { DeleteActivities } from "@/services/exercises/DeleteActivities.tsx";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -313,10 +314,52 @@ const Home = () => {
     setNewExercise(null);
   };
 
-  const deleteExercise = (exerciseId: number | null | undefined) => {
-    setExercises((prev) =>
-      prev.filter((exercise) => exercise.id !== exerciseId),
-    );
+  const deleteExercise = async (exerciseId: number | null | undefined) => {
+    try {
+      // Optimistically update the frontend state
+      setExercises((prev) =>
+        prev.filter((exercise) => exercise.id !== exerciseId),
+      );
+
+      // Send the delete request to the server
+      const response = await DeleteActivities({
+        token,
+        id: exerciseId,
+      });
+
+      if (!response.success) {
+        setResponseMessage(response.message || "Failed to delete activity");
+        toast({
+          variant: "destructive",
+          title: "Failed to delete activity",
+          description: response.message || "Failed to delete activity",
+          duration: 500,
+        });
+        return;
+      }
+
+      // Show success message
+      setResponseMessage("Activity deleted successfully.");
+      toast({
+        title: "Activity deleted successfully.",
+        duration: 500,
+      });
+    } catch (error) {
+      console.error("Error deleting activity:", error);
+      setResponseMessage(
+        "An unexpected error occurred while deleting the activity.",
+      );
+      toast({
+        variant: "destructive",
+        title: "Failed to delete activity",
+        description:
+          "An error occurred while deleting the activity. Please try again.",
+        duration: 500,
+      });
+
+      // Revert the optimistic update
+      fetchExercises().then((r) => r);
+    }
   };
 
   const exDate = currentDate.toISOString().split("T")[0];
