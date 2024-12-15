@@ -24,6 +24,10 @@ import {
 import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
 import { convertDates } from "@/utils/convertDates.ts";
 import { DeleteActivities } from "@/services/exercises/DeleteActivities.tsx";
+import {
+  addChildToParent,
+  replaceExerciseByPosition,
+} from "@/utils/addChildToParent.ts";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -240,7 +244,15 @@ const Home = () => {
       };
 
       // Optimistically update the frontend state
-      setExercises((prev) => [...prev, exerciseToAdd]);
+      // Optimistic update: if it's a child exercise, add it to the parent;
+      // if it's top-level, just push it to exercises.
+      if (newExercise.parentId !== null) {
+        setExercises((prev) =>
+          addChildToParent(prev, newExercise.parentId, exerciseToAdd),
+        );
+      } else {
+        setExercises((prev) => [...prev, exerciseToAdd]);
+      }
 
       // Clear the new exercise form
       setNewExercise(null);
@@ -274,11 +286,13 @@ const Home = () => {
           const rawDataSavedExercise = response.data as Exercise;
           const formattedSavedExercise = convertDates(rawDataSavedExercise);
           console.log("Saved exercise:", formattedSavedExercise);
+
+          // Replace the temporary exercise with the returned exercise using position
           setExercises((prev) =>
-            prev.map((ex) =>
-              ex.position === formattedSavedExercise.position
-                ? formattedSavedExercise
-                : ex,
+            replaceExerciseByPosition(
+              prev,
+              formattedSavedExercise.position,
+              formattedSavedExercise,
             ),
           );
 
