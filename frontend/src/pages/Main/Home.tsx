@@ -274,7 +274,7 @@ const Home = () => {
       newExercise.type.trim() !== ""
     ) {
       // Generate a temporary ID
-      const tempId = Math.max(0, ...exercises.map((ex) => ex.id || 0)) + 1;
+      const tempId = Date.now() * 10 + Math.floor(Math.random() * 10);
 
       // Create a new exercise object with the temporary ID
       const exerciseToAdd: Exercise = {
