@@ -276,7 +276,30 @@ const Home = () => {
       // Generate a temporary ID
       const tempId = Date.now() * 10 + Math.floor(Math.random() * 10);
 
-      // Create a new exercise object with the temporary ID
+      // Modify this part in handleSaveNewExercise
+      const exDate = currentDate.toISOString().split("T")[0];
+
+      let newPosition: number;
+      if (newExercise.parentId === null) {
+        // This is a top-level exercise
+        const topLevelExercisesForDate = exercises.filter((ex) => {
+          const exerciseDate = ex.date?.toISOString().split("T")[0];
+          return ex.parent_id === null && exerciseDate === exDate;
+        });
+        newPosition = topLevelExercisesForDate.length + 1;
+      } else {
+        // This is a child exercise
+        const parentExercise = getExerciseById(exercises, newExercise.parentId);
+        if (!parentExercise) {
+          // In case parent isn't found, default to 1
+          newPosition = 1;
+        } else {
+          newPosition = parentExercise.children?.length
+            ? parentExercise.children.length + 1
+            : 1;
+        }
+      }
+
       const exerciseToAdd: Exercise = {
         id: tempId, // Temporary ID
         name: newExercise.name.trim(),
@@ -284,10 +307,10 @@ const Home = () => {
         completed: false,
         notes: "",
         metrics: [],
-        parent_id: newExercise.parentId, // Parent node
-        date: currentDate, // Current date
-        children: [], // Initialize children if necessary
-        position: exercises.length + 1, // Position in the list
+        parent_id: newExercise.parentId,
+        date: currentDate,
+        children: [],
+        position: newPosition,
       };
 
       // Optimistically update the frontend state
