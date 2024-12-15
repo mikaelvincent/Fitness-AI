@@ -1,14 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 interface MessageBubbleProps {
     sender: "user" | "ai";
     message: string;
+    tools?: string[];
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ sender, message }) => {
+const toolDescriptions: Record<string, string> = {
+    updateUserAttributes: "Updated your attributes.",
+    deleteUserAttributes: "Deleted attribute(s).",
+    getActivities: "Retrieved activity data.",
+    updateActivities: "Updated activity data.",
+    deleteActivities: "Deleted activity data.",
+};
+
+const MessageBubble: React.FC<MessageBubbleProps> = ({ sender, message, tools }) => {
     const isUser = sender === "user";
+    const [showTools, setShowTools] = useState(false);
 
     return (
         <div
@@ -17,6 +28,31 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ sender, message }) => {
                 : "bg-gray-200 text-black self-start"
                 }`}
         >
+            <div>
+                {/* Tools Dropdown */}
+                {tools && tools.length > 0 && (
+                    <div className="mt-2 text-sm italic text-gray-500">
+                        <button
+                            onClick={() => setShowTools((prev) => !prev)}
+                            className="flex items-center gap-1 text-gray-700 hover:text-gray-900 transition"
+                        >
+                            <span className="font-semibold">Actions</span>
+                            {showTools ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                        {showTools && (
+                            <ul className="list-none mt-2 ml-2 p-2 rounded-lg">
+                                {tools.map((tool, index) => (
+                                    <li key={index} className="text-gray-500">
+                                        {toolDescriptions[tool] || `${tool}`}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Markdown-rendered message */}
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]} // Optional for GitHub-flavored markdown
                 components={{
@@ -83,7 +119,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ sender, message }) => {
             >
                 {message}
             </ReactMarkdown>
-        </div >
+        </div>
     );
 };
 

@@ -1,5 +1,7 @@
 import { ENV } from "@/utils/env";
 import Cookies from "js-cookie";
+import { update } from "lodash";
+import { MdUpdateDisabled } from "react-icons/md";
 
 const dummyMessage = `# Welcome to Your AI Chat Interface 🚀
 
@@ -42,7 +44,12 @@ const fetchAPI = async (
     return responseData;
 };
 
-export const postChatMessage = async (messages: { sender: string; message: string }[], emulate = true) => {
+export const postChatMessage = async (
+    messages: { role: string; content: string }[],
+    tools: string[],
+    stream: boolean = false,
+    emulate: boolean = true,
+) => {
     console.log(messages)
     if (emulate) {
         // Return a mock response for testing
@@ -52,15 +59,18 @@ export const postChatMessage = async (messages: { sender: string; message: strin
                     message: "Chatbot response generated successfully.",
                     data: {
                         response: dummyMessage,
-                        updated_attributes: { gender: "female" },
-                        deleted_attributes: [],
+                        tools: ['updateUserAttributes', 'deleteUserAttributes', 'getActivities', 'updateActivities', 'deleteActivities'],
                     },
                 });
-            }, 200); // Simulate 1-second delay
+            }, 200);
         });
     }
 
-    const payload = { messages };
+    const payload = {
+        messages,
+        stream: stream,
+        tools: tools,
+    };
     return fetchAPI("/api/chat", "POST", payload);
 };
 

@@ -10,7 +10,7 @@ import { getUserAttributes } from "@/services/userAttributesService";
 import { postChatMessage } from "@/services/chatService";
 
 const ChatInterface: React.FC = () => {
-    const [messages, setMessages] = useState<{ sender: "user" | "ai"; message: string }[]>([]);
+    const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string, tools?: string[] }[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [currentView, setCurrentView] = useState<"chat" | "fitnessProfile">("chat");
     const [profileInfo, setProfileInfo] = useState<{ label: string; value: string }[]>([]);
@@ -37,23 +37,24 @@ const ChatInterface: React.FC = () => {
         if (isLoading) return;
 
         // Add the user message to the chat
-        setMessages((prev) => [...prev, { sender: "user", message: userMessage }]);
+        setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
         setIsLoading(true);
 
         try {
             // Call the API with the user's message
-            const response = await postChatMessage(messages);
+            const response = await postChatMessage(messages, ['updateUserAttributes', 'deleteUserAttributes'], false, true);
 
             // Extract the AI response from the API response
             const aiResponse = response?.data?.response || "Sorry, something went wrong.";
+            const tools = response?.data?.tools || [];
 
             // Add the AI response to the chat
-            setMessages((prev) => [...prev, { sender: "ai", message: aiResponse }]);
+            setMessages((prev) => [...prev, { role: "ai", content: aiResponse, tools: tools }]);
         } catch (error) {
             console.error("Error sending message:", error);
             setMessages((prev) => [
                 ...prev,
-                { sender: "ai", message: "Oops! There was an error. Please try again later." },
+                { role: "ai", content: "Oops! There was an error. Please try again later." },
             ]);
         } finally {
             setIsLoading(false);
@@ -135,7 +136,7 @@ const ChatInterface: React.FC = () => {
                         <div className="flex flex-col gap-2">
                             {currentView === "chat" ? (
                                 messages.map((msg, index) => (
-                                    <MessageBubble key={index} message={msg.message} sender={msg.sender} />
+                                    <MessageBubble key={index} message={msg.content} sender={msg.role} tools={msg.tools} />
                                 ))
                             ) : (
                                 <div className="p-4 text-white rounded-lg">
