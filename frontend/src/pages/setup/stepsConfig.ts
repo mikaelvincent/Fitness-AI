@@ -1,4 +1,3 @@
-// src/pages/setup/stepsConfig.ts
 export interface Step {
     id: string;
     title: string;

@@ -1,4 +1,3 @@
-// src/pages/setup/steps/SummaryStep.tsx
 import React from "react";
 import { SetupData } from "@/types/setupTypes";
 

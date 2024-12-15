@@ -1,4 +1,3 @@
-// src/pages/setup/steps/MeasurementStep.tsx
 import React from "react";
 import clsx from "clsx";
 import { SetupData } from "@/types/setupTypes";

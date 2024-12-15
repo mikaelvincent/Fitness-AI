@@ -1,4 +1,3 @@
-// src/pages/setup/steps/GenderStep.tsx
 import React from "react";
 import { FaMars, FaVenus } from "react-icons/fa";
 import clsx from "clsx";

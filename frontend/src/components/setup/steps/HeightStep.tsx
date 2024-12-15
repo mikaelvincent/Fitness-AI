@@ -1,4 +1,3 @@
-// src/pages/setup/steps/HeightStep.tsx
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cmToInches, inchesToCm } from "@/utils/setupUtils";

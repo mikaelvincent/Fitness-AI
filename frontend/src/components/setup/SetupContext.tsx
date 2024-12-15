@@ -1,4 +1,3 @@
-// src/pages/setup/SetupContext.tsx
 import React, { createContext, useContext, useState } from "react";
 import { SetupData } from "@/types/setupTypes";
 interface SetupContextType {
