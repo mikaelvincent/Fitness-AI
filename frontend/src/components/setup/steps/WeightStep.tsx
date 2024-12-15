@@ -1,8 +1,7 @@
 // src/pages/setup/steps/WeightStep.tsx
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { kgToLbs, lbsToKg } from "../../../pages/setup/utils";
-import clsx from "clsx";
+import { kgToLbs, lbsToKg } from "../../../utils/setupUtils";
 
 interface WeightStepProps {
     weight: number;
