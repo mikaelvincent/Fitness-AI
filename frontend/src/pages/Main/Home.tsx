@@ -22,6 +22,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
+import { convertDates } from "@/utils/convertDates.ts";
 
 const Home = () => {
   const [searchParams] = useSearchParams();
@@ -33,7 +34,7 @@ const Home = () => {
   const { status, setLoading, setDone, setError } = useStatus();
   const { token } = useUser();
 
-  const [currentDate, setcurrentDate] = useState<Date>(initialDate);
+  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>([]);
 
   const [expandedNodes, setExpandedNodes] = useState<
@@ -102,14 +103,6 @@ const Home = () => {
           setNoExercises(true);
           setDone();
           return;
-        }
-
-        function convertDates(ex: any): Exercise {
-          return {
-            ...ex,
-            date: new Date(ex.date),
-            children: ex.children ? ex.children.map(convertDates) : [],
-          };
         }
 
         const formattedExercises = rawData.map(convertDates);
@@ -221,7 +214,7 @@ const Home = () => {
     setNewExercise((prev) => (prev ? { ...prev, type: description } : null));
   };
 
-  // Modify handleSaveNewExercise to integrate AddorUpdateActivities
+  // Modify handleSaveNewExercise to integrate Add or UpdateActivities
   const handleSaveNewExercise = async () => {
     if (
       newExercise &&
@@ -242,6 +235,7 @@ const Home = () => {
         parent_id: newExercise.parentId, // Parent node
         date: currentDate, // Current date
         children: [], // Initialize children if necessary
+        position: exercises.length, // Position in the list
       };
 
       // Optimistically update the frontend state
@@ -275,10 +269,16 @@ const Home = () => {
           return;
         }
 
-        if (response.success) {
-          // Replace the temporary exercise with the one returned from the backend
+        if (response.success && response.data) {
+          const rawDataSavedExercise = response.data as Exercise;
+          const formattedSavedExercise = convertDates(rawDataSavedExercise);
+          console.log("Saved exercise:", formattedSavedExercise);
           setExercises((prev) =>
-            prev.map((ex) => (ex.id === tempId ? exerciseToAdd : ex)),
+            prev.map((ex) =>
+              ex.position === formattedSavedExercise.position
+                ? formattedSavedExercise
+                : ex,
+            ),
           );
 
           setNoExercises(false);
@@ -373,7 +373,7 @@ const Home = () => {
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
-      <Calendar currentDate={currentDate} setCurrentDate={setcurrentDate}>
+      <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate}>
         {status === "loading" && (
           <Skeleton className="h-[500px] w-[500px] rounded-xl" />
         )}
