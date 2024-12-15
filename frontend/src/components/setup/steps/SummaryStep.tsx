@@ -8,9 +8,7 @@ interface SummaryStepProps {
 export const SummaryStep: React.FC<SummaryStepProps> = ({ data }) => {
     const {
         gender,
-        birthdateDay,
-        birthdateMonth,
-        birthdateYear,
+        birthdate,
         measurement,
         weight,
         weightUnit,
@@ -20,7 +18,7 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({ data }) => {
         nickname,
     } = data;
 
-    const birthdateString = `${birthdateYear}-${birthdateMonth.padStart(2, "0")}-${birthdateDay.padStart(2, "0")}`;
+    const birthdateString = `${birthdate}`;
     const displayedWeight = `${weight}${weightUnit}`;
     const displayedHeight = `${height}${heightUnit}`;
 

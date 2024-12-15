@@ -18,7 +18,7 @@ interface StepContentProps {
 export const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => {
     const stepsMap: Record<string, JSX.Element> = {
         gender: <GenderStep gender={data.gender} onChange={onChange} />,
-        birthdate: <BirthdateStep {...data} onChange={onChange} />,
+        birthdate: <BirthdateStep birthdate={data.birthdate} onChange={onChange} />,
         measurement: <MeasurementStep data={data} onChange={onChange} />,
         weight: <WeightStep weight={data.weight} weightUnit={data.weightUnit} onChange={onChange} />,
         height: <HeightStep height={data.height} heightUnit={data.heightUnit} onChange={onChange} />,

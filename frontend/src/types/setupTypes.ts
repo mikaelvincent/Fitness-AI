@@ -1,8 +1,6 @@
 export interface SetupData {
     gender: string;
-    birthdateDay: string;
-    birthdateMonth: string;
-    birthdateYear: string;
+    birthdate: string;
     measurement: "imperial" | "metric";
     weight: number;
     weightUnit: "kg" | "lbs";

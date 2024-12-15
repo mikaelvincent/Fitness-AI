@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import { SetupData } from "@/types/setupTypes";
 interface SetupContextType {
     data: SetupData;
@@ -10,9 +10,7 @@ const SetupContext = createContext<SetupContextType | undefined>(undefined);
 export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [data, setData] = useState<SetupData>({
         gender: "",
-        birthdateDay: "",
-        birthdateMonth: "",
-        birthdateYear: "",
+        birthdate: "",
         measurement: "metric",
         weight: 70,
         weightUnit: "kg",
@@ -22,9 +20,9 @@ export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         nickname: "",
     });
 
-    const updateData = (partial: Partial<SetupData>) => {
-        setData(prev => ({ ...prev, ...partial }));
-    };
+    const updateData = useCallback((newData: any) => {
+        setData((prevData: any) => ({ ...prevData, ...newData }));
+    }, []);
 
     return (
         <SetupContext.Provider value={{ data, updateData }}>
