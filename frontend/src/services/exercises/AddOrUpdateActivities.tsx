@@ -1,4 +1,4 @@
-// frontend/src/services/exercises/AddorUpdateActivities.tsx
+// frontend/src/services/exercises/AddOrUpdateActivities.tsx
 
 import { ENV } from "@/utils/env.ts";
 import { Exercise } from "@/types/exerciseTypes.ts";
@@ -16,7 +16,7 @@ interface AddOrUpdateActivitiesProps {
   activities: Exercise;
 }
 
-export const UpdateOrAddActivity = async ({
+export const AddOrUpdateActivities = async ({
   token,
   activities,
 }: AddOrUpdateActivitiesProps): Promise<AddOrUpdateActivitiesResponse> => {
