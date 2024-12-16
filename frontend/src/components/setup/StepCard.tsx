@@ -40,16 +40,9 @@ export const StepCard: React.FC<StepCardProps> = ({
             <CardContent className="space-y-6 p-4">{children}</CardContent>
 
             <CardFooter className="flex justify-center space-x-2 p-4">
-                {!isLastStep && (
-                    <Button onClick={onNext} disabled={!canGoNext}>
-                        Next
-                    </Button>
-                )}
-                {isLastStep && (
-                    <Button onClick={onFinish} disabled={!canGoNext || isSubmitting}>
-                        {isSubmitting ? "Submitting..." : "Finish"}
-                    </Button>
-                )}
+                <Button onClick={onNext} disabled={!canGoNext}>
+                    Next
+                </Button>
             </CardFooter>
         </Card>
     );
