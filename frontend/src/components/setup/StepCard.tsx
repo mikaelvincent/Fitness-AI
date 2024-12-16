@@ -47,7 +47,7 @@ export const StepCard: React.FC<StepCardProps> = ({
                 )}
                 {isLastStep && (
                     <Button onClick={onFinish} disabled={!canGoNext || isSubmitting}>
-                        "Next"
+                        Next
                     </Button>
                 )}
             </CardFooter>
