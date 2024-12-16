@@ -1,22 +1,22 @@
 // frontend/src/types/exercise/exerciseTypes.ts
 
-
-// Interface for a Set in Weight Training
-export interface Set {
-    setNumber: number;
-    reps: number;
-    weightKg: number;
+// Define the Metric interface
+export interface Metric {
+  name: string;
+  value: number;
+  unit: string;
 }
 
+// Update the Exercise interface with 'type' as a string
 export interface Exercise {
-    id: number;
-    name: string;
-    isCompleted: boolean;
-    notes: string;
-    isWeightTraining: boolean;
-    numSets?: number;
-    sets?: Set[];
-    distanceKm?: number;
-    timeSeconds?: number;
+  id?: number | null;
+  date?: Date;
+  parent_id?: number | null;
+  name?: string;
+  description?: string;
+  notes?: string;
+  position?: number;
+  metrics?: Metric[];
+  completed?: boolean;
+  children?: Exercise[];
 }
-
