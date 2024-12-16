@@ -23,7 +23,7 @@ const fetchAPI = async (
     method: string,
     body?: object
 ) => {
-    const url = new URL(endpoint, ENV.API_URL); // Base URL + endpoint
+    const url = new URL(endpoint, ENV.API_URL); // Base URL + endpoint 
     const headers = defaultHeaders();
 
     const options: RequestInit = {
@@ -34,7 +34,7 @@ const fetchAPI = async (
 
     const response = await fetch(url.toString(), options);
     const responseData = await response.json();
-    console.log(response)
+
     if (!response.ok) {
         throw new Error(responseData.message || "API request failed.");
     }
@@ -67,7 +67,7 @@ export const postChatMessage = async (
         stream: stream,
         tools: tools,
     };
-    console.log(payload)
+
     return fetchAPI("/api/chat", "POST", payload);
 };
 
@@ -98,6 +98,7 @@ export const streamGPTResponse = async (
         });
 
         if (!response.body) throw new Error("No readable stream available.");
+        if (!response.ok) throw new Error("API request failed.");
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -125,5 +126,6 @@ export const streamGPTResponse = async (
         }
     } catch (error) {
         console.error("Error in streaming GPT response:", error);
+        throw error;
     }
 };
