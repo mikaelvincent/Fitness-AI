@@ -115,13 +115,6 @@ export function toggleCompletionRecursive(
   };
 }
 
-// Checks if all children of an exercise are completed
-export function allChildrenCompleted(exercise: Exercise): boolean {
-  return (
-    !exercise.children || exercise.children.every((child) => child.completed)
-  );
-}
-
 // Helper function to find an exercise by ID anywhere in the tree
 export function getExerciseById(
   exercises: Exercise[],
@@ -207,4 +200,17 @@ export const removeExerciseById = (
       ...ex,
       children: ex.children ? removeExerciseById(ex.children, id) : [],
     }));
+};
+
+// utils/ExerciseHelperFunction.ts
+
+export const locateNewExercise = (
+  savedExercises: Exercise[], // Array of saved Exercise objects
+  parentId: number | null, // Parent ID to match
+  position: number, // Position to match
+): Exercise | undefined => {
+  // Use the `find` method to locate the first matching exercise
+  return savedExercises.find(
+    (ex) => ex.parent_id === parentId && ex.position === position,
+  );
 };
