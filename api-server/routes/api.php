@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\TokenController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\User\UserAttributeController;
 use App\Http\Controllers\Activities\ActivityController;
+use App\Http\Controllers\Chat\ChatController;
 
 // Registration Routes
 Route::group([], function () {
@@ -57,4 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/activities', [ActivityController::class, 'index']);
     Route::put('/activities', [ActivityController::class, 'update']);
     Route::delete('/activities', [ActivityController::class, 'destroy']);
+});
+
+// Chat Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/chat', [ChatController::class, 'handle']);
 });
