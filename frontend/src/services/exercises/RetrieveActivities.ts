@@ -11,19 +11,27 @@ interface RetrieveActivitiesResponse {
 interface RetrieveActivitiesProps {
   token: string | null;
   date: Date;
+  date2?: Date;
+  nested?: string;
 }
 
 export const RetrieveActivities = async ({
   token,
   date,
+  date2,
+  nested,
 }: RetrieveActivitiesProps): Promise<RetrieveActivitiesResponse> => {
   try {
     const formattedDate = date.toISOString().split("T")[0];
+    const formattedDate2 = date2?.toISOString().split("T")[0];
 
     const url = new URL("/api/activities", ENV.API_URL);
     url.searchParams.append("from_date", formattedDate);
-    url.searchParams.append("to_date", formattedDate);
-    url.searchParams.append("nested", "true"); // Include if needed
+    url.searchParams.append(
+      "to_date",
+      formattedDate2 ? formattedDate2 : formattedDate,
+    );
+    url.searchParams.append("nested", nested ? nested : "true"); // Include if needed
 
     console.log("URL:", url);
 
