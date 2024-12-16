@@ -8,6 +8,7 @@ interface WeekHeaderContentUIProps {
   onSelectDate: (date: Date) => void;
   isToday: (date: Date) => boolean;
   isCurrentDate: (date: Date) => boolean;
+  isAnimating: boolean;
 }
 
 const WeekHeaderContentUI = ({
@@ -15,9 +16,12 @@ const WeekHeaderContentUI = ({
   onSelectDate,
   isToday,
   isCurrentDate,
+  isAnimating,
 }: WeekHeaderContentUIProps) => {
   return (
-    <div className="my-2 flex flex-1 justify-between px-2">
+    <div
+      className={`my-2 flex flex-1 justify-between px-2 ${isAnimating ? "pointer-events-none" : ""}`}
+    >
       {weekDates.map((date, index) => (
         <div key={index} className="flex flex-1 justify-center gap-4">
           <div className="flex flex-col items-center gap-2">
@@ -27,6 +31,7 @@ const WeekHeaderContentUI = ({
                 isToday(date) && !isCurrentDate(date) ? "text-primary" : ""
               }`}
               onClick={() => onSelectDate(date)}
+              disabled={isAnimating}
             >
               <span className="text-xs uppercase leading-tight sm:text-lg">
                 {date

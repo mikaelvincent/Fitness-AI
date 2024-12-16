@@ -25,6 +25,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   const [weekTransitionDirection, setWeekTransitionDirection] = useState<
     "next" | "prev" | null
   >(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const navigate = useNavigate();
 
@@ -66,6 +67,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   };
 
   const navigateWeek = (direction: "prev" | "next") => {
+    setIsAnimating(true); // Start the animation
     setWeekTransitionDirection(direction);
     setDayTransitionDirection(direction); // Set the day transition direction based on week navigation
     setCurrentDate((prevDate) => {
@@ -76,6 +78,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   };
 
   const navigateDay = (direction: "prev" | "next") => {
+    setIsAnimating(true); // Start the animation
     setDayTransitionDirection(direction);
     setCurrentDate((prevDate) => {
       const newDate = new Date(prevDate);
@@ -145,14 +148,17 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
         </h2>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-muted pb-6 pt-4 sm:mx-8">
+      <div className="overflow-hidden rounded-lg bg-muted pb-6 pt-4 sm:mx-8 sm:pb-8 sm:pt-6">
         {/* Navigation Buttons with Swipeable Week Header */}
         <WeekHeaderNavigation onNavigateWeek={navigateWeek}>
           <div className="relative h-auto">
             <AnimatePresence
               initial={false}
               custom={weekTransitionDirection}
-              onExitComplete={() => setWeekTransitionDirection(null)}
+              onExitComplete={() => {
+                setWeekTransitionDirection(null);
+                setIsAnimating(false); // Animation fully completed
+              }}
             >
               <SwipableWeekHeader
                 key={weekStart.getTime()}
@@ -164,6 +170,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
                   weekDates={weekDates}
                   currentDate={currentDate}
                   onSelectDate={selectDate}
+                  isAnimating={isAnimating}
                 />
               </SwipableWeekHeader>
             </AnimatePresence>
@@ -175,7 +182,10 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
           <AnimatePresence
             initial={false}
             custom={dayTransitionDirection}
-            onExitComplete={() => setDayTransitionDirection(null)}
+            onExitComplete={() => {
+              setDayTransitionDirection(null);
+              setIsAnimating(false); // Day animation finished
+            }}
           >
             <SwipableView
               key={currentDate.getTime()}
