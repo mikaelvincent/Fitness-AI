@@ -109,6 +109,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-DELETEapi-activities">
                                 <a href="#endpoints-DELETEapi-activities">Delete activities by ID.</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-chat">
+                                <a href="#endpoints-POSTapi-chat">Handle chat requests.</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-password-management" class="tocify-header">
@@ -1460,7 +1463,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"activities\": [
         {
             \"id\": 10,
-            \"date\": \"2024-12-13T06:59:32\",
+            \"date\": \"2024-12-14T03:47:16\",
             \"parent_id\": 10,
             \"position\": 10,
             \"name\": \"cjanyizogaho\",
@@ -1487,7 +1490,7 @@ let body = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-13T06:59:32",
+            "date": "2024-12-14T03:47:16",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1519,7 +1522,7 @@ $response = $client-&gt;put(
             'activities' =&gt; [
                 [
                     'id' =&gt; 10,
-                    'date' =&gt; '2024-12-13T06:59:32',
+                    'date' =&gt; '2024-12-14T03:47:16',
                     'parent_id' =&gt; 10,
                     'position' =&gt; 10,
                     'name' =&gt; 'cjanyizogaho',
@@ -1544,7 +1547,7 @@ payload = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-13T06:59:32",
+            "date": "2024-12-14T03:47:16",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1662,10 +1665,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="activities.0.date"                data-endpoint="PUTapi-activities"
-               value="2024-12-13T06:59:32"
+               value="2024-12-14T03:47:16"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2024-12-13T06:59:32</code></p>
+<p>Must be a valid date. Example: <code>2024-12-14T03:47:16</code></p>
                     </div>
                                                                 <div style="margin-left: 14px; clear: unset;">
                         <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
@@ -1930,6 +1933,283 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 
+        </div>
+        </form>
+
+                    <h2 id="endpoints-POSTapi-chat">Handle chat requests.</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-POSTapi-chat">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1:8000/api/chat" \
+    --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"messages\": [
+        {
+            \"role\": \"assistant\",
+            \"content\": \"voluptatum\"
+        }
+    ],
+    \"stream\": false,
+    \"tools\": [
+        \"deleteActivities\"
+    ]
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/chat"
+);
+
+const headers = {
+    "Authorization": "Bearer {YOUR_AUTH_KEY}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "messages": [
+        {
+            "role": "assistant",
+            "content": "voluptatum"
+        }
+    ],
+    "stream": false,
+    "tools": [
+        "deleteActivities"
+    ]
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/chat';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer {YOUR_AUTH_KEY}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'messages' =&gt; [
+                [
+                    'role' =&gt; 'assistant',
+                    'content' =&gt; 'voluptatum',
+                ],
+            ],
+            'stream' =&gt; false,
+            'tools' =&gt; [
+                'deleteActivities',
+            ],
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/chat'
+payload = {
+    "messages": [
+        {
+            "role": "assistant",
+            "content": "voluptatum"
+        }
+    ],
+    "stream": false,
+    "tools": [
+        "deleteActivities"
+    ]
+}
+headers = {
+  'Authorization': 'Bearer {YOUR_AUTH_KEY}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('POST', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-chat">
+</span>
+<span id="execution-results-POSTapi-chat" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-chat"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-chat"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-chat" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-chat">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-chat" data-method="POST"
+      data-path="api/chat"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-chat', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-chat"
+                    onclick="tryItOut('POSTapi-chat');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-chat"
+                    onclick="cancelTryOut('POSTapi-chat');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-chat"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/chat</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-chat"
+               value="Bearer {YOUR_AUTH_KEY}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_AUTH_KEY}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-chat"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-chat"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>messages</code></b>&nbsp;&nbsp;
+<small>object[]</small>&nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>role</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="messages.0.role"                data-endpoint="POSTapi-chat"
+               value="assistant"
+               data-component="body">
+    <br>
+<p>Example: <code>assistant</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>user</code></li> <li><code>assistant</code></li></ul>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>content</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="messages.0.content"                data-endpoint="POSTapi-chat"
+               value="voluptatum"
+               data-component="body">
+    <br>
+<p>Example: <code>voluptatum</code></p>
+                    </div>
+                                    </details>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>stream</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+                <label data-endpoint="POSTapi-chat" style="display: none">
+            <input type="radio" name="stream"
+                   value="true"
+                   data-endpoint="POSTapi-chat"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-chat" style="display: none">
+            <input type="radio" name="stream"
+                   value="false"
+                   data-endpoint="POSTapi-chat"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>false</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>tools</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="tools[0]"                data-endpoint="POSTapi-chat"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="tools[1]"                data-endpoint="POSTapi-chat"
+               data-component="body">
+    <br>
+
+Must be one of:
+<ul style="list-style-type: square;"><li><code>updateUserAttributes</code></li> <li><code>deleteUserAttributes</code></li> <li><code>getActivities</code></li> <li><code>updateActivities</code></li> <li><code>deleteActivities</code></li></ul>
         </div>
         </form>
 

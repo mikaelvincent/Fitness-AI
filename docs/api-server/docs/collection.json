@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "9e74e8cd-0350-435e-85b9-5c6629703a05",
+        "_postman_id": "eff800d4-c35c-4f8a-a728-32137126ddd2",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -337,7 +337,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-13T06:59:32\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
+                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-14T03:47:16\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
                         },
                         "description": "",
                         "auth": {
@@ -374,6 +374,34 @@
                         "auth": {
                             "type": "noauth"
                         }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Handle chat requests.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/chat",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/chat"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"messages\":[{\"role\":\"assistant\",\"content\":\"voluptatum\"}],\"stream\":false,\"tools\":[\"deleteActivities\"]}"
+                        },
+                        "description": ""
                     },
                     "response": []
                 }
