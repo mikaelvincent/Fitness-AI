@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TwoFactorAuthUI from "@/components/profile/twoFactorAuthencation/TwoFactorAuthUI.tsx";
 import {
   EnableTwoFactorAuth,
@@ -21,10 +21,38 @@ export const TwoFactorAuthentication = () => {
   const handleToggle2FA = (checked: boolean) => {
     if (checked) {
       // User is attempting to enable 2FA
-      initializeEnable2FA();
+      initializeEnable2FA().then((r) => r);
     } else {
       // User is attempting to disable 2FA
-      disable2FA();
+      disable2FA().then((r) => r);
+    }
+  };
+
+  useEffect(() => {
+    toggled2FA().then((r) => r);
+  }, []);
+
+  const toggled2FA = async () => {
+    try {
+      const response: EnableTwoFactorAuthResponse =
+        await EnableTwoFactorAuth(token);
+
+      if (
+        !response?.success &&
+        response.message === "Two-factor authentication is already enabled."
+      ) {
+        setIs2FAEnabled(true);
+        return;
+      }
+
+      setIs2FAEnabled(false);
+    } catch (err) {
+      console.error("Error during initializing 2FA:", err);
+      toast({
+        variant: "destructive",
+        title: "Error Initializing 2FA",
+        description: "Failed to initiate two-factor authentication.",
+      });
     }
   };
 
