@@ -1,42 +1,58 @@
-import React, { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import React, { useState, useEffect } from "react";
+import { isAtLeast13AtMost100 } from "@/utils/setupUtils";
 
 interface BirthdateStepProps {
-    birthdate: string; // ISO format date string
-    onChange: (key: string, value: any) => void;
+    birthdate: string;
+    onChange: (key: string, value: string) => void;
 }
 
 export const BirthdateStep: React.FC<BirthdateStepProps> = ({ birthdate, onChange }) => {
+    const [localValue, setLocalValue] = useState(birthdate);
+    const [error, setError] = useState<string>("");
 
-    // Handle date change
-    const handleDateChange = (date: Date | null) => {
-
-        if (date) {
-            console.log(date.toISOString().split('T')[0])
-            onChange("birthdate", date.toISOString().split('T')[0]); // Save as ISO string (YYYY-MM-DD)
+    useEffect(() => {
+        // Validate the initial birthdate if provided.
+        if (localValue && !isAtLeast13AtMost100(localValue)) {
+            setError("Please enter a valid birthdate. You must be at least 13 years old.");
+        } else {
+            setError("");
         }
+    }, [localValue]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setLocalValue(value);
+
+        // Validate as the user changes the input
+        if (value && !isAtLeast13AtMost100(value)) {
+            setError("Please enter a valid birthdate. You must be at least 13 years old.");
+        } else {
+            setError("");
+        }
+
+        onChange("birthdate", value);
     };
 
     return (
-        <div className="space-y-4 text-center">
-            <h2 className="text-lg font-medium">Select Your Birthdate</h2>
-            <div className="flex justify-center">
-                <DatePicker
-                    selected={birthdate ? new Date(birthdate) : null}
-                    onChange={handleDateChange}
-                    dateFormat="dd/MM/yyyy" // Day, Month, and Year format
-                    showYearDropdown
-                    showMonthDropdown
-                    dropdownMode="select" // Enables dropdowns for month and year
-                    scrollableYearDropdown
-                    yearDropdownItemNumber={100}
-                    maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 13))} // Max 13 years ago
-                    minDate={new Date(new Date().setFullYear(new Date().getFullYear() - 100))} // Min 100 years ago
-                    placeholderText="DD/MM/YYYY"
-                    className="bg-inherit border rounded-md p-2 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
+        <div className="flex flex-col space-y-3 items-center">
+            <input
+                type="date"
+                id="birthdate"
+                name="birthdate"
+                value={localValue}
+                onChange={handleInputChange}
+                aria-describedby={error ? "birthdate-error" : undefined}
+                className={`border rounded-md max-w-40 p-2 bg-inherit focus:outline-none 
+                    ${error ? "border-red-500 focus:ring-red-500" : ""}`
+                }
+                placeholder="YYYY-MM-DD"
+                required
+            />
+            {error && (
+                <p id="birthdate-error" className="text-sm text-red-600">
+                    {error}
+                </p>
+            )}
         </div>
     );
 };
