@@ -196,3 +196,15 @@ export function flattenExercises(
   recurse(exercisesArray);
   return flattened;
 }
+
+export const removeExerciseById = (
+  exercises: Exercise[],
+  id: number,
+): Exercise[] => {
+  return exercises
+    .filter((ex) => ex.id !== id)
+    .map((ex) => ({
+      ...ex,
+      children: ex.children ? removeExerciseById(ex.children, id) : [],
+    }));
+};

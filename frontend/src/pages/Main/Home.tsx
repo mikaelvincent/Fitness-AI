@@ -194,25 +194,23 @@ const Home = () => {
       console.log("Activities to update:", activitiesToUpdate);
 
       // Send updates to backend one by one
-      for (const activity of activitiesToUpdate) {
-        const response = await AddOrUpdateActivities({
-          token,
-          activities: activity, // Single activity per request
-        });
+      const response = await AddOrUpdateActivities({
+        token,
+        activities: activitiesToUpdate,
+      });
 
-        if (!response.success) {
-          // Revert if backend fails
-          setExercises(originalExercises);
-          setUpdateError();
-          setResponseMessage(response.message || "Failed to toggle activity");
-          toast({
-            variant: "destructive",
-            title: "Failed to toggle activity",
-            description: response.message || "Failed to toggle activity",
-            duration: 500,
-          });
-          return;
-        }
+      if (!response.success) {
+        // Revert if backend fails
+        setExercises(originalExercises);
+        setUpdateError();
+        setResponseMessage(response.message || "Failed to toggle activity");
+        toast({
+          variant: "destructive",
+          title: "Failed to toggle activity",
+          description: response.message || "Failed to toggle activity",
+          duration: 500,
+        });
+        return;
       }
 
       setRerenderWeekHeader(true);
@@ -275,13 +273,9 @@ const Home = () => {
       newExercise.name.trim() !== "" &&
       newExercise.type.trim() !== ""
     ) {
-      // Generate a temporary ID
       const tempId = Date.now() * 10 + Math.floor(Math.random() * 10);
-
-      // Format the current date
       const exDate = currentDate.toISOString().split("T")[0];
 
-      // Determine the position of the new exercise
       let newPosition: number;
       if (newExercise.parentId === null) {
         // Top-level exercise
@@ -294,7 +288,7 @@ const Home = () => {
         // Child exercise
         const parentExercise = getExerciseById(exercises, newExercise.parentId);
         if (!parentExercise) {
-          newPosition = 1; // Default position if parent not found
+          newPosition = 1;
         } else {
           newPosition = parentExercise.children?.length
             ? parentExercise.children.length + 1
@@ -302,7 +296,6 @@ const Home = () => {
         }
       }
 
-      // Create the new exercise object
       const exerciseToAdd: Exercise = {
         id: tempId, // Temporary ID
         name: newExercise.name.trim(),
@@ -316,92 +309,65 @@ const Home = () => {
         position: newPosition,
       };
 
-      // Optimistically update the frontend state by adding the new exercise
+      // **Step 1: Compute updatedExercises**
+      let updatedExercises: Exercise[];
       if (newExercise.parentId !== null) {
-        setExercises((prev) =>
-          addChildToParent(prev, newExercise.parentId, exerciseToAdd),
+        updatedExercises = addChildToParent(
+          exercises,
+          newExercise.parentId,
+          exerciseToAdd,
         );
       } else {
-        setExercises((prev) => [...prev, exerciseToAdd]);
+        updatedExercises = [...exercises, exerciseToAdd];
       }
 
-      // Clear the new exercise form
+      // Update ancestors' completion states
+      updatedExercises = recalculateAncestorsCompletion(
+        updatedExercises,
+        newExercise.parentId,
+      );
+
+      // **Step 2: Set the updatedExercises to state**
+      setExercises(updatedExercises);
+
+      // **Step 3: Create flattenedExercises from updatedExercises**
+      const flattenedExercises = flattenExercises(updatedExercises);
+
+      // **Step 4: Clear the new exercise form**
       setNewExercise(null);
 
       try {
-        // Initialize an array to hold all activities to update
-        const activitiesToUpdate: Exercise[] = [];
-
-        // Always add the new exercise to the update list
-        activitiesToUpdate.push({ ...exerciseToAdd, id: null }); // Backend will assign the actual ID
-
-        // If the new exercise has a parent, check if the parent is completed
-        if (newExercise.parentId !== null) {
-          const parentExercise = getExerciseById(
-            exercises,
-            newExercise.parentId,
-          );
-          if (parentExercise?.completed) {
-            // Get all ancestors (parent and above)
-            const ancestors = getAncestorChainExercises(
-              exercises,
-              parentExercise.parent_id,
-            );
-
-            // Create updated parent and ancestor exercises with 'completed' set to false
-            const updatedParent = { ...parentExercise, completed: false };
-            activitiesToUpdate.push(updatedParent);
-
-            ancestors.forEach((ancestor) => {
-              const updatedAncestor = { ...ancestor, completed: false };
-              activitiesToUpdate.push(updatedAncestor);
-            });
-
-            // Update the state optimistically by marking parent and ancestors as incomplete
-            setExercises((prev) => {
-              let updatedExercises = updateExerciseInTree(prev, updatedParent);
-              ancestors.forEach((ancestor) => {
-                updatedExercises = updateExerciseInTree(prev, {
-                  ...ancestor,
-                  completed: false,
-                });
-              });
-              return recalculateAncestorsCompletion(
-                updatedExercises,
-                updatedParent.parent_id,
-              );
-            });
-          }
-        }
-
-        // Set loading state for updating activities
         setUpdateLoading();
 
-        // Send all activities to the backend one by one
-        for (const activity of activitiesToUpdate) {
-          const response = await AddOrUpdateActivities({
-            token,
-            activities: activity,
-          });
+        // **Step 5: Send the flattened exercises to the backend**
+        // Filter out the new exercise using tempId
+        const activitiesToUpdate: Exercise[] = [
+          { ...exerciseToAdd, id: null }, // New exercise with id set to null
+          ...flattenedExercises.filter((ex) => ex.id !== tempId),
+        ];
 
-          if (!response.success) {
-            throw new Error(
-              response.message || "Failed to add/update activity",
-            );
-          }
+        console.log("Activities to update:", activitiesToUpdate);
 
-          if (response.success && response.data) {
-            const savedExercise = convertDates(response.data as Exercise);
-            // Replace the temporary exercise with the saved exercise
-            setExercises((prev) =>
-              replaceExerciseByPosition(
-                prev,
-                savedExercise.parent_id,
-                savedExercise.position,
-                savedExercise,
-              ),
-            );
-          }
+        const response = await AddOrUpdateActivities({
+          token,
+          activities: activitiesToUpdate,
+        });
+
+        if (!response.success) {
+          throw new Error(response.message || "Failed to add/update activity");
+        }
+
+        if (response.success && response.data) {
+          const savedExercise = convertDates(response.data as Exercise);
+          // Replace the temporary exercise in the frontend with the saved one from the backend.
+          setExercises((prev) =>
+            replaceExerciseByPosition(
+              prev,
+              savedExercise.parent_id,
+              savedExercise.position,
+              savedExercise,
+            ),
+          );
         }
 
         setNoExercises(false);
@@ -425,20 +391,10 @@ const Home = () => {
           duration: 500,
         });
 
-        // Revert the optimistic update by removing the temporary exercise
-        setExercises((prev) => prev.filter((ex) => ex.id !== tempId));
-
-        // Additionally, revert parent and ancestors if they were toggled
-        if (newExercise.parentId !== null) {
-          const parentExercise = getExerciseById(
-            exercises,
-            newExercise.parentId,
-          );
-          if (parentExercise?.completed === false) {
-            // Re-fetch exercises to ensure consistency
-            await fetchExercises();
-          }
-        }
+        // Revert changes by refetching from the backend
+        fetchExercises().then(() => {
+          // Ensure the state is consistent after revert.
+        });
       }
     }
   };
