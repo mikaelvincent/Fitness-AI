@@ -305,7 +305,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-13T06:59:32'
+                        example: '2024-12-14T03:47:16'
                         nullable: false
                       parent_id:
                         type: integer
@@ -374,6 +374,66 @@ paths:
               required:
                 - ids
       security: []
+  /api/chat:
+    post:
+      summary: 'Handle chat requests.'
+      operationId: handleChatRequests
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  description: ''
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        description: ''
+                        example: assistant
+                        nullable: false
+                        enum:
+                          - user
+                          - assistant
+                      content:
+                        type: string
+                        description: ''
+                        example: voluptatum
+                        nullable: false
+                    required:
+                      - role
+                      - content
+                stream:
+                  type: boolean
+                  description: ''
+                  example: false
+                  nullable: false
+                tools:
+                  type: array
+                  description: ''
+                  example:
+                    - deleteActivities
+                  items:
+                    type: string
+                    enum:
+                      - updateUserAttributes
+                      - deleteUserAttributes
+                      - getActivities
+                      - updateActivities
+                      - deleteActivities
+              required:
+                - messages
   /api/password/forgot:
     post:
       summary: 'Send a password reset link to the user''s email.'
