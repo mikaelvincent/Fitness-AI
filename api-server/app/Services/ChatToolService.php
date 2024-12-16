@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
+
 /**
  * Provides chatbot-accessible tools for managing user attributes and activities.
  */
@@ -26,9 +28,10 @@ class ChatToolService
      * Retrieve the authenticated user's attributes.
      *
      * @param int $userId
+     * @param array $arguments
      * @return array
      */
-    public function getUserAttributes(int $userId): array
+    public function getUserAttributes(int $userId, array $arguments): array
     {
         return $this->userAttributeService->getAttributes($userId);
     }
@@ -37,11 +40,21 @@ class ChatToolService
      * Add or update the authenticated user's attributes.
      *
      * @param int $userId
-     * @param array $attributes
+     * @param array $arguments
      * @return array
      */
-    public function updateUserAttributes(int $userId, array $attributes): array
+    public function updateUserAttributes(int $userId, array $arguments): array
     {
+        $attributes = $arguments['attributes'] ?? [];
+
+        if (!is_array($attributes)) {
+            Log::warning('Invalid attributes provided for updateUserAttributes.', [
+                'user_id' => $userId,
+                'attributes' => $attributes
+            ]);
+            return ['message' => 'Invalid attributes provided.'];
+        }
+
         $this->userAttributeService->updateAttributes($userId, $attributes);
         return ['message' => 'User attributes updated successfully.'];
     }
@@ -50,11 +63,21 @@ class ChatToolService
      * Delete specified attributes from the authenticated user.
      *
      * @param int $userId
-     * @param array $keys
+     * @param array $arguments
      * @return array
      */
-    public function deleteUserAttributes(int $userId, array $keys): array
+    public function deleteUserAttributes(int $userId, array $arguments): array
     {
+        $keys = $arguments['keys'] ?? [];
+
+        if (!is_array($keys)) {
+            Log::warning('Invalid keys provided for deleteUserAttributes.', [
+                'user_id' => $userId,
+                'keys' => $keys
+            ]);
+            return ['message' => 'Invalid keys provided.'];
+        }
+
         $this->userAttributeService->deleteAttributes($userId, $keys);
         return ['message' => 'User attributes deleted successfully.'];
     }
@@ -63,24 +86,38 @@ class ChatToolService
      * Retrieve the authenticated user's activities with optional filtering.
      *
      * @param int $userId
-     * @param array $filters
+     * @param array $arguments
      * @return array
      */
-    public function getActivities(int $userId, array $filters): array
+    public function getActivities(int $userId, array $arguments): array
     {
-        $activities = $this->activityService->getActivities($userId, $filters)->toArray();
-        return $activities;
+        $filters = [
+            'from_date' => $arguments['from_date'] ?? null,
+            'to_date' => $arguments['to_date'] ?? null,
+        ];
+
+        return $this->activityService->getActivities($userId, $filters)->toArray();
     }
 
     /**
      * Add or update the authenticated user's activities.
      *
      * @param int $userId
-     * @param array $activities
+     * @param array $arguments
      * @return array
      */
-    public function updateActivities(int $userId, array $activities): array
+    public function updateActivities(int $userId, array $arguments): array
     {
+        $activities = $arguments['activities'] ?? [];
+
+        if (!is_array($activities)) {
+            Log::warning('Invalid activities provided for updateActivities.', [
+                'user_id' => $userId,
+                'activities' => $activities
+            ]);
+            return ['message' => 'Invalid activities provided.'];
+        }
+
         $result = $this->activityService->upsertActivities($userId, $activities);
         return [
             'message' => 'Activities processed successfully.',
@@ -92,11 +129,21 @@ class ChatToolService
      * Delete specified activities from the authenticated user.
      *
      * @param int $userId
-     * @param array $activityIds
+     * @param array $arguments
      * @return array
      */
-    public function deleteActivities(int $userId, array $activityIds): array
+    public function deleteActivities(int $userId, array $arguments): array
     {
+        $activityIds = $arguments['activityIds'] ?? [];
+
+        if (!is_array($activityIds)) {
+            Log::warning('Invalid activityIds provided for deleteActivities.', [
+                'user_id' => $userId,
+                'activityIds' => $activityIds
+            ]);
+            return ['message' => 'Invalid activity IDs provided.'];
+        }
+
         $this->activityService->deleteActivities($userId, $activityIds);
         return ['message' => 'Activities deleted successfully.'];
     }
