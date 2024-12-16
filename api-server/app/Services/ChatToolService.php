@@ -26,10 +26,6 @@ class ChatToolService
 
     /**
      * Retrieve the authenticated user's attributes.
-     *
-     * @param int $userId
-     * @param array $arguments
-     * @return array
      */
     public function getUserAttributes(int $userId, array $arguments): array
     {
@@ -38,13 +34,15 @@ class ChatToolService
 
     /**
      * Add or update the authenticated user's attributes.
-     *
-     * @param int $userId
-     * @param array $arguments
-     * @return array
+     * If the 'attributes' key is missing, treat the entire arguments array as attributes.
      */
     public function updateUserAttributes(int $userId, array $arguments): array
     {
+        // If the arguments do not contain 'attributes', assume all key-value pairs are attributes.
+        if (!isset($arguments['attributes'])) {
+            $arguments = ['attributes' => $arguments];
+        }
+
         $attributes = $arguments['attributes'] ?? [];
 
         if (!is_array($attributes)) {
@@ -61,10 +59,6 @@ class ChatToolService
 
     /**
      * Delete specified attributes from the authenticated user.
-     *
-     * @param int $userId
-     * @param array $arguments
-     * @return array
      */
     public function deleteUserAttributes(int $userId, array $arguments): array
     {
@@ -84,10 +78,6 @@ class ChatToolService
 
     /**
      * Retrieve the authenticated user's activities with optional filtering.
-     *
-     * @param int $userId
-     * @param array $arguments
-     * @return array
      */
     public function getActivities(int $userId, array $arguments): array
     {
@@ -101,10 +91,6 @@ class ChatToolService
 
     /**
      * Add or update the authenticated user's activities.
-     *
-     * @param int $userId
-     * @param array $arguments
-     * @return array
      */
     public function updateActivities(int $userId, array $arguments): array
     {
@@ -127,10 +113,6 @@ class ChatToolService
 
     /**
      * Delete specified activities from the authenticated user.
-     *
-     * @param int $userId
-     * @param array $arguments
-     * @return array
      */
     public function deleteActivities(int $userId, array $arguments): array
     {
