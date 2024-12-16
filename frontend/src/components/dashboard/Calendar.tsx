@@ -145,10 +145,10 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
         </h2>
       </div>
 
-      <div className="rounded-lg bg-muted py-4 sm:mx-8">
+      <div className="overflow-hidden rounded-lg bg-muted pb-6 pt-4 sm:mx-8">
         {/* Navigation Buttons with Swipeable Week Header */}
         <WeekHeaderNavigation onNavigateWeek={navigateWeek}>
-          <div className="relative h-10 overflow-hidden sm:h-14">
+          <div className="relative h-auto">
             <AnimatePresence
               initial={false}
               custom={weekTransitionDirection}
