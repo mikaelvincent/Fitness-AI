@@ -24,7 +24,7 @@ export const SetupWizard: React.FC = () => {
             setCurrentStepIndex(Number(savedStep));
         }
         if (savedData) {
-            updateData(JSON.parse(savedData)); // Restore form data
+            updateData(JSON.parse(savedData));
         }
     }, [updateData]);
 
@@ -47,7 +47,7 @@ export const SetupWizard: React.FC = () => {
         saveProgress(prevStep, data);
     };
 
-    const handleFinish = async () => {
+    const handleSubmit = async () => {
         setIsSubmitting(true);
 
         try {
@@ -72,11 +72,10 @@ export const SetupWizard: React.FC = () => {
 
             await updateUserAttributes(payload);
 
-            // Clear localStorage on success
             localStorage.removeItem("currentStepIndex");
             localStorage.removeItem("setupData");
 
-            navigate("/initial-chat");
+            navigate("/verify-email");
         } catch (error: any) {
             console.error("Error:", error.message);
             const errorMsg = error.message === "Authentication token not found."
@@ -87,6 +86,63 @@ export const SetupWizard: React.FC = () => {
             setIsSubmitting(false);
         }
     };
+
+    const handleFinish = () => {
+
+        const isAllDataFilled = validateAllData();
+
+        if (!isAllDataFilled) {
+            toast({
+                title: "Incomplete Data",
+                description: "Please ensure all fields are filled out correctly before finishing.",
+            });
+            return;
+        }
+
+        handleSubmit();
+    };
+
+    const validateAllData = () => {
+        const requiredFields = [
+            "gender",
+            "birthdate",
+            "measurement",
+            "weight",
+            "height",
+            "activity",
+            "nickname",
+        ];
+
+        for (const field of requiredFields) {
+            if (!data[field] || (typeof data[field] === "string" && !data[field].trim())) {
+                return false;
+            }
+        }
+
+        if (!isAtLeast13AtMost100(data.birthdate)) {
+            toast({ title: "Invalid Birthdate", description: "Please enter a valid birthdate." });
+            return false;
+        }
+
+        if (data.nickname.length < 3 || data.nickname.length > 30) {
+            toast({
+                title: "Invalid Nickname",
+                description: "Nickname must be between 3 and 30 characters.",
+            });
+            return false;
+        }
+
+        if (data.weight <= 0 || data.height <= 0) {
+            toast({
+                title: "Invalid Measurements",
+                description: "Weight and height must be greater than zero.",
+            });
+            return false;
+        }
+
+        return true;
+    };
+
 
     const canGoNext = (): boolean => {
         switch (currentStep.id) {
