@@ -11,9 +11,9 @@ import NewExercise from "@/components/dashboard/NewExercise.tsx";
 import ExerciseTree from "@/components/dashboard/exerciseSet/ExerciseTree.tsx";
 import useStatus from "@/hooks/useStatus.tsx";
 import { useUser } from "@/hooks/context/UserContext.tsx";
-import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.tsx";
+import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.ts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AddOrUpdateActivities } from "@/services/exercises/AddOrUpdateActivities.tsx";
+import { AddOrUpdateActivities } from "@/services/exercises/AddOrUpdateActivities.ts";
 import { toast } from "@/hooks/use-toast.tsx";
 import {
   Card,
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/card";
 import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
 import { convertDates } from "@/utils/convertDates.ts";
-import { DeleteActivities } from "@/services/exercises/DeleteActivities.tsx";
+import { DeleteActivities } from "@/services/exercises/DeleteActivities.ts";
 import {
   addChildToParent,
   flattenExercises,

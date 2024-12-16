@@ -24,6 +24,7 @@ const WeekHeaderContent = ({
     return date.toDateString() === today.toDateString();
   };
 
+  const DaysOfWeekCompleted :  =
   return (
     <WeekHeaderContentUI
       weekDates={weekDates}
