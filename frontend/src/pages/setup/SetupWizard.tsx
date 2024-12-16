@@ -75,7 +75,7 @@ export const SetupWizard: React.FC = () => {
             localStorage.removeItem("currentStepIndex");
             localStorage.removeItem("setupData");
 
-            navigate("/verify-email");
+            navigate("/");
         } catch (error: any) {
             console.error("Error:", error.message);
             const errorMsg = error.message === "Authentication token not found."
@@ -99,7 +99,7 @@ export const SetupWizard: React.FC = () => {
             return;
         }
 
-        handleSubmit();
+        navigate("/verify-email");
     };
 
     const validateAllData = () => {
