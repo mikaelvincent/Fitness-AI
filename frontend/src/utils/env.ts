@@ -3,4 +3,5 @@ export const ENV = {
   WEB_SOCKET_URL: import.meta.env.VITE_WEB_SOCKET_URL,
   APP_NAME: import.meta.env.VITE_APP_NAME,
   ENVIRONMENT: import.meta.env.MODE,
+  OPENAI_API_KEY: import.meta.env.VITE_OPENAI_API_KEY
 };

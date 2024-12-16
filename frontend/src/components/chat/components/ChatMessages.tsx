@@ -4,7 +4,7 @@ import MessageBubble from "./MessageBubble";
 interface ChatMessagesProps {
     currentView: "chat" | "fitnessProfile";
     messages: {
-        role: "user" | "ai";
+        role: "user" | "assistant";
         content: string;
         tools?: string[];
     }[];

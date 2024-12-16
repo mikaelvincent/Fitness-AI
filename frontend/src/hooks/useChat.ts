@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { postChatMessage } from "@/services/chatService";
 import { getUserAttributes } from "@/services/userAttributesService";
 import { capitalizeFirstLetter } from "@/utils/utils";
+import { streamGPTResponse } from "@/services/chatService";
 
 type Message = {
-    role: "user" | "ai";
+    role: "user" | "assistant";
     content: string;
     tools?: string[];
 };
@@ -30,6 +31,12 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         if (currentView === "fitnessProfile") fetchProfileInfo();
     }, [currentView]);
 
+    useEffect(() => {
+        if (currentView === "chat") {
+            scrollToBottom();
+        }
+    }, [currentView]);
+
     const scrollToBottom = () => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -46,17 +53,43 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
 
     const sendMessage = async (userMessage: string) => {
         if (isLoading) return;
-        setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+
+        const newUserMessage: Message = { role: "user", content: userMessage };
+        const updatedMessages = [...messages, newUserMessage];
+        setMessages(updatedMessages);
         setIsLoading(true);
 
+        // Prepare messages for API (remove tools)
+        const sanitizedMessages = updatedMessages.map(({ role, content }) => ({ role, content }));
+
         try {
-            const response = await postChatMessage(messages, ["updateUserAttributes", "deleteUserAttributes"], false, true);
+            const response = await postChatMessage(
+                sanitizedMessages,
+                ["updateUserAttributes", "deleteUserAttributes"],
+                false,
+                false
+            );
+
             const aiResponse = response?.data?.response || "Sorry, something went wrong.";
             const tools = response?.data?.tools || [];
-            setMessages((prev) => [...prev, { role: "ai", content: aiResponse, tools }]);
+
+            // Attach tools internally
+            const newAIMessage: Message = {
+                role: "assistant",
+                content: aiResponse,
+                tools: tools, // Tools stay internal
+            };
+
+            setMessages((prev) => [...prev, newAIMessage]);
         } catch (error) {
             console.error("Error sending message:", error);
-            setMessages((prev) => [...prev, { role: "ai", content: "Oops! There was an error. Please try again later." }]);
+
+            const errorMessage: Message = {
+                role: "assistant",
+                content: "Oops! There was an error. Please try again later.",
+            };
+
+            setMessages((prev) => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
         }

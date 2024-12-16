@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 interface MessageBubbleProps {
-    sender: "user" | "ai";
+    sender: "user" | "assistant";
     message: string;
     tools?: string[];
 }

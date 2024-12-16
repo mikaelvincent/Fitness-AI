@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const INITIAL_AI_MESSAGE = [
     {
-        role: "ai" as const,
+        role: "assistant" as const,
         content: `**Hi I'm GymGenie Your AI Workout Coach!** 🏋️‍♂️  
 I’m here to help you create a personalized workout plan based on your fitness goals, preferences, and current lifestyle. 
 
@@ -41,14 +41,14 @@ const ChatInterface: React.FC = () => {
     const handleGenerateWorkout = () => navigate("/");
 
     return (
-        <div className="min-h-screen flex flex-col bg-background text-foreground">
+        <div className="min-h-screen flex flex-col bg-background text-foreground justify-center items-center mx-2">
             <ChatHeader
                 currentView={currentView}
                 onGenerateWorkout={handleGenerateWorkout}
                 onFitnessProfileClick={switchToFitnessProfile}
                 onBackToChatClick={switchToChat}
             />
-            <main className="flex-1 bg-primary rounded-t-3xl flex flex-col overflow-hidden w-full max-w-full lg:max-w-3xl mx-auto">
+            <main className="flex-1 bg-primary rounded-t-3xl flex flex-col overflow-hidden w-full max-w-full lg:max-w-3xl">
                 <ChatMessages
                     currentView={currentView}
                     messages={messages}

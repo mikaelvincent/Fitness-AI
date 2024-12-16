@@ -1,6 +1,7 @@
 import React from "react";
 import { RiAiGenerate } from "react-icons/ri";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
+import { Button } from "@/components/ui/button";
 
 interface ChatHeaderProps {
     currentView: "chat" | "fitnessProfile";
@@ -39,34 +40,42 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                 )}
             </div>
 
-            <div className="flex justify-center mt-4">
-                <button
+            <div className="flex flex-row-reverse justify-center mt-4 items-center gap-2">
+                <Button
                     onClick={onGenerateWorkout}
-                    className="flex items-center text-primary hover:text-white transition-colors rounded-lg px-3 py-2"
+                    className=""
                 >
-                    <RiAiGenerate size={24} />
-                    <span className="ml-1 text-sm font-medium">Generate Workout</span>
-                </button>
+                    {/* Shimmer Effect */}
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white /30 to-transparent -translate-x-full animate-[shimmer_0.1s_infinite]"></span>
 
-                {isChatView ? (
-                    <button
-                        onClick={onFitnessProfileClick}
-                        className="flex items-center text-primary hover:text-white transition-colors rounded-lg px-3 py-2"
-                    >
-                        <MdOutlineInfo size={24} />
-                        Fitness Profile
-                    </button>
-                ) : (
-                    <button
-                        onClick={onBackToChatClick}
-                        className="flex items-center text-primary hover:text-white transition-colors rounded-lg px-3 py-2"
-                    >
-                        <MdMessage size={24} />
-                        Back to Chat
-                    </button>
-                )}
-            </div>
-        </header>
+                    <RiAiGenerate size={24} className="z-10" />
+                    <span className="ml-1 text-sm font-medium z-10">Generate Workout</span>
+                </Button>
+
+
+                {
+                    isChatView ? (
+                        <Button
+                            onClick={onFitnessProfileClick}
+                            className="border-2 border-gray-600"
+                            variant="outline"
+                        >
+                            <MdOutlineInfo size={24} />
+                            <span className="ml-1 text-sm font-medium hover:underline-offset-1">Fitness Profile</span>
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={onBackToChatClick}
+                            className="border-2 border-gray-600"
+                            variant="outline"
+                        >
+                            <MdMessage size={24} />
+                            <span className="ml-1 text-sm font-medium">Back to Chat</span>
+                        </Button>
+                    )
+                }
+            </div >
+        </header >
     );
 };
 
