@@ -8,6 +8,7 @@ export interface SetupData {
     heightUnit: "cm" | "in";
     activity: string;
     nickname: string;
+    [key: string]: any;
 }
 
 export interface Step {
