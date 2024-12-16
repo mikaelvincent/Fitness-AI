@@ -103,7 +103,7 @@ export const SetupWizard: React.FC = () => {
             case "activity":
                 return !!data.activity.trim();
             case "nickname":
-                return !!data.nickname.trim();
+                return !!data.nickname.trim() && data.nickname.length <= 30 && data.nickname.length >= 3;
             default:
                 return true;
         }
