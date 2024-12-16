@@ -109,17 +109,28 @@ export default function ProfileDashboardUI({
         <Card className="flex-1 border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900">
           <CardContent className="h-full p-6">
             <div className="h-full flex-col">
+              <div className="mt-4 flex w-full justify-end">
+                <Button variant="link" size="lg">
+                  <Link to="/chat" className="flex items-center gap-1">
+                    <BotMessageSquare />
+                    Chat with GENIE to update your attributes
+                  </Link>
+                </Button>
+              </div>
               <div className="flex h-5/6 w-full flex-col rounded-lg bg-primary">
-                <ScrollArea className="h-full w-full">
+                <ScrollArea className="h-full w-full p-4">
                   {attributes && attributes.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <div className="flex flex-col gap-2">
                       {attributes.map((attribute, index) => (
-                        <div key={index} className="rounded p-4 shadow">
-                          <p className="text-2xl font-semibold">
-                            {attribute.value}
-                          </p>
-                          <p className="text-sm text-orange-200">
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 rounded p-4 shadow dark:border-zinc-800 dark:bg-zinc-900"
+                        >
+                          <p className="w-4/12 text-start text-lg capitalize text-orange-400">
                             {attribute.name}
+                          </p>
+                          <p className="w-8/12 text-wrap text-start text-xl capitalize">
+                            {attribute.value}
                           </p>
                         </div>
                       ))}
@@ -131,14 +142,6 @@ export default function ProfileDashboardUI({
                   )}
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>
-              </div>
-              <div className="mt-4 flex w-full justify-end">
-                <Button variant="link" size="lg">
-                  <Link to="/chat" className="flex items-center gap-1">
-                    <BotMessageSquare />
-                    Chat with GENIE to update your attributes
-                  </Link>
-                </Button>
               </div>
             </div>
           </CardContent>
