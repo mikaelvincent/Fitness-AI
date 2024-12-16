@@ -14,7 +14,7 @@ const Profile = () => {
     email: "pascojericho@gmail.com",
   });
 
-  const { token } = useUser();
+  const { token, refreshToken } = useUser();
 
   const [isUpdateName, setIsUpdateName] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ const Profile = () => {
   }, []);
 
   const handleRetrieveAttributes = async () => {
+    refreshToken();
     try {
       const response = await RetrieveAttributes({ token });
       if (!response?.success) {
@@ -52,6 +53,7 @@ const Profile = () => {
   };
 
   const handleNavigation = (path: string) => {
+    refreshToken();
     navigate(path);
   };
 

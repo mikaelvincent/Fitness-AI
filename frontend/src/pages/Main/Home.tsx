@@ -43,7 +43,7 @@ const Home = () => {
     : new Date();
 
   const { status, setLoading, setDone, setError } = useStatus();
-  const { token } = useUser();
+  const { token, refreshToken } = useUser();
 
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -102,6 +102,7 @@ const Home = () => {
 
   const fetchExercises = async () => {
     setLoading();
+    refreshToken();
     try {
       const response = await RetrieveActivities({
         token,
@@ -137,6 +138,7 @@ const Home = () => {
   };
 
   const toggleExerciseCompletion = async (id: number | null | undefined) => {
+    refreshToken();
     if (id === null || id === undefined) return;
 
     const originalExercises = exercises;
@@ -273,6 +275,7 @@ const Home = () => {
       newExercise.name.trim() !== "" &&
       newExercise.type.trim() !== ""
     ) {
+      refreshToken();
       const originalExercises = exercises;
       const tempId = Date.now() * 10 + Math.floor(Math.random() * 10);
       const exDate = currentDate.toISOString().split("T")[0];
@@ -448,6 +451,7 @@ const Home = () => {
 
   const deleteExercise = async (exerciseId: number | null | undefined) => {
     try {
+      refreshToken();
       // Optimistically update the frontend state
       setExercises((prev) => {
         const updatedExercises = removeExerciseFromTree(prev, exerciseId);
@@ -517,6 +521,7 @@ const Home = () => {
   });
 
   const handleUpdateExercise = async (updatedExercise: Exercise) => {
+    refreshToken();
     try {
       // Indicate that an update is in progress
       setUpdateLoading();

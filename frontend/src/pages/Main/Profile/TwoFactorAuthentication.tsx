@@ -13,7 +13,7 @@ export const TwoFactorAuthentication = () => {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
-  const { token } = useUser();
+  const { token, refreshToken } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
 
@@ -22,14 +22,17 @@ export const TwoFactorAuthentication = () => {
     if (checked) {
       // User is attempting to enable 2FA
       initializeEnable2FA().then((r) => r);
+      refreshToken();
     } else {
       // User is attempting to disable 2FA
       disable2FA().then((r) => r);
+      refreshToken();
     }
   };
 
   useEffect(() => {
     toggled2FA().then((r) => r);
+    refreshToken();
   }, []);
 
   const toggled2FA = async () => {

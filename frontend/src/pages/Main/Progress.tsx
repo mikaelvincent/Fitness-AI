@@ -28,7 +28,7 @@ const Progress = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { token } = useUser();
+  const { token, refreshToken } = useUser();
 
   // Update currentDate if URL param changes
   // Update the URL when currentDate changes
@@ -40,11 +40,13 @@ const Progress = () => {
   // Fetch activities for the current month
   useEffect(() => {
     fetchActivities().then((r) => r);
+    refreshToken();
   }, [currentDate, token]);
 
   const fetchActivities = async () => {
     setLoading(true);
     setError(null);
+    refreshToken();
 
     const firstDay = startOfMonth(currentDate);
     const lastDay = endOfMonth(currentDate);
