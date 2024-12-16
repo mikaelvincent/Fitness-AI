@@ -1,6 +1,10 @@
 // components/WeekHeaderContent.tsx
 
 import WeekHeaderContentUI from "@/components/dashboard/calendarHeader/WeekHeaderContentUI.tsx";
+import { Exercise } from "@/types/exerciseTypes.ts";
+import { useEffect, useState } from "react";
+import { useUser } from "@/hooks/context/UserContext.tsx";
+import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.ts";
 
 interface WeekHeaderContentProps {
   weekDates: Date[];
@@ -15,6 +19,12 @@ const WeekHeaderContent = ({
   onSelectDate,
   isAnimating,
 }: WeekHeaderContentProps) => {
+  const [activities, setActivities] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { token } = useUser();
+
   const isCurrentDate = (date: Date) => {
     return date.toDateString() === currentDate.toDateString();
   };
@@ -24,7 +34,56 @@ const WeekHeaderContent = ({
     return date.toDateString() === today.toDateString();
   };
 
-  const DaysOfWeekCompleted :  =
+  useEffect(() => {
+    fetchActivities();
+  }, [weekDates, token]);
+
+  const fetchActivities = async () => {
+    setLoading(true);
+    setError(null);
+
+    const firstDay = weekDates[0];
+    const lastDay = weekDates[weekDates.length - 1];
+
+    try {
+      const response = await RetrieveActivities({
+        token: token,
+        date: firstDay,
+        date2: lastDay,
+        nested: "false",
+      });
+
+      if (response.success && response.data) {
+        // Assuming response.data is an array of activities
+        setActivities(response.data as Exercise[]);
+      } else {
+        setError(response.message || "Failed to retrieve activities.");
+      }
+    } catch (err) {
+      console.error("Error fetching activities:", err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Determine the completion ratio for each day
+  const DaysOfWeekCompletedList = weekDates.map((date) => {
+    const activitiesForDay = activities.filter(
+      (activity) =>
+        new Date(activity.date!).toDateString() === date.toDateString(),
+    );
+    if (activitiesForDay.length === 0) return 0; // No activities
+    const completedActivities = activitiesForDay.filter(
+      (activity) => activity.completed,
+    ).length;
+    return completedActivities / activitiesForDay.length; // Ratio between 0 and 1
+  });
+
+  useEffect(() => {
+    console.log("DaysOfWeekCompletedList:", DaysOfWeekCompletedList);
+  }, [DaysOfWeekCompletedList]);
+
   return (
     <WeekHeaderContentUI
       weekDates={weekDates}
@@ -32,6 +91,7 @@ const WeekHeaderContent = ({
       isToday={isToday}
       isCurrentDate={isCurrentDate}
       isAnimating={isAnimating}
+      DaysOfWeekCompletedList={DaysOfWeekCompletedList}
     />
   );
 };

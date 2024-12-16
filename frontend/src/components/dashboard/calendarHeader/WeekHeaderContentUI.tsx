@@ -7,7 +7,19 @@ interface WeekHeaderContentUIProps {
   isToday: (date: Date) => boolean;
   isCurrentDate: (date: Date) => boolean;
   isAnimating: boolean;
+  DaysOfWeekCompletedList: number[];
 }
+
+// Helper function to map ratio to Tailwind CSS classes
+const getGreenClass = (ratio: number): string => {
+  if (ratio === 0) return "bg-transparent";
+  if (ratio > 0 && ratio <= 0.2) return "bg-green-100";
+  if (ratio > 0.2 && ratio <= 0.4) return "bg-green-300";
+  if (ratio > 0.4 && ratio <= 0.6) return "bg-green-400";
+  if (ratio > 0.6 && ratio <= 0.8) return "bg-green-600";
+  if (ratio > 0.8) return "bg-green-800";
+  return "bg-transparent"; // Fallback
+};
 
 const WeekHeaderContentUI = ({
   weekDates,
@@ -15,6 +27,7 @@ const WeekHeaderContentUI = ({
   isToday,
   isCurrentDate,
   isAnimating,
+  DaysOfWeekCompletedList,
 }: WeekHeaderContentUIProps) => {
   return (
     <div
@@ -46,7 +59,14 @@ const WeekHeaderContentUI = ({
                 {date.getDate()}
               </span>
             </Button>
-            <div className="h-1 w-3 bg-green-500 sm:w-6"></div>
+            <div
+              className={`h-1 w-3 rounded sm:w-6 ${getGreenClass(
+                DaysOfWeekCompletedList[index],
+              )}`}
+              title={`Completed: ${Math.round(
+                DaysOfWeekCompletedList[index] * 100,
+              )}%`}
+            ></div>
           </div>
         </div>
       ))}
