@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import rehypeRaw from "rehype-raw";
 
 interface MessageBubbleProps {
     sender: "user" | "assistant";
@@ -51,24 +52,41 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ sender, message, tools })
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                    h1: ({ ...props }) => <h1 {...props} className="text-3xl font-bold my-4" />,
-                    h2: ({ ...props }) => <h2 {...props} className="text-2xl font-bold my-3" />,
-                    h3: ({ ...props }) => <h3 {...props} className="text-xl font-semibold my-2" />,
+                    h1: ({ ...props }) => <h1 {...props} className="text-4xl font-bold my-4" />,
+                    h2: ({ ...props }) => <h2 {...props} className="text-3xl font-semibold my-3" />,
+                    h3: ({ ...props }) => <h3 {...props} className="text-2xl font-medium my-2" />,
                     p: ({ ...props }) => <p {...props} className="my-2 leading-relaxed" />,
-                    a: ({ ...props }) => <a {...props} className="text-primary underline hover:text-blue-600" />,
-                    ul: ({ ...props }) => <ul {...props} className="list-disc list-inside my-2" />,
-                    ol: ({ ...props }) => <ol {...props} className="list-decimal list-inside my-2" />,
-                    li: ({ ...props }) => <li {...props} className="ml-4 my-1" />,
-                    blockquote: ({ ...props }) => <blockquote {...props} className="border-l-4 border-gray-400 italic pl-4 my-4 text-gray-600" />,
-                    img: ({ ...props }) => <img {...props} className="rounded-md shadow-md mx-auto my-4" />,
-                    hr: ({ ...props }) => <hr {...props} className="border-t-2 border-gray-300 my-4" />,
-                    table: ({ ...props }) => <table {...props} className="w-full border-collapse border my-4" />,
-                    th: ({ ...props }) => <th {...props} className="border border-gray-300 px-3 py-2 text-left bg-gray-100" />,
+                    ul: ({ ...props }) => <ul {...props} className="list-disc list-inside pl-4 my-2" />,
+                    ol: ({ ...props }) => <ol {...props} className="list-decimal list-inside pl-4 my-2" />,
+                    li: ({ ...props }) => <li {...props} className="leading-relaxed" />,
+                    blockquote: ({ ...props }) => (
+                        <blockquote {...props} className="border-l-4 border-blue-400 pl-4 italic my-4 text-gray-600" />
+                    ),
+                    code: ({ ...props }) => (
+                        <code {...props} className="bg-gray-100 text-red-600 rounded px-2 py-1 text-sm" />
+                    ),
+                    pre: ({ ...props }) => (
+                        <pre {...props} className="bg-gray-900 text-white p-4 rounded-lg overflow-x-auto my-4" />
+                    ),
+                    img: ({ ...props }) => (
+                        <img {...props} className="rounded-md shadow-md mx-auto my-4 max-w-full h-auto" />
+                    ),
+                    hr: ({ ...props }) => <hr {...props} className="border-t-2 border-gray-300 my-6" />,
+                    table: ({ ...props }) => (
+                        <div className="overflow-x-auto my-4">
+                            <table {...props} className="w-full border-collapse border" />
+                        </div>
+                    ),
+                    th: ({ ...props }) => <th {...props} className="border border-gray-300 px-3 py-2 bg-gray-100 text-left" />,
                     td: ({ ...props }) => <td {...props} className="border border-gray-300 px-3 py-2" />,
+                    a: ({ ...props }) => (
+                        <a {...props} className="text-blue-600 underline hover:text-blue-800 transition-colors duration-200" />
+                    ),
                 }}
             >
                 {message}
             </ReactMarkdown>
+
         </div>
     );
 };

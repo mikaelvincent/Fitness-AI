@@ -38,6 +38,7 @@
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.28.0",
     "react-swipeable": "^7.0.2",
+    "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
