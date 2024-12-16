@@ -6,12 +6,14 @@ interface WeekHeaderContentProps {
   weekDates: Date[];
   currentDate: Date;
   onSelectDate: (date: Date) => void;
+  isAnimating: boolean;
 }
 
 const WeekHeaderContent = ({
   weekDates,
   currentDate,
   onSelectDate,
+  isAnimating,
 }: WeekHeaderContentProps) => {
   const isCurrentDate = (date: Date) => {
     return date.toDateString() === currentDate.toDateString();
@@ -28,6 +30,7 @@ const WeekHeaderContent = ({
       onSelectDate={onSelectDate}
       isToday={isToday}
       isCurrentDate={isCurrentDate}
+      isAnimating={isAnimating}
     />
   );
 };
