@@ -93,7 +93,7 @@ export const SetupWizard: React.FC = () => {
             case "gender":
                 return !!data.gender.trim();
             case "birthdate":
-                return !!data.birthdate;
+                return !!data.birthdate && isAtLeast13AtMost100(data.birthdate);
             case "measurement":
                 return ["metric", "imperial"].includes(data.measurement);
             case "weight":
