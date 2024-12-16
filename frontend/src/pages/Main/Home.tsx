@@ -22,16 +22,16 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
-import { convertDates } from "@/utils/convertDates.ts";
+import { convertDates, convertDatesFromObject } from "@/utils/convertDates.ts";
 import { DeleteActivities } from "@/services/exercises/DeleteActivities.ts";
 import {
   addChildToParent,
   flattenExercises,
   getAncestorChainExercises,
   getExerciseById,
+  locateNewExercise,
   recalculateAncestorsCompletion,
   removeExerciseFromTree,
-  replaceExerciseByPosition,
   toggleCompletionRecursive,
 } from "@/utils/ExerciseHelperFunction.ts";
 
@@ -273,6 +273,7 @@ const Home = () => {
       newExercise.name.trim() !== "" &&
       newExercise.type.trim() !== ""
     ) {
+      const originalExercises = exercises;
       const tempId = Date.now() * 10 + Math.floor(Math.random() * 10);
       const exDate = currentDate.toISOString().split("T")[0];
 
@@ -354,22 +355,67 @@ const Home = () => {
         });
 
         if (!response.success) {
-          throw new Error(response.message || "Failed to add/update activity");
+          setUpdateError();
+          setResponseMessage(response.message || "Failed to add the activity");
+          toast({
+            variant: "destructive",
+            title: "Failed to add activity",
+            description: response.message || "Failed to add activity",
+            duration: 500,
+          });
+
+          setExercises(originalExercises);
+          return;
         }
 
-        if (response.success && response.data) {
-          const savedExercise = convertDates(response.data as Exercise);
-          // Replace the temporary exercise in the frontend with the saved one from the backend.
-          setExercises((prev) =>
-            replaceExerciseByPosition(
-              prev,
-              savedExercise.parent_id,
-              savedExercise.position,
-              savedExercise,
-            ),
-          );
+        // Assuming `response.data` is an array of Exercise objects
+        const savedExercises = convertDatesFromObject(
+          response.data as Exercise[],
+        );
+
+        // Replace the temporary exercise in the frontend with the saved one from the backend.
+        const newExerciseFromBackend = locateNewExercise(
+          savedExercises, // Pass the array of saved exercises
+          exerciseToAdd.parent_id!, // Parent ID
+          exerciseToAdd.position!, // Position
+        );
+
+        if (newExerciseFromBackend) {
+          // Function to replace the temporary exercise with the saved one
+          const replaceTempExercise = (exercises: Exercise[]): Exercise[] => {
+            return exercises.map((ex) => {
+              if (ex.id === exerciseToAdd.id) {
+                return newExerciseFromBackend;
+              }
+              if (ex.children && ex.children.length > 0) {
+                return {
+                  ...ex,
+                  children: replaceTempExercise(ex.children),
+                };
+              }
+              return ex;
+            });
+          };
+
+          // Use a new variable name to avoid shadowing
+          const updatedExercisesFinal = replaceTempExercise(updatedExercises);
+
+          // Update the exercises state by replacing the temp exercise with the one from the backend
+          setExercises(updatedExercisesFinal);
+        } else {
+          // If for some reason the new exercise isn't found, you might want to refetch exercises
+          setExercises(originalExercises); // Revert to original exercises
+          setUpdateError();
+          setResponseMessage("Failed to add activity.");
+          toast({
+            variant: "destructive",
+            title: "Failed to add activity",
+            duration: 500,
+          });
+          return;
         }
 
+        // setExercises(updatedExercises);
         setNoExercises(false);
         setUpdateDone();
         setResponseMessage("Activity added successfully.");
@@ -391,10 +437,7 @@ const Home = () => {
           duration: 500,
         });
 
-        // Revert changes by refetching from the backend
-        fetchExercises().then(() => {
-          // Ensure the state is consistent after revert.
-        });
+        setExercises(originalExercises);
       }
     }
   };
