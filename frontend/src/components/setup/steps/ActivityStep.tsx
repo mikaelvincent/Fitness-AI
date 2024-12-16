@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 
 interface ActivityStepProps {
     activity: string;
@@ -20,8 +21,12 @@ export const ActivityStep: React.FC<ActivityStepProps> = ({ activity, onChange }
                     <button
                         key={act.value}
                         onClick={() => onChange("activity", act.value)}
-                        className={`p-4 rounded-lg border-2 transition-all text-center ${activity === act.value ? "bg-orange-500 border-orange-600 text-white" : "border-gray-300 text-gray-700"
-                            }`}
+                        className={clsx(
+                            "p-4 rounded-lg border-2 transition-all text-center",
+                            activity === act.value
+                                ? "bg-orange-500 border-orange-600 text-white"
+                                : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                        )}
                     >
                         {act.label}
                     </button>
