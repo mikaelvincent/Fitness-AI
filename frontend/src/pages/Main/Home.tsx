@@ -65,6 +65,7 @@ const Home = () => {
   const lastExerciseRef = useRef<HTMLDivElement>(null);
   const prevNewExerciseRef = useRef<typeof newExercise>(null);
   const [noExercises, setNoExercises] = useState<boolean>(false);
+  const [rerenderWeekHeader, setRerenderWeekHeader] = useState<boolean>(false);
 
   // Separate useStatus for updating activities
   const {
@@ -214,6 +215,7 @@ const Home = () => {
         }
       }
 
+      setRerenderWeekHeader(true);
       setResponseMessage("Activity toggled successfully.");
       setUpdateDone();
       toast({
@@ -517,7 +519,12 @@ const Home = () => {
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
-      <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate}>
+      <Calendar
+        currentDate={currentDate}
+        setCurrentDate={setCurrentDate}
+        rerenderWeekHeader={rerenderWeekHeader}
+        setRerenderWeekHeader={setRerenderWeekHeader}
+      >
         {status === "loading" && (
           <Skeleton className="h-[500px] w-[500px] rounded-xl" />
         )}
