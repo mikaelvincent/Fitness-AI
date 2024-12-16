@@ -11,6 +11,8 @@ interface WeekHeaderContentProps {
   currentDate: Date;
   onSelectDate: (date: Date) => void;
   isAnimating: boolean;
+  rerender: boolean;
+  setRerender: (rerender: boolean) => void;
 }
 
 const WeekHeaderContent = ({
@@ -18,6 +20,8 @@ const WeekHeaderContent = ({
   currentDate,
   onSelectDate,
   isAnimating,
+  rerender,
+  setRerender,
 }: WeekHeaderContentProps) => {
   const [activities, setActivities] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,8 +39,9 @@ const WeekHeaderContent = ({
   };
 
   useEffect(() => {
-    fetchActivities();
-  }, [weekDates, token]);
+    fetchActivities().then((r) => r);
+    setRerender(false);
+  }, [weekDates, token, rerender]);
 
   const fetchActivities = async () => {
     setLoading(true);

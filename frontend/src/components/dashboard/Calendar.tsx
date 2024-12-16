@@ -16,9 +16,17 @@ interface CalendarProps {
   children: ReactNode;
   currentDate: Date;
   setCurrentDate: Dispatch<SetStateAction<Date>>;
+  rerenderWeekHeader: boolean;
+  setRerenderWeekHeader: Dispatch<SetStateAction<boolean>>;
 }
 
-const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
+const Calendar = ({
+  children,
+  currentDate,
+  setCurrentDate,
+  rerenderWeekHeader,
+  setRerenderWeekHeader,
+}: CalendarProps) => {
   const [dayTransitionDirection, setDayTransitionDirection] = useState<
     "next" | "prev" | null
   >(null);
@@ -171,6 +179,8 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
                   currentDate={currentDate}
                   onSelectDate={selectDate}
                   isAnimating={isAnimating}
+                  rerender={rerenderWeekHeader}
+                  setRerender={setRerenderWeekHeader}
                 />
               </SwipableWeekHeader>
             </AnimatePresence>
