@@ -1,4 +1,5 @@
 import { ENV } from "@/utils/env";
+import { logout } from "@/services/auth/authService.ts";
 
 interface ConfirmTwoFactorAuthResponse {
   success: boolean;
@@ -44,6 +45,10 @@ export const ConfirmTwoFactorAuth = async ({
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Trigger logout if unauthorized
+        logout();
+      }
       return {
         success: false,
         message:

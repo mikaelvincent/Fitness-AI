@@ -1,6 +1,7 @@
 import { ENV } from "@/utils/env.ts";
 import { ChangePasswordSchema } from "@/utils/schema/ChangePasswordSchema.ts";
 import { z } from "zod";
+import { logout } from "@/services/auth/authService.ts";
 
 interface ChangePasswordRequestResponse {
   success: boolean;
@@ -47,6 +48,10 @@ export const ChangePasswordRequest = async ({
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Trigger logout if unauthorized
+        logout();
+      }
       return {
         success: false,
         message: responseData.message,

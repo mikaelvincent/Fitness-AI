@@ -1,4 +1,5 @@
 import { ENV } from "@/utils/env";
+import { logout } from "@/services/auth/authService.ts";
 
 export interface twoFactorAuthData {
   qr_code_url: string;
@@ -43,6 +44,10 @@ export const EnableTwoFactorAuth = async (
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Trigger logout if unauthorized
+        logout();
+      }
       return {
         success: false,
         message:

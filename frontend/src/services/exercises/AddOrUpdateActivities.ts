@@ -2,6 +2,7 @@
 
 import { ENV } from "@/utils/env.ts";
 import { Exercise } from "@/types/exerciseTypes.ts";
+import { logout } from "@/services/auth/authService.ts";
 
 interface AddOrUpdateActivitiesResponse {
   success: boolean;
@@ -73,6 +74,10 @@ export const AddOrUpdateActivities = async ({
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Trigger logout if unauthorized
+        logout();
+      }
       return {
         success: false,
         message: responseData.message,
