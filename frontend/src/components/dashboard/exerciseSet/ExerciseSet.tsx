@@ -355,7 +355,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                 {/* Metrics Section */}
                 <div className="space-y-2">
                   <h4 className="font-semibold">Metrics:</h4>
-                  {exercise.metrics?.map((metric, index) => (
+                  {(Array.isArray(exercise.metrics) ? exercise.metrics : []).map((metric, index) => (
                     <div
                       key={index}
                       className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"

@@ -87,7 +87,7 @@ const Progress = () => {
     setCurrentDate(date);
     // Navigate to the week view route, e.g., /?date=yyyy-MM-dd
     const formattedDate = format(date, "yyyy-MM-dd");
-    navigate(`/?date=${formattedDate}`);
+    navigate(`/dashboard?date=${formattedDate}`);
   };
 
   // Instead of relying on internal state in MonthViewCalendar,
