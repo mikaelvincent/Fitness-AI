@@ -38,7 +38,7 @@ class SessionController extends Controller
      * @response 422 {
      *   "message": "The two-factor authentication code is invalid."
      * }
-     * 
+     *
      * @response 429 {
      *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
      *   "retry_after": 60
@@ -47,7 +47,7 @@ class SessionController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
@@ -56,7 +56,7 @@ class SessionController extends Controller
         /** @var User $user */
         $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'message' => 'Invalid email or password provided.',
             ], 401);
@@ -67,13 +67,33 @@ class SessionController extends Controller
                 'two_factor_code' => ['required', 'string'],
             ]);
 
-            $google2fa = new \PragmaRX\Google2FA\Google2FA();
-            $secretKey = decrypt($user->two_factor_secret);
+            $twoFactorCode = $request->input('two_factor_code');
+            $google2fa     = new \PragmaRX\Google2FA\Google2FA();
 
-            if (!$google2fa->verifyKey($secretKey, $request->two_factor_code)) {
+            try {
+                $secretKey = decrypt($user->two_factor_secret);
+            } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
                 return response()->json([
-                    'message' => 'The two-factor authentication code is invalid.',
-                ], 422);
+                    'message' => 'Invalid two-factor authentication secret.',
+                ], 500);
+            }
+
+            // Verify the two-factor authentication code
+            if (! $google2fa->verifyKey($secretKey, $twoFactorCode)) {
+                // Check if the provided code matches a recovery code
+                $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
+
+                if (in_array($twoFactorCode, $recoveryCodes)) {
+                    // Invalidate the used recovery code
+                    $remainingCodes = array_diff($recoveryCodes, [$twoFactorCode]);
+                    $user->forceFill([
+                        'two_factor_recovery_codes' => encrypt(json_encode($remainingCodes)),
+                    ])->save();
+                } else {
+                    return response()->json([
+                        'message' => 'The two-factor authentication code is invalid.',
+                    ], 422);
+                }
             }
         }
 
@@ -81,7 +101,7 @@ class SessionController extends Controller
 
         return response()->json([
             'message' => 'Login successful. You are now authenticated.',
-            'data' => [
+            'data'    => [
                 'token' => $token,
             ],
         ], 200);
@@ -98,7 +118,7 @@ class SessionController extends Controller
      * @response 200 {
      *   "message": "You have been successfully logged out."
      * }
-     * 
+     *
      * @response 429 {
      *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
      *   "retry_after": 60
