@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "97e64a24-2f40-4253-aaa7-9e9ab0513ea6",
+        "_postman_id": "9a2292c7-c477-4dcb-9b22-4449e431dcfb",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -337,7 +337,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T11:59:40\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
+                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T14:42:55\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
                         },
                         "description": "",
                         "auth": {
@@ -653,7 +653,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"email\":\"freddy.balistreri@example.org\"}"
+                            "raw": "{\"email\":\"freddy.balistreri@example.org\",\"user_attributes\":[]}"
                         },
                         "description": "Generates a registration token and sends a verification email.",
                         "auth": {
@@ -664,13 +664,13 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"Registration process has been initiated. Please check your email for further instructions.\"\n}",
+                            "body": "{\n \"message\": \"Registration process has been initiated. Please check your email for further instructions.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -708,13 +708,13 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"A new verification email has been sent to your address.\"\n}",
+                            "body": "{\n \"message\": \"A new verification email has been sent to your address.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -752,19 +752,19 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\n  \"message\": \"The registration token is valid.\",\n  \"data\": {\n    \"expires_in\": 3600\n  }\n}",
+                            "body": "{\n \"message\": \"The registration token is valid.\",\n \"data\": {\n     \"expires_in\": 3600\n }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 400,
-                            "body": "{\n  \"message\": \"The registration token is invalid or has expired.\"\n}",
+                            "body": "{\n \"message\": \"The registration token is invalid or has expired.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
@@ -802,19 +802,19 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\n  \"message\": \"Registration completed successfully. Welcome aboard!\",\n  \"data\": {\n    \"token\": \"example-token\"\n  }\n}",
+                            "body": "{\n \"message\": \"Registration completed successfully. Welcome aboard!\",\n \"data\": {\n     \"token\": \"example-token\"\n }\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 400,
-                            "body": "{\n  \"message\": \"The registration token provided is invalid or has expired.\"\n}",
+                            "body": "{\n \"message\": \"The registration token provided is invalid or has expired.\"\n}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 429,
-                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
+                            "body": "{\n \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n \"retry_after\": 60\n}",
                             "name": ""
                         }
                     ]
