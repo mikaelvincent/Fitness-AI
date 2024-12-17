@@ -24,10 +24,10 @@ class TwoFactorController extends Controller
      *   "message": "Two-factor authentication enabled.",
      *   "data": {
      *     "qr_code_url": "otpauth://totp/AppName:user@example.com?secret=ABCDEF...",
-     *     "recovery_codes": ["code1", "code2", "..."]
+     *     "recovery_codes": ["12345678", "87654321", "..."]
      *   }
      * }
-     * 
+     *
      * @response 429 {
      *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
      *   "retry_after": 60
@@ -37,7 +37,7 @@ class TwoFactorController extends Controller
     {
         $user = $request->user();
 
-        if ($user->two_factor_secret) {
+        if ($user->two_factor_confirmed_at) {
             return response()->json([
                 'message' => 'Two-factor authentication is already enabled.',
             ], 400);
@@ -47,8 +47,9 @@ class TwoFactorController extends Controller
         $secretKey = $google2fa->generateSecretKey();
 
         $user->forceFill([
-            'two_factor_secret' => encrypt($secretKey),
+            'two_factor_secret'         => encrypt($secretKey),
             'two_factor_recovery_codes' => encrypt(json_encode($this->generateRecoveryCodes())),
+            'two_factor_confirmed_at'   => null,
         ])->save();
 
         $qrCodeUrl = $google2fa->getQRCodeUrl(
@@ -59,8 +60,8 @@ class TwoFactorController extends Controller
 
         return response()->json([
             'message' => 'Two-factor authentication enabled.',
-            'data' => [
-                'qr_code_url' => $qrCodeUrl,
+            'data'    => [
+                'qr_code_url'    => $qrCodeUrl,
                 'recovery_codes' => json_decode(decrypt($user->two_factor_recovery_codes), true),
             ],
         ], 200);
@@ -79,7 +80,11 @@ class TwoFactorController extends Controller
      * @response 200 {
      *   "message": "Two-factor authentication confirmed."
      * }
-     * 
+     *
+     * @response 422 {
+     *   "message": "Invalid two-factor authentication code."
+     * }
+     *
      * @response 429 {
      *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
      *   "retry_after": 60
@@ -93,11 +98,16 @@ class TwoFactorController extends Controller
 
         $user = $request->user();
 
-        // Check if two-factor authentication is enabled
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             return response()->json([
                 'message' => 'Two-factor authentication is not enabled.',
             ], 404);
+        }
+
+        if ($user->two_factor_confirmed_at) {
+            return response()->json([
+                'message' => 'Two-factor authentication is already confirmed.',
+            ], 400);
         }
 
         $google2fa = new Google2FA();
@@ -110,7 +120,7 @@ class TwoFactorController extends Controller
             ], 500);
         }
 
-        if (!$google2fa->verifyKey($secretKey, $request->code)) {
+        if (! $google2fa->verifyKey($secretKey, $request->code)) {
             return response()->json([
                 'message' => 'Invalid two-factor authentication code.',
             ], 422);
@@ -136,7 +146,11 @@ class TwoFactorController extends Controller
      * @response 200 {
      *   "message": "Two-factor authentication disabled."
      * }
-     * 
+     *
+     * @response 400 {
+     *   "message": "Two-factor authentication is not enabled."
+     * }
+     *
      * @response 429 {
      *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
      *   "retry_after": 60
@@ -146,16 +160,16 @@ class TwoFactorController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_confirmed_at) {
             return response()->json([
                 'message' => 'Two-factor authentication is not enabled.',
             ], 400);
         }
 
         $user->forceFill([
-            'two_factor_secret' => null,
+            'two_factor_secret'         => null,
             'two_factor_recovery_codes' => null,
-            'two_factor_confirmed_at' => null,
+            'two_factor_confirmed_at'   => null,
         ])->save();
 
         return response()->json([
@@ -171,7 +185,7 @@ class TwoFactorController extends Controller
     protected function generateRecoveryCodes()
     {
         return collect(range(1, 8))->map(function () {
-            return Str::random(10) . '-' . Str::random(10);
+            return (string) random_int(10000000, 99999999);
         })->all();
     }
 }
