@@ -43,7 +43,7 @@ const LandingPage: React.FC = () => {
             </section>
 
             <section className="z-50 xl:rounded-md md:h-[450px] w-full bg-lightYellow dark:bg-dot-white/[0.2] bg-dot-black/[0.2] mx-auto py-10 mt-20 lg:mb-20 shadow-[4px_4px_0px_black] shadow-black">
-                <h1 className="text-center font-bold tracking-widest text-outerCard text-xl">REACH YOUR FITNESS GOALS</h1>
+                <h1 className="text-center font-bold tracking-widest text-outerCard text-4xl">REACH YOUR FITNESS GOALS</h1>
                 <div className="w-full grid grid-cols-1 grid-rows-3 md:grid-cols-3 md:grid-rows-1 p-5 gap-5 md:gap-8 lg:gap-10">
                     <div className="flex flex-col transition-all duration-300 hover:scale-[1.05] justify-center gap-5 items-center py-0">
                         <MdTrackChanges className="h-32 w-32 flex-shrink-0 text-outerCard" fill='hsl(var(--primary))' />
