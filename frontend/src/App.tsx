@@ -35,6 +35,8 @@ const App = () => {
       <Router>
         <Toaster />
         <Routes>
+          <Route index element={<LandingPage />} />
+
           {/* Protected Routes */}
           <Route
             path="/"
