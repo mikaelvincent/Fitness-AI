@@ -211,6 +211,7 @@ export const SetupWizard: React.FC = () => {
               stepId={currentStep.id}
               data={data}
               onChange={handleChange}
+              setCurrentStep={setCurrentStepIndex}
             />
             {isSubmitting && (
               <div className="mt-4 text-center text-sm text-gray-500">
