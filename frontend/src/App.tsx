@@ -23,6 +23,10 @@ import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentic
 
 import ChatPage from "./pages/ChatPage.tsx";
 
+// Import ProtectedRoute and PublicRoute components
+import ProtectedRoute from "@/components/protected-routes/ProtectedRoute";
+import PublicRoute from "@/components/protected-routes/PublicRoute";
+
 import LandingPage from "./pages/LandingPage.tsx";
 
 const App = () => {
@@ -30,64 +34,20 @@ const App = () => {
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
       <Router>
         <Toaster />
-        {/*Uncomment for protected routes*/}
-        {/*<Routes>*/}
-        {/*    /!* Main layout routes *!/*/}
-        {/*<Route*/}
-        {/*  path="/"*/}
-        {/*  element={*/}
-        {/*    <ProtectedRoute>*/}
-        {/*      <MainLayout />*/}
-        {/*    </ProtectedRoute>*/}
-        {/*  }*/}
-        {/*>*/}
-        {/*  /!* Root Route *!/*/}
-        {/*  <Route index element={<Home />} />*/}
-
-        {/*  /!* Progress Route *!/*/}
-        {/*  <Route path="progress" element={<Progress />} />*/}
-
-        {/*  /!* Profile Routes *!/*/}
-        {/*  <Route path="profile">*/}
-        {/*    /!* Default Profile Page *!/*/}
-        {/*    <Route index element={<Profile />} />*/}
-
-        {/*    /!* Nested Profile Actions *!/*/}
-        {/*    <Route path="update-profile" element={<UpdateProfile />} />*/}
-        {/*    <Route path="change-password" element={<ChangePassword />} />*/}
-        {/*    <Route*/}
-        {/*      path="two-factor-authentication"*/}
-        {/*      element={<TwoFactorAuthentication />}*/}
-        {/*    />*/}
-        {/*  </Route>*/}
-        {/*</Route>*/}
-
-        {/*<Route path="chat" element={<ProtectedRoute><Chat/></ProtectedRoute>}>}/>*/}
-        {/*<Route path="chat" element={<ProtectedRoute><ChatPage/></ProtectedRoute>}>}/>*/}
-
-        {/*    /!* Authentication layout routes *!/*/}
-        {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
-        {/*        <Route path="login" element={<Login/>}/>*/}
-        {/*        <Route path="complete-registration" element={<Register/>}/>*/}
-        {/*        <Route path="verify-email" element={<VerifyEmail/>}/>*/}
-        {/*        <Route path="forgot-password" element={<ForgotPassword/>}/>*/}
-        {/*        <Route path="reset-password" element={<ResetPassword/>}/>*/}
-        {/*    </Route>*/}
-
-        {/*    /!* Catch-all route for 404 *!/*/}
-        {/*    <Route path="*" element={<ProtectedRoute> <NotFound/> </ProtectedRoute>}/>*/}
-        {/*</Routes>*/}
-
-        {/*For development to remove protected routes*/}
-
         <Routes>
-          {/* Main layout routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/Home" element={<MainLayout />}>
+          {/* Protected Routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
             {/* Root Route */}
-            <Route index element={<Home />} />
+            <Route path="dashboard" element={<Home />} />
 
-            {/* Other Top-Level Routes */}
+            {/* Progress Route */}
             <Route path="progress" element={<Progress />} />
 
             {/* Profile Routes */}
@@ -104,25 +64,50 @@ const App = () => {
             </Route>
           </Route>
 
-          <Route path="/chat" element={<ChatPage />} />
-
-          {/* Setup process with its own context and layout */}
-          {/* Single route for setup wizard */}
+          {/* Chat Route */}
           <Route
-            path="/setup"
+            path="/chat"
             element={
-              <SetupProvider>
-                <SetupLayout />
-              </SetupProvider>
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Setup Routes */}
+          <Route
+            path="/setup/*"
+            element={
+              <PublicRoute>
+                <SetupProvider>
+                  <SetupLayout />
+                </SetupProvider>
+              </PublicRoute>
             }
           >
             <Route index element={<SetupWizard />} />
+            {/* Add more nested setup routes here if needed */}
           </Route>
 
-          <Route path="/initial-chat" element={<ChatPage />} />
+          {/* Initial Chat Route */}
+          <Route
+            path="/initial-chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Authentication layout routes */}
-          <Route path="/" element={<AuthLayout />}>
+          {/* Public Routes */}
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <AuthLayout />
+              </PublicRoute>
+            }
+          >
             <Route path="login" element={<Login />} />
             <Route path="complete-registration" element={<Register />} />
             <Route path="verify-email" element={<VerifyEmail />} />
@@ -130,8 +115,15 @@ const App = () => {
             <Route path="reset-password" element={<ResetPassword />} />
           </Route>
 
-          {/* Catch-all route for 404 */}
-          <Route path="*" element={<NotFound />} />
+          {/* Catch-all Route for 404 */}
+          <Route
+            path="*"
+            element={
+              <ProtectedRoute>
+                <NotFound />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </ThemeProvider>

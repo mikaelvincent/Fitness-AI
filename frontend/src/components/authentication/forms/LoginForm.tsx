@@ -59,7 +59,7 @@ const LoginForm = ({
       label="Welcome to Fitness AI"
       title="Login"
       backLabel="Don't have an account?"
-      backButtonHref="/verify-email"
+      backButtonHref="/setup"
       backButtonLabel="Register here"
       logo="none"
     >
