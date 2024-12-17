@@ -16,7 +16,7 @@ import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
 import { Toaster } from "@/components/ui/toaster";
 
 import SetupLayout from "./layout/SetupLayout.tsx";
-import { SetupProvider } from "./pages/setup/SetupContext";
+import { SetupProvider } from "./components/setup/SetupContext.tsx";
 import SetupWizard from "./pages/setup/SetupWizard";
 import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
 import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";

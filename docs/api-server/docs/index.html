@@ -112,6 +112,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-chat">
                                 <a href="#endpoints-POSTapi-chat">Handle chat requests.</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-PUTapi-user-profile-name">
+                                <a href="#endpoints-PUTapi-user-profile-name">Update the authenticated user's name.</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-password-management" class="tocify-header">
@@ -1463,7 +1466,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"activities\": [
         {
             \"id\": 10,
-            \"date\": \"2024-12-14T03:47:16\",
+            \"date\": \"2024-12-17T04:44:29\",
             \"parent_id\": 10,
             \"position\": 10,
             \"name\": \"cjanyizogaho\",
@@ -1490,7 +1493,7 @@ let body = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-14T03:47:16",
+            "date": "2024-12-17T04:44:29",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1522,7 +1525,7 @@ $response = $client-&gt;put(
             'activities' =&gt; [
                 [
                     'id' =&gt; 10,
-                    'date' =&gt; '2024-12-14T03:47:16',
+                    'date' =&gt; '2024-12-17T04:44:29',
                     'parent_id' =&gt; 10,
                     'position' =&gt; 10,
                     'name' =&gt; 'cjanyizogaho',
@@ -1547,7 +1550,7 @@ payload = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-14T03:47:16",
+            "date": "2024-12-17T04:44:29",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1665,10 +1668,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="activities.0.date"                data-endpoint="PUTapi-activities"
-               value="2024-12-14T03:47:16"
+               value="2024-12-17T04:44:29"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2024-12-14T03:47:16</code></p>
+<p>Must be a valid date. Example: <code>2024-12-17T04:44:29</code></p>
                     </div>
                                                                 <div style="margin-left: 14px; clear: unset;">
                         <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
@@ -2210,6 +2213,187 @@ Must be one of:
 
 Must be one of:
 <ul style="list-style-type: square;"><li><code>updateUserAttributes</code></li> <li><code>deleteUserAttributes</code></li> <li><code>getActivities</code></li> <li><code>updateActivities</code></li> <li><code>deleteActivities</code></li></ul>
+        </div>
+        </form>
+
+                    <h2 id="endpoints-PUTapi-user-profile-name">Update the authenticated user&#039;s name.</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-PUTapi-user-profile-name">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PUT \
+    "http://127.0.0.1:8000/api/user/profile/name" \
+    --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"name\": \"mcjanyizogah\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1:8000/api/user/profile/name"
+);
+
+const headers = {
+    "Authorization": "Bearer {YOUR_AUTH_KEY}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "name": "mcjanyizogah"
+};
+
+fetch(url, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://127.0.0.1:8000/api/user/profile/name';
+$response = $client-&gt;put(
+    $url,
+    [
+        'headers' =&gt; [
+            'Authorization' =&gt; 'Bearer {YOUR_AUTH_KEY}',
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'name' =&gt; 'mcjanyizogah',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+
+<div class="python-example">
+    <pre><code class="language-python">import requests
+import json
+
+url = 'http://127.0.0.1:8000/api/user/profile/name'
+payload = {
+    "name": "mcjanyizogah"
+}
+headers = {
+  'Authorization': 'Bearer {YOUR_AUTH_KEY}',
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+response = requests.request('PUT', url, headers=headers, json=payload)
+response.json()</code></pre></div>
+
+</span>
+
+<span id="example-responses-PUTapi-user-profile-name">
+</span>
+<span id="execution-results-PUTapi-user-profile-name" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PUTapi-user-profile-name"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PUTapi-user-profile-name"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PUTapi-user-profile-name" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PUTapi-user-profile-name">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PUTapi-user-profile-name" data-method="PUT"
+      data-path="api/user/profile/name"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-user-profile-name', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PUTapi-user-profile-name"
+                    onclick="tryItOut('PUTapi-user-profile-name');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PUTapi-user-profile-name"
+                    onclick="cancelTryOut('PUTapi-user-profile-name');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PUTapi-user-profile-name"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-darkblue">PUT</small>
+            <b><code>api/user/profile/name</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PUTapi-user-profile-name"
+               value="Bearer {YOUR_AUTH_KEY}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {YOUR_AUTH_KEY}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PUTapi-user-profile-name"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PUTapi-user-profile-name"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="name"                data-endpoint="PUTapi-user-profile-name"
+               value="mcjanyizogah"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>mcjanyizogah</code></p>
         </div>
         </form>
 

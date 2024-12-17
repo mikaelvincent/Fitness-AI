@@ -1,19 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-
-export interface SetupData {
-    gender: string;
-    birthdateDay: string;
-    birthdateMonth: string;
-    birthdateYear: string;
-    measurement: "imperial" | "metric";
-    weight: number; // We'll store in a base unit, e.g. kg if metric chosen, else lbs.
-    weightUnit: "kg" | "lbs";
-    height: number; // Store in a base unit, e.g. cm if metric chosen, else inches.
-    heightUnit: "cm" | "in";
-    activity: string;
-    nickname: string;
-}
-
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { SetupData } from "@/types/setupTypes";
 interface SetupContextType {
     data: SetupData;
     updateData: (partial: Partial<SetupData>) => void;
@@ -24,21 +10,19 @@ const SetupContext = createContext<SetupContextType | undefined>(undefined);
 export const SetupProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [data, setData] = useState<SetupData>({
         gender: "",
-        birthdateDay: "",
-        birthdateMonth: "",
-        birthdateYear: "",
+        birthdate: "",
         measurement: "metric",
-        weight: 70, // default weight in kg
+        weight: 70,
         weightUnit: "kg",
-        height: 170, // default height in cm
+        height: 170,
         heightUnit: "cm",
         activity: "sedentary",
         nickname: "",
     });
 
-    const updateData = (partial: Partial<SetupData>) => {
-        setData((prev) => ({ ...prev, ...partial }));
-    };
+    const updateData = useCallback((newData: any) => {
+        setData((prevData: any) => ({ ...prevData, ...newData }));
+    }, []);
 
     return (
         <SetupContext.Provider value={{ data, updateData }}>
