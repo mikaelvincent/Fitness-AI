@@ -56,7 +56,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                             variant="outline"
                         >
                             <MdOutlineInfo size={24} />
-                            <span className="ml-1 text-sm font-medium hover:underline-offset-1">Fitness Profile</span>
+                            <span className="chat-fitness-profile-button ml-1 text-sm font-medium hover:underline-offset-1">Fitness Profile</span>
                         </Button>
                     ) : (
                         <Button

@@ -23,7 +23,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     return (
         <div className="flex-1 flex flex-col justify-end p-4 relative">
             <div className="absolute inset-0 top-0 bottom-0 overflow-y-auto p-4">
-                <div className="flex flex-col gap-2">
+                <div className="chat-messages flex flex-col gap-2">
                     {currentView === "chat" ? (
                         messages.map((msg, index) => (
                             <MessageBubble key={index} message={msg.content} sender={msg.role} tools={msg.tools} />

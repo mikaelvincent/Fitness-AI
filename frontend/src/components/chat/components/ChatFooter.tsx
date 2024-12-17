@@ -28,7 +28,7 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ onSend, isLoading, showInput })
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 rounded-lg px-4 py-2"
+                className="chat-input flex-1 rounded-lg px-4 py-2"
             />
             <Button
                 type="submit"

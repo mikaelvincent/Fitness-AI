@@ -1,9 +1,12 @@
-import React from "react";
+// src/pages/chat/ChatInterface.tsx
+
+import React, { useEffect, useState } from "react";
 import ChatHeader from "./components/ChatHeader";
 import ChatMessages from "./components/ChatMessages";
 import ChatFooter from "./components/ChatFooter";
 import { useChat } from "../../hooks/useChat";
 import { useNavigate } from "react-router-dom";
+import ChatTutorial from "./components/ChatTutorial"; // Import the tutorial component
 
 const INITIAL_AI_MESSAGE = [
   {
@@ -38,10 +41,21 @@ const ChatInterface: React.FC = () => {
     switchToChat,
   } = useChat({ initialMessages: INITIAL_AI_MESSAGE });
 
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem("chatTutorialSeen");
+    if (!hasSeenTutorial) {
+      setShowTutorial(true);
+      localStorage.setItem("chatTutorialSeen", "true");
+    }
+  }, []);
+
   const handleGenerateWorkout = () => navigate("/dashboard");
 
   return (
-    <div className="mx-2 flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
+    <div className="chat mx-2 flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
+      {showTutorial && <ChatTutorial />}
       <ChatHeader
         currentView={currentView}
         onGenerateWorkout={handleGenerateWorkout}
