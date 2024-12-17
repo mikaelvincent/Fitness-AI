@@ -31,9 +31,8 @@ export interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
   isUpdateName: boolean;
   onEditName: () => void;
-  onSaveName: () => void;
+  onSaveName: any;
   onCancelEditName: () => void;
-  onNameChange: (newName: string) => void;
   handleNavigation: (path: string) => void;
   attributes: Attribute[]; // Updated to an array of Attribute objects
   form: UseFormReturn<z.infer<typeof UpdateNameSchema>>;
@@ -45,7 +44,6 @@ export default function ProfileDashboardUI({
   onEditName,
   onSaveName,
   onCancelEditName,
-  onNameChange,
   handleNavigation,
   attributes,
   form,
@@ -81,12 +79,7 @@ export default function ProfileDashboardUI({
                         render={({ field }) => (
                           <FormItem className="w-full flex-1">
                             <FormControl>
-                              <Input
-                                {...field}
-                                type="text"
-                                value={profileInfo.name}
-                                onChange={(e) => onNameChange(e.target.value)}
-                              />
+                              <Input {...field} type="text" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
