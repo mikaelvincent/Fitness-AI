@@ -26,17 +26,13 @@ class ChatService
      * If a tool call is requested by the model, this method executes the tool and then prompts the model again
      * for a follow-up response.
      *
-     * @param int $userId The authenticated user's ID.
-     * @param array $userMessages A list of messages sent by the user and/or assistant. Each element is an associative array:
-     *                            [
-     *                              'role' => 'user'|'assistant',
-     *                              'content' => string
-     *                            ]
-     * @param array $context Contextual data (user attributes and recent activities) retrieved by ChatContextService.
-     * @param bool $stream If true, enables streaming responses.
-     * @param array $selectedTools A list of tool names that the assistant can use.
+     * @param int $userId
+     * @param array $userMessages
+     * @param array $context
+     * @param bool $stream
+     * @param array $selectedTools
      *
-     * @return string|iterable The response from the model, or an iterable if streaming is enabled.
+     * @return string|iterable|array
      */
     public function getResponse(int $userId, array $userMessages, array $context, bool $stream = false, array $selectedTools = [])
     {
@@ -66,21 +62,7 @@ class ChatService
             ];
         }
 
-        /**
-         * Refined tool definitions:
-         *
-         * These tools are available for the assistant to perform certain actions on behalf of the user.
-         * Each tool has a "function" definition that includes:
-         * - name: The tool's identifier.
-         * - description: A detailed explanation of what the tool does, when it should be used, and how it behaves.
-         * - parameters: The schema defining the expected input parameters for the tool. This includes the types, formats,
-         *   and requirements of each parameter. These parameters dictate what data the assistant can and should provide
-         *   when invoking the tool.
-         *
-         * The tools manage user attributes and activities, enabling the assistant to help the user update their profile,
-         * view and record their fitness activities, and maintain an accurate fitness log.
-         */
-
+        // Tool definitions
         $allTools = [
             [
                 'type' => 'function',
@@ -150,7 +132,7 @@ class ChatService
                 'type' => 'function',
                 'function' => [
                     'name' => 'updateActivities',
-                    'description' => 'Use this tool to add new activities or update existing ones in the user\'s activity log. Activities represent any recorded fitness-related action, such as "running", "bench press", or "meditation session". Each activity object must include "date" (a string in YYYY-MM-DD format) and "name" (a short, descriptive string, e.g., "Morning Run"). Optional fields include "id" (if updating an existing activity), "parent_id" (if this activity is grouped under another activity), "position" (an integer ordering within a set), "description" (a longer text), "notes" (additional user comments), "metrics" (an object storing numerical or descriptive measures like {"distance_km": 5, "duration_min": 30}), and "completed" (a boolean to indicate whether the user considers this activity done). If "completed" is true, related hierarchical updates may propagate to parent or child activities. Use this tool when the user provides new activities to log or updates details of existing activities.',
+                    'description' => 'Use this tool to add new activities or update existing ones in the user\'s activity log. Activities represent any recorded fitness-related action, such as "running", "bench press", or "meditation session". Each activity object must include "date" (a string in YYYY-MM-DD format) and "name" (a short, descriptive string, e.g., "Morning Run"). Optional fields include "id" (if updating an existing activity), "parent_id" (if this activity is grouped under another activity), "position" (an integer ordering within a set), "description" (a longer text), "notes" (additional user comments), "metrics" (an object storing numerical or descriptive measures like {"repetitions": 20, "weight": "3 kg"}), and "completed" (a boolean to indicate whether the user considers this activity done). If "completed" is true, related hierarchical updates may propagate to parent or child activities. Use this tool when the user provides new activities to log or updates details of existing activities.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -241,7 +223,8 @@ class ChatService
 
         try {
             if ($stream) {
-                $response = OpenAI::chat()->createStreamed([
+                // Initial streaming request
+                $response = OpenAI::chat()->create([
                     'model' => $model,
                     'messages' => $messages,
                     'tools' => $tools,
@@ -263,7 +246,7 @@ class ChatService
             // Attempt fallback model
             try {
                 if ($stream) {
-                    $response = OpenAI::chat()->createStreamed([
+                    $response = OpenAI::chat()->create([
                         'model' => $fallbackModel,
                         'messages' => $messages,
                         'tools' => $tools,
@@ -290,89 +273,25 @@ class ChatService
             }
         }
 
-        if ($stream) {
-            return $response;
-        }
+        $executedToolCalls = [];
 
-        $choice = $response->choices[0];
-        if (!empty($choice->message->toolCalls)) {
-            $toolCall = $choice->message->toolCalls[0];
-            $toolName = $toolCall->function->name;
-            $arguments = json_decode($toolCall->function->arguments, true);
+        // Process tool calls until none remain, ensuring a final user response
+        $finalContent = $this->processToolCalls($userId, $tools, $model, $messages, $response, $executedToolCalls, $fallbackModel, $stream);
 
-            Log::info('Executing tool call.', [
-                'user_id' => $userId,
-                'tool_name' => $toolName,
-                'arguments' => $arguments
-            ]);
-
-            $toolResult = $this->executeTool($userId, $toolName, $arguments);
-
-            $messages[] = [
-                'role' => 'function',
-                'name' => $toolName,
-                'content' => json_encode($toolResult),
-            ];
-
-            try {
-                if (!isset($toolResult['message'])) {
-                    $toolResult['message'] = 'Tool call completed.';
-                }
-
-                if ($stream) {
-                    $followUpResponse = OpenAI::chat()->createStreamed([
-                        'model' => $model,
-                        'messages' => $messages,
-                        'tools' => $tools,
-                    ]);
-                } else {
-                    $followUpResponse = OpenAI::chat()->create([
-                        'model' => $model,
-                        'messages' => $messages,
-                        'tools' => $tools,
-                    ]);
-                }
-
-                if (!isset($followUpResponse->choices[0]->message->content)) {
-                    return 'No response generated. Please try again.';
-                }
-
-                Log::info('Response generated after tool call.', [
-                    'user_id' => $userId,
-                ]);
-
-                return trim($followUpResponse->choices[0]->message->content);
-
-            } catch (Exception $e) {
-                Log::error('OpenAI follow-up request after tool call failed.', [
-                    'user_id' => $userId,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-
-                return 'An error occurred while processing your request. Please try again later.';
-            }
-        }
-
-        if (!isset($choice->message->content)) {
-            return 'No response generated. Please try again.';
-        }
-
-        Log::info('Response generated successfully without tool calls.', [
-            'user_id' => $userId,
-        ]);
-
-        return trim($choice->message->content);
+        return [
+            'response' => $finalContent,
+            'executed_tool_calls' => $executedToolCalls
+        ];
     }
 
     /**
      * Execute a specific tool based on provided arguments.
      *
-     * @param int $userId The ID of the current user.
-     * @param string $toolName The name of the tool to be executed.
-     * @param array $arguments The arguments to pass to the tool.
+     * @param int $userId
+     * @param string $toolName
+     * @param array $arguments
      *
-     * @return array The result returned by the executed tool.
+     * @return array
      */
     protected function executeTool(int $userId, string $toolName, array $arguments): array
     {
@@ -398,6 +317,145 @@ class ChatService
                     'tool_name' => $toolName
                 ]);
                 return ['message' => 'Tool not recognized.'];
+        }
+    }
+
+    /**
+     * Handle multiple tool calls if any, and ensure a final user-facing response.
+     *
+     * @param int $userId
+     * @param array $tools
+     * @param string $model
+     * @param array $messages
+     * @param mixed $response
+     * @param array &$executedToolCalls
+     * @param string $fallbackModel
+     * @param bool $stream
+     *
+     * @return string
+     */
+    protected function processToolCalls(
+        int $userId,
+        array $tools,
+        string $model,
+        array &$messages,
+        $response,
+        array &$executedToolCalls,
+        string $fallbackModel,
+        bool $stream
+    ): string {
+        // Loop until no more tool calls are returned
+        while (true) {
+            $choice = $response->choices[0];
+            $toolCalls = $choice->message->toolCalls ?? [];
+
+            if (empty($toolCalls)) {
+                // No tool calls, return final response
+                if (!isset($choice->message->content)) {
+                    return 'No response generated. Please try again.';
+                }
+
+                Log::info('Response generated successfully without further tool calls.', [
+                    'user_id' => $userId,
+                ]);
+
+                return trim($choice->message->content);
+            }
+
+            // Execute each tool call in sequence
+            foreach ($toolCalls as $toolCall) {
+                $toolName = $toolCall->function->name;
+                $arguments = json_decode($toolCall->function->arguments, true);
+
+                Log::info('Executing tool call.', [
+                    'user_id' => $userId,
+                    'tool_name' => $toolName,
+                    'arguments' => $arguments
+                ]);
+
+                $toolResult = $this->executeTool($userId, $toolName, $arguments);
+                $executedToolCalls[] = [
+                    'tool_name' => $toolName,
+                    'arguments' => $arguments,
+                    'result' => $toolResult,
+                ];
+
+                $messages[] = [
+                    'role' => 'function',
+                    'name' => $toolName,
+                    'content' => json_encode($toolResult),
+                ];
+
+                // After executing each tool call, request a follow-up response
+                $response = $this->safeOpenAIRequest($userId, $model, $fallbackModel, $messages, $tools, $stream);
+                if (!$response) {
+                    return 'An error occurred while processing your request. Please try again later.';
+                }
+            }
+
+            // After handling all tool calls, the loop continues if there are new tool calls in the follow-up
+        }
+    }
+
+    /**
+     * Safely request a follow-up response from OpenAI.
+     *
+     * @param int $userId
+     * @param string $model
+     * @param string $fallbackModel
+     * @param array $messages
+     * @param array $tools
+     * @param bool $stream
+     *
+     * @return mixed
+     */
+    protected function safeOpenAIRequest(
+        int $userId,
+        string $model,
+        string $fallbackModel,
+        array $messages,
+        array $tools,
+        bool $stream
+    ) {
+        try {
+            if ($stream) {
+                // For simplicity, we do not stream intermediate steps.
+                // We always return a final streamed result after no more tool calls.
+                return OpenAI::chat()->create([
+                    'model' => $model,
+                    'messages' => $messages,
+                    'tools' => $tools,
+                ]);
+            } else {
+                return OpenAI::chat()->create([
+                    'model' => $model,
+                    'messages' => $messages,
+                    'tools' => $tools,
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error('OpenAI request failed during follow-up.', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Attempt fallback model
+            try {
+                return OpenAI::chat()->create([
+                    'model' => $fallbackModel,
+                    'messages' => $messages,
+                    'tools' => $tools,
+                ]);
+            } catch (Exception $fallbackException) {
+                Log::error('Fallback model request failed during follow-up.', [
+                    'user_id' => $userId,
+                    'error' => $fallbackException->getMessage(),
+                    'trace' => $fallbackException->getTraceAsString()
+                ]);
+
+                return null;
+            }
         }
     }
 }
