@@ -203,6 +203,7 @@ const TwoFactorAuthUI = ({
               onChange={(e) => setVerificationCode(e.target.value)}
               placeholder="Enter 6-digit code"
               className="mt-1"
+              maxLength={6}
             />
             <DialogFooter className="mt-4">
               <Button
