@@ -1469,7 +1469,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"activities\": [
         {
             \"id\": 10,
-            \"date\": \"2024-12-17T11:59:40\",
+            \"date\": \"2024-12-17T14:42:55\",
             \"parent_id\": 10,
             \"position\": 10,
             \"name\": \"cjanyizogaho\",
@@ -1496,7 +1496,7 @@ let body = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-17T11:59:40",
+            "date": "2024-12-17T14:42:55",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1528,7 +1528,7 @@ $response = $client-&gt;put(
             'activities' =&gt; [
                 [
                     'id' =&gt; 10,
-                    'date' =&gt; '2024-12-17T11:59:40',
+                    'date' =&gt; '2024-12-17T14:42:55',
                     'parent_id' =&gt; 10,
                     'position' =&gt; 10,
                     'name' =&gt; 'cjanyizogaho',
@@ -1553,7 +1553,7 @@ payload = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-17T11:59:40",
+            "date": "2024-12-17T14:42:55",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1671,10 +1671,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="activities.0.date"                data-endpoint="PUTapi-activities"
-               value="2024-12-17T11:59:40"
+               value="2024-12-17T14:42:55"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2024-12-17T11:59:40</code></p>
+<p>Must be a valid date. Example: <code>2024-12-17T14:42:55</code></p>
                     </div>
                                                                 <div style="margin-left: 14px; clear: unset;">
                         <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
@@ -3256,7 +3256,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"email\": \"freddy.balistreri@example.org\"
+    \"email\": \"freddy.balistreri@example.org\",
+    \"user_attributes\": []
 }"
 </code></pre></div>
 
@@ -3272,7 +3273,8 @@ const headers = {
 };
 
 let body = {
-    "email": "freddy.balistreri@example.org"
+    "email": "freddy.balistreri@example.org",
+    "user_attributes": []
 };
 
 fetch(url, {
@@ -3294,6 +3296,7 @@ $response = $client-&gt;post(
         ],
         'json' =&gt; [
             'email' =&gt; 'freddy.balistreri@example.org',
+            'user_attributes' =&gt; [],
         ],
     ]
 );
@@ -3307,7 +3310,8 @@ import json
 
 url = 'http://127.0.0.1:8000/api/registration/initiate'
 payload = {
-    "email": "freddy.balistreri@example.org"
+    "email": "freddy.balistreri@example.org",
+    "user_attributes": []
 }
 headers = {
   'Content-Type': 'application/json',
@@ -3420,6 +3424,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>The user's email address. Example: <code>freddy.balistreri@example.org</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>user_attributes</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+<i>optional</i> &nbsp;
+                <input type="text" style="display: none"
+                              name="user_attributes"                data-endpoint="POSTapi-registration-initiate"
+               value=""
+               data-component="body">
+    <br>
+<p>optional Key-value pairs of user attributes.</p>
         </div>
         </form>
 

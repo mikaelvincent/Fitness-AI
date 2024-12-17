@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('token')->unique();
             $table->timestamp('expires_at');
+            $table->json('user_attributes')->nullable();
             $table->timestamps();
         });
     }
