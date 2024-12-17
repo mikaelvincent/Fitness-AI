@@ -23,6 +23,8 @@ import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentic
 
 import ChatPage from "./pages/ChatPage.tsx";
 
+import LandingPage from "./pages/LandingPage.tsx";
+
 // Import ProtectedRoute and PublicRoute components
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute";
 import PublicRoute from "@/components/protected-routes/PublicRoute";

@@ -2,7 +2,7 @@
 import logoNoText from "@/assets/images/no_text.svg";
 import logoLight from "@/assets/images/light_mode.svg";
 import logoDark from "@/assets/images/dark_mode.svg";
-import {useTheme} from "@/components/theme/theme-provider.tsx";
+import { useTheme } from "@/components/theme/theme-provider.tsx";
 
 interface LogoProps {
     className?: string;
@@ -12,14 +12,14 @@ interface LogoProps {
 }
 
 const Logo = ({
-                  className,
-                  alt = "Company Logo",
-                  toUseTheme = null,
-                  variant = "withText",
-              }: LogoProps) => {
+    className,
+    alt = "Company Logo",
+    toUseTheme = null,
+    variant = "withText",
+}: LogoProps) => {
     let logoSrc: string;
 
-    const {appliedTheme} = useTheme();
+    const { appliedTheme } = useTheme();
 
     const theme = toUseTheme || appliedTheme;
 
@@ -34,7 +34,7 @@ const Logo = ({
         logoSrc = logoNoText;
     }
 
-    return <img src={logoSrc} alt={alt} className={className}/>;
+    return <img src={logoSrc} alt={alt} className={className} />;
 };
 
 export default Logo;
