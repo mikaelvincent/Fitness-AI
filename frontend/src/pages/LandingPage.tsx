@@ -10,7 +10,9 @@ import { ImageLink } from "@/components/ui/image-links";
 import { LuSwords } from "react-icons/lu";
 import no_text from "@/assets/images/no_text.svg";
 import chat_img from "@/assets/images/chat_img.png";
-
+import tj from "@/assets/images/tj.png";
+import jericho from "@/assets/images/jericho.png";
+import mikael from "@/assets/images/mikael.png";
 const LandingPage: React.FC = () => {
     return (
         <div className="w-full flex flex-col pt-24 bg-outerCard gap-10">
@@ -104,19 +106,19 @@ const LandingPage: React.FC = () => {
                     <ImageLink
                         heading="T-jay Abunales"
                         subheading="Fullstack Developer"
-                        imgSrc="/mallen.jpg"
+                        imgSrc={tj}
                         href="https://github.com/Yaj-t"
                     />
                     <ImageLink
                         heading="Jericho Pasco"
                         subheading="Fullstack Developer"
-                        imgSrc="/alex.jpg"
+                        imgSrc={jericho}
                         href="https://github.com/Jpasco31"
                     />
                     <ImageLink
                         heading="Mikael Tumampos"
                         subheading="Fullstack Developer"
-                        imgSrc="/alex.jpg"
+                        imgSrc={mikael}
                         href="https://github.com/mikaelvincent"
                     />
                 </div>
