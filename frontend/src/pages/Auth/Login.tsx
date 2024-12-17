@@ -84,14 +84,18 @@ const Login = () => {
 
       if (!response?.success && response?.status === 422 && !isOpen2FAModal) {
         setLoading();
-        setFormMessage("Two-Factor Authentication is required.");
+        setFormMessage(
+          response?.message || "Two-Factor Authentication is required.",
+        );
         setIsOpen2FAModal(true);
         return;
       }
 
       if (!response?.success && response?.status === 422 && isOpen2FAModal) {
         setError();
-        setFormMessage("Two-Factor Authentication is required.");
+        setFormMessage(
+          response?.message || "Two-Factor Authentication is required.",
+        );
         setIsOpen2FAModal(true);
         return;
       }
