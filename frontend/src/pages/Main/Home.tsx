@@ -576,7 +576,9 @@ const Home = () => {
         setRerenderWeekHeader={setRerenderWeekHeader}
       >
         {status === "loading" && (
-          <Skeleton className="h-[500px] w-[500px] rounded-xl" />
+          <div className="w-full px-8">
+            <Skeleton className="h-[500px] w-full rounded-xl" />
+          </div>
         )}
         {status === "error" && (
           <Alert variant="destructive" className="mt-4">
@@ -587,8 +589,8 @@ const Home = () => {
             </AlertDescription>
           </Alert>
         )}
-        {noExercises && (
-          <Card>
+        {noExercises && status !== "error" && status !== "loading" && (
+          <Card className="mx-8">
             <CardHeader>
               <h1 className="text-center text-2xl font-semibold">
                 No activities found
