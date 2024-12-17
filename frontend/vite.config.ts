@@ -16,4 +16,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    exclude: ["chunk-WVXBTL6A"], // Replace with the exact dependency name
+  },
 });
