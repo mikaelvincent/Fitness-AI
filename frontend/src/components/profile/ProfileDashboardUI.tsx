@@ -140,9 +140,12 @@ export default function ProfileDashboardUI({
         <Card className="flex-1 border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900">
           <CardContent className="h-full p-6">
             <div className="h-full flex-col">
-              <div className="mt-4 flex w-full justify-end">
-                <Button variant="link" size="lg">
-                  <Link to="/chat" className="flex items-center gap-1">
+              <div className="flex w-full justify-end p-0">
+                <Button variant="link" size="lg" asChild>
+                  <Link
+                    to="/chat"
+                    className="flex h-auto items-center gap-1 px-0 pb-2"
+                  >
                     <BotMessageSquare />
                     Chat with GENIE to update your attributes
                   </Link>
