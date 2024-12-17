@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\Auth\SessionController;
@@ -66,4 +67,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat', [ChatController::class, 'handle']);
 });
 
-Route::middleware('auth:sanctum')->put('/user/profile/name', [UserProfileController::class, 'updateName']);
+// User Profile Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user/profile', [UserProfileController::class, 'show']);
+    Route::put('/user/profile/name', [UserProfileController::class, 'updateName']);
+});
