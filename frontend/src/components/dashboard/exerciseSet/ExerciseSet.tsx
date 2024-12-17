@@ -100,15 +100,28 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     };
 
     const handleSaveMetric = () => {
-      if (!editingMetricKey) return;
+      if (editingMetricKey === null) return;
+
+      let key = tempMetricKey.trim();
+      let value = tempMetricValue; // Keep empty string if empty
+      // If key is empty, set key to null
+      const metricKey = key === "" ? null : key;
 
       const updatedMetrics = { ...(exercise.metrics || {}) };
-      // If the key has changed, remove the old key
-      if (tempMetricKey !== editingMetricKey) {
+
+      // Remove old key if changed
+      if (metricKey !== editingMetricKey) {
         delete updatedMetrics[editingMetricKey];
       }
-      // Add/Update the metric with the new key/value
-      updatedMetrics[tempMetricKey.trim()] = tempMetricValue.trim();
+
+      if (metricKey === null) {
+        // If key is null, we don't add it back
+        // effectively deleting this metric
+      } else {
+        // If the value is empty string, just keep it as empty string
+        // (no conversion to null needed)
+        updatedMetrics[metricKey] = value;
+      }
 
       const updatedExercise: Exercise = {
         ...exercise,
@@ -124,12 +137,18 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
     };
 
     const handleAddMetricSubmit = () => {
-      const key = newMetricKey.trim();
-      const value = newMetricValue.trim();
-      if (!key) return;
+      let key = newMetricKey.trim();
+      let value = newMetricValue; // keep empty string if empty
+      const metricKey = key === "" ? null : key;
 
       const updatedMetrics = { ...(exercise.metrics || {}) };
-      updatedMetrics[key] = value;
+
+      if (metricKey === null) {
+        // If no valid key, don't add anything
+      } else {
+        // Add or update the metric with given key and value
+        updatedMetrics[metricKey] = value;
+      }
 
       const updatedExercise: Exercise = {
         ...exercise,
@@ -214,12 +233,12 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     />
                   </motion.span>
                 </Button>
-                <h3 className="text-xl font-semibold" onClick={onExpand}>
-                  {exercise.name}{" "}
-                  <span className="text-sm text-primary">
-                    {exercise.description}
-                  </span>
-                </h3>
+                <div>
+                  <h3 className="text-xl font-semibold" onClick={onExpand}>
+                    {exercise.name}
+                  </h3>
+                  <p className="text-sm text-primary">{exercise.description}</p>
+                </div>
               </div>
               <div className="flex items-center justify-center gap-2">
                 {!isActive && (
@@ -251,21 +270,31 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
           )}
           {editingExercise && (
             <>
-              <div className="flex w-10/12 items-center gap-2">
-                <Input
-                  type="text"
-                  value={tempExerciseName || ""}
-                  onChange={(e) => setTempExerciseName(e.target.value)}
-                  className="rounded px-2 py-1 text-sm"
-                  placeholder="Exercise Name"
-                />
-                <Input
-                  type="text"
-                  value={tempExerciseDescription || ""}
-                  onChange={(e) => setTempExerciseDescription(e.target.value)}
-                  className="rounded px-2 py-1 text-sm"
-                  placeholder="Description"
-                />
+              <div className="flex w-10/12 flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <label className="w-3/12 text-sm font-semibold text-primary md:w-2/12">
+                    Activity
+                  </label>
+                  <Input
+                    type="text"
+                    value={tempExerciseName || ""}
+                    onChange={(e) => setTempExerciseName(e.target.value)}
+                    className="w-9/12 rounded px-2 py-1 text-sm font-semibold md:w-10/12"
+                    placeholder="Exercise Name"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="w-3/12 text-sm font-semibold text-primary md:w-2/12">
+                    Description
+                  </label>
+                  <Input
+                    type="text"
+                    value={tempExerciseDescription || ""}
+                    onChange={(e) => setTempExerciseDescription(e.target.value)}
+                    className="w-9/12 rounded px-2 py-1 text-sm text-primary md:w-10/12"
+                    placeholder="Description"
+                  />
+                </div>
               </div>
               <div className="flex items-center justify-center gap-2">
                 <Button
@@ -363,7 +392,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                                   htmlFor={`metric-key-${key}`}
                                   className="text-xs text-gray-300"
                                 >
-                                  Name
+                                  Key
                                 </label>
                                 <Input
                                   id={`metric-key-${key}`}
