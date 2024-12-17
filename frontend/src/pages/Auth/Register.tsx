@@ -122,7 +122,7 @@ const Register = () => {
           description: "You are now registered.",
         });
         contextLoginUser(response.token);
-        navigate("/initial-chat");
+        navigate("/chat");
         return;
       }
     } catch (error) {
