@@ -102,8 +102,7 @@ class ActivityTest extends TestCase
         $activity->save();
 
         $this->assertDatabaseHas('activities', [
-            'id' => $activity->id,
-            'metrics' => json_encode($newMetrics),
+            'id' => $activity->id
         ]);
 
         $this->assertEquals($newMetrics, $activity->fresh()->metrics);
