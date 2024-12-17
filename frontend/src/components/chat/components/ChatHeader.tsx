@@ -52,7 +52,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                     isChatView ? (
                         <Button
                             onClick={onFitnessProfileClick}
-                            className="border-2 border-gray-600"
+                            className="border-2 bg-none hover:bg-primary"
                             variant="outline"
                         >
                             <MdOutlineInfo size={24} />
@@ -61,7 +61,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                     ) : (
                         <Button
                             onClick={onBackToChatClick}
-                            className="border-2 border-gray-600"
+                            className="border-2 bg-none hover:bg-primary"
                             variant="outline"
                         >
                             <MdMessage size={24} />
