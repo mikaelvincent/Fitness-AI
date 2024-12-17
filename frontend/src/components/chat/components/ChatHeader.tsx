@@ -25,7 +25,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             <div className="">
                 {location.pathname === "/chat" && (
                     <div>
-                        <BackButton onClick={() => navigate(-1)} />
+                        <BackButton onClick={() => navigate('/dashboard')} />
                     </div>
                 )}
                 {isChatView ? (
