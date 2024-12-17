@@ -8,6 +8,10 @@ return [
         ],
         [
             'role' => 'system',
+            'content' => 'Current Date: {{today_date}}'
+        ],
+        [
+            'role' => 'system',
             'content' => 'User Attributes: '
         ],
         [
