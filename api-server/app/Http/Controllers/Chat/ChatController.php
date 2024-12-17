@@ -69,7 +69,6 @@ class ChatController extends Controller
 
         $validated = $validator->validated();
 
-        // Log the incoming request data for monitoring and debugging
         Log::info('Received chat request.', [
             'user_id' => $request->user() ? $request->user()->id : null,
             'messages' => $validated['messages'],
@@ -105,20 +104,20 @@ class ChatController extends Controller
                 ]);
             }
 
-            // Log successful response generation
             Log::info('Chat response generated successfully.', [
                 'user_id' => $request->user()->id,
             ]);
 
+            // Flatten the response so that the final message is directly in data.response
             return response()->json([
                 'message' => 'Chat response generated successfully.',
                 'data' => [
-                    'response' => $response,
+                    'response' => $response['response'] ?? null,
+                    'executed_tool_calls' => $response['executed_tool_calls'] ?? []
                 ],
             ], 200);
 
         } catch (Exception $e) {
-            // Log the error details for troubleshooting
             Log::error('Chat request processing failed.', [
                 'user_id' => $request->user() ? $request->user()->id : null,
                 'error' => $e->getMessage(),
@@ -131,3 +130,4 @@ class ChatController extends Controller
         }
     }
 }
+
