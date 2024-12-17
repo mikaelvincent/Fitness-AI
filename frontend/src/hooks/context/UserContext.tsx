@@ -1,5 +1,12 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import Cookies from "js-cookie";
+import { setLogoutFunction } from "@/services/auth/authService";
 
 // Define the context type
 interface UserContextType {
@@ -35,8 +42,11 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   const loginUser = (userToken: string) => {
     setToken(userToken);
+
+    const expirationDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
     Cookies.set("token", userToken, {
-      expires: 1,
+      expires: expirationDate,
       secure: true,
       sameSite: "strict",
     });
@@ -53,8 +63,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const refreshToken = () => {
     const currentToken = Cookies.get("token");
     if (currentToken) {
+      const newExpirationDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
       Cookies.set("token", currentToken, {
-        expires: 1,
+        expires: newExpirationDate,
         secure: true,
         sameSite: "strict",
       });
@@ -62,34 +73,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
   };
 
-  // // Optionally, fetch user data on mount if token exists
-  // const fetchUser = async () => {
-  //     if (token && !user) {
-  //         try {
-  //             const response = await fetch(`${ENV.API_URL}/api/user`, {
-  //                 method: "GET",
-  //                 headers: {
-  //                     "Content-Type": "application/json",
-  //                     Accept: "application/json",
-  //                 },
-  //                 credentials: "include", // Include cookies
-  //             });
-  //
-  //             if (response.ok) {
-  //                 const data = await response.json();
-  //                 setUser({
-  //                     name: data.name,
-  //                 });
-  //             } else {
-  //                 // If token is invalid or expired, perform logout
-  //                 logoutUser();
-  //             }
-  //         } catch (error) {
-  //             console.error("Error fetching user data:", error);
-  //             logoutUser();
-  //         }
-  //     }
-  // };
+  useEffect(() => {
+    setLogoutFunction(logoutUser);
+  }, []);
 
   return (
     <UserContext.Provider
