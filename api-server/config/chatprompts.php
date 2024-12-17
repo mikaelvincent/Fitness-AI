@@ -12,7 +12,7 @@ return [
         ],
         [
             'role' => 'system',
-            'content' => 'Recent Activities: '
+            'content' => 'User Activities (from 3 months ago to 1 month) : '
         ],
     ],
 ];
