@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum', 'update.token.expiry'])->group(function () {
 // Chat Routes
 Route::middleware(['auth:sanctum', 'update.token.expiry'])->group(function () {
     Route::post('/chat', [ChatController::class, 'handle']);
+    Route::get('/chat/response', [ChatController::class, 'getResponse']);
 });
 
 // User Profile Routes
