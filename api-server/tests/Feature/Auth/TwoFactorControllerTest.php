@@ -43,21 +43,24 @@ class TwoFactorControllerTest extends TestCase
      */
     public function test_enable_two_factor_authentication_when_already_enabled()
     {
-        $user = User::factory()->create([
+        $user = User::factory()->create();
+
+        $user->forceFill([
             'two_factor_secret' => encrypt('existingsecret'),
             'two_factor_recovery_codes' => encrypt(json_encode(['code1', 'code2'])),
-        ]);
+            'two_factor_confirmed_at' => now(),
+        ])->save();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $response = $this->withHeaders([
-                            'Authorization' => 'Bearer ' . $token,
-                        ])->postJson('/api/two-factor/enable');
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/two-factor/enable');
 
         $response->assertStatus(400)
-                 ->assertJson([
-                     'message' => 'Two-factor authentication is already enabled.',
-                 ]);
+            ->assertJson([
+                'message' => 'Two-factor authentication is already enabled.',
+            ]);
     }
 
     /**
@@ -217,5 +220,33 @@ class TwoFactorControllerTest extends TestCase
                  ->assertJson([
                      'message' => 'Unauthenticated.',
                  ]);
+    }
+
+    /**
+     * Test that recovery codes are generated with correct length.
+     */
+    public function test_recovery_codes_are_correct_length()
+    {
+        $user  = User::factory()->create();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token,
+        ])->postJson('/api/two-factor/enable');
+
+        $response->assertStatus(200)
+                 ->assertJsonStructure([
+                     'message',
+                     'data' => [
+                         'qr_code_url',
+                         'recovery_codes',
+                     ],
+                 ]);
+
+        $recoveryCodes = $response->json('data.recovery_codes');
+        foreach ($recoveryCodes as $code) {
+            $this->assertEquals(8, strlen($code));
+            $this->assertMatchesRegularExpression('/^\d{8}$/', $code);
+        }
     }
 }
