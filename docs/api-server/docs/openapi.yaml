@@ -305,7 +305,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-17T04:44:29'
+                        example: '2024-12-17T11:59:40'
                         nullable: false
                       parent_id:
                         type: integer
@@ -434,6 +434,27 @@ paths:
                       - deleteActivities
               required:
                 - messages
+  /api/user/profile:
+    get:
+      summary: 'Get the authenticated user''s information.'
+      operationId: getTheAuthenticatedUsersInformation
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
   /api/user/profile/name:
     put:
       summary: 'Update the authenticated user''s name.'
@@ -950,8 +971,8 @@ paths:
                   data:
                     qr_code_url: 'otpauth://totp/AppName:user@example.com?secret=ABCDEF...'
                     recovery_codes:
-                      - code1
-                      - code2
+                      - '12345678'
+                      - '87654321'
                       - ...
                 properties:
                   message:
@@ -966,8 +987,8 @@ paths:
                       recovery_codes:
                         type: array
                         example:
-                          - code1
-                          - code2
+                          - '12345678'
+                          - '87654321'
                           - ...
                         items:
                           type: string
@@ -1008,6 +1029,18 @@ paths:
                   message:
                     type: string
                     example: 'Two-factor authentication confirmed.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid two-factor authentication code.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid two-factor authentication code.'
         429:
           description: ''
           content:
@@ -1059,6 +1092,18 @@ paths:
                   message:
                     type: string
                     example: 'Two-factor authentication disabled.'
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Two-factor authentication is not enabled.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Two-factor authentication is not enabled.'
         429:
           description: ''
           content:
