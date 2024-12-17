@@ -260,7 +260,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-17T19:31:19'
+                        example: '2024-12-17T21:05:24'
                         nullable: false
                       parent_id:
                         type: integer
@@ -389,6 +389,27 @@ paths:
                       - deleteActivities
               required:
                 - messages
+  /api/chat/response:
+    get:
+      summary: 'Retrieve the chat response for the authenticated user.'
+      operationId: retrieveTheChatResponseForTheAuthenticatedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
   /api/user/profile:
     get:
       summary: 'Get the authenticated user''s information.'

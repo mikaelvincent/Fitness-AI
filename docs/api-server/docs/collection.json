@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "c00964d8-aa66-41ff-8b02-bd404e462529",
+        "_postman_id": "6f0ddb82-535b-4719-bcac-defbbb7c99aa",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -299,7 +299,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T19:31:19\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
+                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T21:05:24\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
                         },
                         "description": "",
                         "auth": {
@@ -366,6 +366,51 @@
                         "description": ""
                     },
                     "response": []
+                },
+                {
+                    "name": "Retrieve the chat response for the authenticated user.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/chat\/response",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/chat\/response"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "access-control-allow-origin",
+                                    "value": "*"
+                                }
+                            ],
+                            "code": 401,
+                            "body": "{\"message\":\"Unauthenticated.\"}",
+                            "name": ""
+                        }
+                    ]
                 },
                 {
                     "name": "Get the authenticated user's information.",
