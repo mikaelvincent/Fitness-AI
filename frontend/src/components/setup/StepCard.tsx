@@ -3,6 +3,7 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/custom-ui/BackButton";
+import { useNavigate } from "react-router-dom";
 
 interface StepCardProps {
     title: string;
@@ -27,11 +28,15 @@ export const StepCard: React.FC<StepCardProps> = ({
     isFirstStep = false,
     isSubmitting = false,
 }) => {
+    const navigate = useNavigate();
     return (
         <Card className="w-full mx-auto border-0">
             <CardHeader className="flex justify-center p-4">
                 <div className="flex items-center justify-start p-2">
                     {!isFirstStep && <BackButton onClick={onPrev} />}
+                </div>
+                <div className="flex items-center justify-start p-2">
+                    {isFirstStep && <BackButton onClick={() => navigate('/login')} />}
                 </div>
                 <CardTitle className="text-3xl lg:text-4xl text-center w-full p-2">
                     {title}
