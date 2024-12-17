@@ -90,7 +90,6 @@ const TwoFactorAuthForm = ({
                           {...field}
                           type="text"
                           placeholder="Enter your 2FA code"
-                          maxLength={6}
                         />
                       </FormControl>
                       <FormMessage />
