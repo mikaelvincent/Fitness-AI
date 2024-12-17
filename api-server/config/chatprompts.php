@@ -8,11 +8,15 @@ return [
         ],
         [
             'role' => 'system',
+            'content' => 'Current Date: {{today_date}}'
+        ],
+        [
+            'role' => 'system',
             'content' => 'User Attributes: '
         ],
         [
             'role' => 'system',
-            'content' => 'Recent Activities: '
+            'content' => 'User Activities (from 3 months ago to 1 month) : '
         ],
     ],
 ];

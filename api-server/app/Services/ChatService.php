@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Services;
 
 use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 use Exception;
 
 class ChatService
@@ -29,6 +29,15 @@ class ChatService
         // Load system prompts from config
         $systemPrompts = config('chatprompts.assistant_intro', []);
 
+        // Replace placeholders with dynamic values
+        $todayDate = Carbon::now()->format('F j, Y');
+        foreach ($systemPrompts as &$prompt) {
+            if (isset($prompt['content'])) {
+                $prompt['content'] = str_replace('{{today_date}}', $todayDate, $prompt['content']);
+            }
+        }
+        unset($prompt);
+
         // Append the user attributes and activities data
         if (isset($systemPrompts[1]['content'])) {
             $systemPrompts[1]['content'] .= json_encode($context['user_attributes']);
@@ -47,7 +56,6 @@ class ChatService
 
         // Load tool definitions from config
         $allTools = config('chattools', []);
-
         $tools = [];
         if (!empty($selectedTools)) {
             foreach ($allTools as $tool) {
@@ -72,7 +80,6 @@ class ChatService
         // if stream is requested, handle gracefully without causing errors.
         try {
             $response = OpenAI::chat()->create($payload);
-
         } catch (Exception $e) {
             Log::error('OpenAI primary model request failed.', [
                 'user_id' => $userId,
@@ -93,13 +100,11 @@ class ChatService
                     'error' => $fallbackException->getMessage(),
                     'trace' => $fallbackException->getTraceAsString()
                 ]);
-
                 return 'An error occurred while processing your request. Please try again later.';
             }
         }
 
         $executedToolCalls = [];
-
         $finalContent = $this->processToolCalls($userId, $tools, $model, $messages, $response, $executedToolCalls, $fallbackModel, $stream);
 
         // If stream is requested, we will simulate streaming the final result.
