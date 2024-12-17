@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +21,7 @@ class RegistrationToken extends Model
     ];
 
     /**
-     * Check if the registration token has expired.
+     * Determine if the registration token has expired.
      *
      * @return bool
      */
@@ -32,13 +31,14 @@ class RegistrationToken extends Model
     }
 
     /**
-     * Get the time until the token expires in seconds.
+     * Get the time until expiration in seconds.
+     *
+     * Negative value indicates the token has expired.
      *
      * @return int
      */
     public function timeUntilExpiration(): int
     {
-        $now = now();
-        return $now->lessThan($this->expires_at) ? $now->diffInSeconds($this->expires_at) : 0;
+        return now()->diffInSeconds($this->expires_at, false);
     }
 }
