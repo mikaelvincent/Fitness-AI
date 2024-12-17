@@ -145,15 +145,13 @@ const Calendar = ({
       <div className="mx-2 flex items-center py-6 sm:mx-8">
         <Button
           variant="ghost"
-          size="icon"
-          asChild
+          size="lg"
           onClick={handleMonthProgressView}
+          className="px-0 text-2xl text-primary hover:text-orange-300"
         >
-          <ChevronLeft className="h-10 w-10 text-primary hover:text-orange-400" />
-        </Button>
-        <h2 className="text-lg font-semibold dark:text-primary sm:text-2xl">
+          <ChevronLeft />
           {formatMonthYear(currentDate)}
-        </h2>
+        </Button>
       </div>
 
       <div className="overflow-hidden rounded-lg bg-muted pb-6 pt-4 sm:mx-8 sm:pb-8 sm:pt-6">
