@@ -1,4 +1,3 @@
-// src/pages/setup/steps/ActivityStep.tsx
 import React from "react";
 import clsx from "clsx";
 

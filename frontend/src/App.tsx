@@ -61,6 +61,7 @@ const App = () => {
         {/*</Route>*/}
 
         {/*<Route path="chat" element={<ProtectedRoute><Chat/></ProtectedRoute>}>}/>*/}
+        {/*<Route path="chat" element={<ProtectedRoute><ChatPage/></ProtectedRoute>}>}/>*/}
 
         {/*    /!* Authentication layout routes *!/*/}
         {/*    <Route path="/" element={<PublicRoute> <AuthLayout/> </PublicRoute>}>*/}
