@@ -2,23 +2,29 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class RegistrationToken extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['email', 'token', 'expires_at'];
+    protected $fillable = [
+        'email',
+        'token',
+        'expires_at',
+        'user_attributes',
+    ];
 
     protected $casts = [
         'expires_at' => 'datetime',
+        'user_attributes' => 'array',
     ];
 
     public $timestamps = true;
 
     /**
-     * Check if the token is expired.
+     * Determine if the registration token is expired.
+     *
+     * @return bool
      */
     public function isExpired(): bool
     {
@@ -26,7 +32,9 @@ class RegistrationToken extends Model
     }
 
     /**
-     * Get the time until expiration in seconds.
+     * Get the time in seconds until the token expires.
+     *
+     * @return int
      */
     public function timeUntilExpiration(): int
     {
