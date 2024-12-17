@@ -32,7 +32,7 @@ const LandingPage: React.FC = () => {
                             <Button
                                 variant="outline"
                                 size="lg"
-                                className="lg:py-6 sm:py-4 py-4 px-8 rounded-md border-lightYellow hover:bg-lightYellow hover:text-outerCard"
+                                className="lg:py-6 sm:py-4 py-4 px-8 rounded-md bg-primary hover:bg-orange-800"
                             >
                                 Get Started
                                 <ArrowRightIcon className="w-4 h-4" />
@@ -79,7 +79,7 @@ const LandingPage: React.FC = () => {
                 titleComponent={
                     <>
                         <h1 className="text-2xl md:text-4xl font-medium text-lightYellow">
-                            Your Personalized Trainer<br />
+                            Your Personal Fitness Coach<br />
                             <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
                                 Chat with GymGenie
                             </span>
