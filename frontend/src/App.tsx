@@ -22,16 +22,12 @@ import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
 import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
 
 import ChatPage from "./pages/ChatPage.tsx";
-
-// Import ProtectedRoute and PublicRoute components
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute";
 import PublicRoute from "@/components/protected-routes/PublicRoute";
 
 import LandingPage from "./pages/LandingPage.tsx";
 
-// Import ProtectedRoute and PublicRoute components
-import ProtectedRoute from "@/components/protected-routes/ProtectedRoute";
-import PublicRoute from "@/components/protected-routes/PublicRoute";
+
 
 const App = () => {
   return (
