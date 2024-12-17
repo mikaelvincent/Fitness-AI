@@ -135,7 +135,7 @@ const Profile = () => {
         // Optionally reset the form or handle as needed
         return;
       }
-      if (response?.success && response?.data) {
+      if (response?.success) {
         toast({
           title: response?.message || "Name updated successfully",
         });

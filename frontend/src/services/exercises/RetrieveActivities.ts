@@ -1,4 +1,5 @@
 import { ENV } from "@/utils/env.ts";
+import { logout } from "@/services/auth/authService.ts";
 
 interface RetrieveActivitiesResponse {
   success: boolean;
@@ -60,6 +61,10 @@ export const RetrieveActivities = async ({
     }
 
     if (!response.ok) {
+      if (response.status === 401) {
+        // Trigger logout if unauthorized
+        logout();
+      }
       return {
         success: false,
         message: responseData.message,

@@ -28,6 +28,40 @@ const convertValuesToString = (
   return stringifiedAttrs;
 };
 
+// Function to transform specific userAttributes
+const transformUserAttributes = (
+  attrs: Record<string, any>,
+): Record<string, any> => {
+  const transformedAttrs = { ...attrs };
+
+  // Transform birthdate to string if it exists
+  if (transformedAttrs.birthdate !== undefined) {
+    transformedAttrs.birthdate = `${transformedAttrs.birthdate}`;
+  }
+
+  // Combine weight and weightUnit if both exist
+  if (
+    transformedAttrs.weight !== undefined &&
+    transformedAttrs.weightUnit !== undefined
+  ) {
+    transformedAttrs.weight = `${transformedAttrs.weight} ${transformedAttrs.weightUnit}`;
+    // Optionally, remove the separate weightUnit field
+    delete transformedAttrs.weightUnit;
+  }
+
+  // Combine height and heightUnit if both exist
+  if (
+    transformedAttrs.height !== undefined &&
+    transformedAttrs.heightUnit !== undefined
+  ) {
+    transformedAttrs.height = `${transformedAttrs.height} ${transformedAttrs.heightUnit}`;
+    // Optionally, remove the separate heightUnit field
+    delete transformedAttrs.heightUnit;
+  }
+
+  return transformedAttrs;
+};
+
 export const initiateVerifyEmail = async ({
   data,
   userAttributes,
@@ -39,9 +73,18 @@ export const initiateVerifyEmail = async ({
     console.log("Parsed data:", parsedData);
     console.log("User attributes:", userAttributes);
 
-    const stringifiedUserAttributes = userAttributes
-      ? convertValuesToString(userAttributes)
-      : undefined;
+    let stringifiedUserAttributes: Record<string, string> | undefined;
+
+    if (userAttributes) {
+      // Transform specific attributes
+      const transformedUserAttributes = transformUserAttributes(userAttributes);
+      console.log("Transformed user attributes:", transformedUserAttributes);
+
+      // Convert all values to strings
+      stringifiedUserAttributes = convertValuesToString(
+        transformedUserAttributes,
+      );
+    }
 
     // Construct the full URL
     const url = new URL("/api/registration/initiate", ENV.API_URL).toString();

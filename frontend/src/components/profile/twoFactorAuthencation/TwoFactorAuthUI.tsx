@@ -86,6 +86,22 @@ const TwoFactorAuthUI = ({
     }
   };
 
+  const handleCopyAll = () => {
+    if (recoveryCodes && recoveryCodes.length > 0) {
+      const allCodes = recoveryCodes.join("\n");
+      navigator.clipboard
+        .writeText(allCodes)
+        .then(() => {
+          setCopySuccess("Recovery codes copied!");
+          setTimeout(() => setCopySuccess(""), 2000);
+        })
+        .catch(() => {
+          setCopySuccess("Failed to copy!");
+          setTimeout(() => setCopySuccess(""), 2000);
+        });
+    }
+  };
+
   const secretKey = extractSecretKey(qrCode!);
 
   return (
@@ -127,6 +143,22 @@ const TwoFactorAuthUI = ({
                 Save these recovery codes in a secure place. You can use these
                 to regain access to your account if you lose your 2FA device.
               </CardDescription>
+              <div className="flex w-full justify-end">
+                {copySuccess && (
+                  <span className="mt-2 block text-sm text-green-500">
+                    {copySuccess}
+                  </span>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyAll}
+                  className="ml-2"
+                  aria-label="Copy all recovery codes"
+                >
+                  <Clipboard />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -203,6 +235,7 @@ const TwoFactorAuthUI = ({
               onChange={(e) => setVerificationCode(e.target.value)}
               placeholder="Enter 6-digit code"
               className="mt-1"
+              maxLength={6}
             />
             <DialogFooter className="mt-4">
               <Button

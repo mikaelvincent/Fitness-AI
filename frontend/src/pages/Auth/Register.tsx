@@ -117,12 +117,16 @@ const Register = () => {
       if (response?.success && response?.token) {
         setDone();
         setResponseMessage(response?.message || "Registration successful!");
+        // Clear the 'setUpData' from SessionStorage
+        sessionStorage.removeItem("setupData");
+        sessionStorage.removeItem("currentStepIndex");
+
         toast({
           title: "Registration Successful",
           description: "You are now registered.",
         });
         contextLoginUser(response.token);
-        navigate("/initial-chat");
+        navigate("/chat");
         return;
       }
     } catch (error) {

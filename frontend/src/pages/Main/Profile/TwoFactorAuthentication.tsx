@@ -86,6 +86,8 @@ export const TwoFactorAuthentication = () => {
         setRecoveryCodes(response.data.recovery_codes);
       }
 
+      // Reset the verification code before opening the modal
+      setVerificationCode("");
       // Open the modal for user to confirm 2FA
       setIsModalOpen(true);
     } catch (err) {

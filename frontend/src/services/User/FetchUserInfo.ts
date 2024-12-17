@@ -1,5 +1,6 @@
 // src/services/User/FetchUserInfo.ts
 import { ENV } from "@/utils/env.ts";
+import { logout } from "@/services/auth/authService.ts";
 
 // Define the response interfaces
 interface FetchUserInfoResponse {
@@ -55,6 +56,10 @@ export const FetchUserInfo = async ({
         };
       }
 
+      if (response.status === 401) {
+        // Trigger logout if unauthorized
+        logout();
+      }
       return {
         success: false,
         message: responseData.message || "Failed to fetch user information.",

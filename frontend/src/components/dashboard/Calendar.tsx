@@ -147,7 +147,7 @@ const Calendar = ({
           variant="ghost"
           size="lg"
           onClick={handleMonthProgressView}
-          className="px-0 text-2xl text-primary hover:text-orange-300"
+          className="text-2xl text-primary hover:text-orange-300"
         >
           <ChevronLeft />
           {formatMonthYear(currentDate)}

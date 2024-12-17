@@ -84,14 +84,18 @@ const Login = () => {
 
       if (!response?.success && response?.status === 422 && !isOpen2FAModal) {
         setLoading();
-        setFormMessage("Two-Factor Authentication is required.");
+        setFormMessage(
+          response?.message || "Two-Factor Authentication is required.",
+        );
         setIsOpen2FAModal(true);
         return;
       }
 
       if (!response?.success && response?.status === 422 && isOpen2FAModal) {
         setError();
-        setFormMessage("Two-Factor Authentication is required.");
+        setFormMessage(
+          response?.message || "Two-Factor Authentication is required.",
+        );
         setIsOpen2FAModal(true);
         return;
       }
@@ -100,6 +104,11 @@ const Login = () => {
       if (response?.success && response?.token) {
         setDone();
         setFormMessage(response?.message || "Login successful!");
+
+        // Clear the 'setUpData' from SessionStorage
+        sessionStorage.removeItem("setupData");
+        sessionStorage.removeItem("currentStepIndex");
+
         // Set user data and token in UserContext
         contextLoginUser(response.token);
 
