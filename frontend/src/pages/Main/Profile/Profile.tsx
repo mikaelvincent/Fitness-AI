@@ -6,6 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { RetrieveAttributes } from "@/services/User/RetreiveAllAttributes.ts";
 import { useUser } from "@/hooks/context/UserContext.tsx";
 import { toast } from "@/hooks/use-toast.tsx";
+import { UpdateNameSchema } from "@/utils/schema/UpdateName.ts";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UpdateName } from "@/services/User/UpdateName.ts";
 
 const Profile = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -18,6 +23,13 @@ const Profile = () => {
 
   const [isUpdateName, setIsUpdateName] = useState<boolean>(false);
   const navigate = useNavigate();
+
+  const form = useForm<z.infer<typeof UpdateNameSchema>>({
+    resolver: zodResolver(UpdateNameSchema),
+    defaultValues: {
+      name: profileInfo.name,
+    },
+  });
 
   useEffect(() => {
     handleRetrieveAttributes().then((r) => r);
@@ -61,9 +73,34 @@ const Profile = () => {
     setIsUpdateName(true);
   };
 
-  const handleSaveName = () => {
-    // Implement save logic here, e.g., API call to update the name
-    // For now, we'll just exit the edit mode
+  const handleSaveName = async () => {
+    refreshToken();
+    try {
+      const response = await UpdateName({ token, name: profileInfo.name });
+      if (!response?.success) {
+        toast({
+          variant: "destructive",
+          title: response?.message || "Failed to update name",
+        });
+        setIsUpdateName(false);
+        setProfileInfo((prev) => ({ ...prev, name: prev.name }));
+        return;
+      }
+      if (response?.success && response?.data) {
+        toast({
+          title: response?.message || "Name updated successfully",
+        });
+        setIsUpdateName(false);
+        return;
+      }
+    } catch (error) {
+      console.error("Error updating name:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to update name",
+      });
+      setProfileInfo((prev) => ({ ...prev, name: prev.name }));
+    }
     setIsUpdateName(false);
   };
 
@@ -87,6 +124,7 @@ const Profile = () => {
       onNameChange={handleNameChange}
       handleNavigation={handleNavigation}
       attributes={attributes}
+      form={form}
     />
   );
 };
