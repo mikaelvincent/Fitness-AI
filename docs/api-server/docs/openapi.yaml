@@ -305,7 +305,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-17T11:59:40'
+                        example: '2024-12-17T14:42:55'
                         nullable: false
                       parent_id:
                         type: integer
@@ -736,6 +736,12 @@ paths:
                   description: 'The user''s email address.'
                   example: freddy.balistreri@example.org
                   nullable: false
+                user_attributes:
+                  type: object
+                  description: 'optional Key-value pairs of user attributes.'
+                  example: []
+                  nullable: false
+                  properties: {  }
               required:
                 - email
       security: []
