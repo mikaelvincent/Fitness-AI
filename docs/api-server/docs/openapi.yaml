@@ -305,7 +305,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-14T03:47:16'
+                        example: '2024-12-17T04:44:29'
                         nullable: false
                       parent_id:
                         type: integer
@@ -434,6 +434,29 @@ paths:
                       - deleteActivities
               required:
                 - messages
+  /api/user/profile/name:
+    put:
+      summary: 'Update the authenticated user''s name.'
+      operationId: updateTheAuthenticatedUsersName
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: mcjanyizogah
+                  nullable: false
+              required:
+                - name
   /api/password/forgot:
     post:
       summary: 'Send a password reset link to the user''s email.'

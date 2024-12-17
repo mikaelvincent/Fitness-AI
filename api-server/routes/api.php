@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\User\UserAttributeController;
 use App\Http\Controllers\Activities\ActivityController;
 use App\Http\Controllers\Chat\ChatController;
+use App\Http\Controllers\User\UserProfileController;
 
 // Registration Routes
 Route::group([], function () {
@@ -64,3 +65,5 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat', [ChatController::class, 'handle']);
 });
+
+Route::middleware('auth:sanctum')->put('/user/profile/name', [UserProfileController::class, 'updateName']);
