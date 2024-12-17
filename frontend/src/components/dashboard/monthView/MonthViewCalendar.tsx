@@ -1,6 +1,4 @@
-// frontend/src/components/dashboard/monthView/MonthViewCalendar.tsx
-
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   addMonths,
   eachDayOfInterval,
@@ -12,26 +10,31 @@ import { MonthViewCalendarUI } from "./MonthViewCalendarUI";
 import { Exercise } from "@/types/exerciseTypes.ts";
 
 interface MonthViewCalendarProps {
-  initialMonth?: Date;
+  currentMonth: Date;
   onSelectDate?: (date: Date) => void;
+  onMonthChange?: (newMonth: Date) => void;
   activities: Exercise[];
 }
 
 export function MonthViewCalendar({
-  initialMonth = new Date(),
+  currentMonth,
   onSelectDate,
+  onMonthChange,
   activities,
 }: MonthViewCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(initialMonth);
-
   const startDate = startOfMonth(currentMonth);
   const endDate = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-  const goToPreviousMonth = () =>
-    setCurrentMonth((prevMonth) => subMonths(prevMonth, 1));
-  const goToNextMonth = () =>
-    setCurrentMonth((prevMonth) => addMonths(prevMonth, 1));
+  const goToPreviousMonth = () => {
+    const newMonth = subMonths(currentMonth, 1);
+    onMonthChange && onMonthChange(newMonth);
+  };
+
+  const goToNextMonth = () => {
+    const newMonth = addMonths(currentMonth, 1);
+    onMonthChange && onMonthChange(newMonth);
+  };
 
   // Calculate completion ratio for each day
   const completionRatios = useMemo(() => {

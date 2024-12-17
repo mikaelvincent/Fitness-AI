@@ -1,5 +1,3 @@
-// frontend/src/pages/Progress.tsx
-
 import { MonthViewCalendar } from "@/components/dashboard/monthView/MonthViewCalendar.tsx";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -30,14 +28,13 @@ const Progress = () => {
 
   const { token, refreshToken } = useUser();
 
-  // Update currentDate if URL param changes
-  // Update the URL when currentDate changes
+  // Sync the URL with currentDate
   useEffect(() => {
     const formattedDate = currentDate.toISOString().split("T")[0]; // YYYY-MM-DD
     window.history.replaceState(null, "", `?date=${formattedDate}`);
   }, [currentDate]);
 
-  // Fetch activities for the current month
+  // Fetch activities for the current month whenever currentDate or token changes
   useEffect(() => {
     fetchActivities().then((r) => r);
     refreshToken();
@@ -88,16 +85,24 @@ const Progress = () => {
 
   const handleSelectDate = (date: Date) => {
     setCurrentDate(date);
-    // Navigate to the week view route, e.g., /week/yyyy-MM-dd
+    // Navigate to the week view route, e.g., /?date=yyyy-MM-dd
     const formattedDate = format(date, "yyyy-MM-dd");
     navigate(`/?date=${formattedDate}`);
+  };
+
+  // Instead of relying on internal state in MonthViewCalendar,
+  // we define handlers here and pass them down
+  const handleMonthChange = (newMonth: Date) => {
+    // Here we just set the `currentDate` to the first day of the new month
+    setCurrentDate(startOfMonth(newMonth));
   };
 
   return (
     <div className="flex h-full flex-col items-center justify-start gap-4 bg-background p-8">
       <MonthViewCalendar
-        initialMonth={currentDate}
+        currentMonth={currentDate}
         onSelectDate={handleSelectDate}
+        onMonthChange={handleMonthChange}
         activities={activities}
       />
 
