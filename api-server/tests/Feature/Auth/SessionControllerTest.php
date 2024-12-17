@@ -196,4 +196,68 @@ class SessionControllerTest extends TestCase
                      'message' => 'Unauthenticated.',
                  ]);
     }
+
+    /**
+     * Test login using a valid two-factor recovery code.
+     */
+    public function test_login_with_valid_two_factor_recovery_code()
+    {
+        $google2fa      = new Google2FA();
+        $secret         = $google2fa->generateSecretKey();
+        $recoveryCodes  = ['12345678', '87654321'];
+
+        $user = User::factory()->create([
+            'password'                  => Hash::make('ValidPassword123!'),
+            'two_factor_secret'         => encrypt($secret),
+            'two_factor_confirmed_at'   => now(),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email'           => $user->email,
+            'password'        => 'ValidPassword123!',
+            'two_factor_code' => '12345678',
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJsonStructure([
+                     'message',
+                     'data' => [
+                         'token',
+                     ],
+                 ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id'                        => $user->id,
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
+        ]);
+    }
+
+    /**
+     * Test login with an invalid two-factor recovery code.
+     */
+    public function test_login_with_invalid_two_factor_recovery_code()
+    {
+        $google2fa      = new Google2FA();
+        $secret         = $google2fa->generateSecretKey();
+        $recoveryCodes  = ['12345678', '87654321'];
+
+        $user = User::factory()->create([
+            'password'                  => Hash::make('ValidPassword123!'),
+            'two_factor_secret'         => encrypt($secret),
+            'two_factor_confirmed_at'   => now(),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email'           => $user->email,
+            'password'        => 'ValidPassword123!',
+            'two_factor_code' => 'invalidcode',
+        ]);
+
+        $response->assertStatus(422)
+                 ->assertJson([
+                     'message' => 'The two-factor authentication code is invalid.',
+                 ]);
+    }
 }

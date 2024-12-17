@@ -218,4 +218,32 @@ class TwoFactorControllerTest extends TestCase
                      'message' => 'Unauthenticated.',
                  ]);
     }
+
+    /**
+     * Test that recovery codes are generated with correct length.
+     */
+    public function test_recovery_codes_are_correct_length()
+    {
+        $user  = User::factory()->create();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer '.$token,
+        ])->postJson('/api/two-factor/enable');
+
+        $response->assertStatus(200)
+                 ->assertJsonStructure([
+                     'message',
+                     'data' => [
+                         'qr_code_url',
+                         'recovery_codes',
+                     ],
+                 ]);
+
+        $recoveryCodes = $response->json('data.recovery_codes');
+        foreach ($recoveryCodes as $code) {
+            $this->assertEquals(8, strlen($code));
+            $this->assertMatchesRegularExpression('/^\d{8}$/', $code);
+        }
+    }
 }
