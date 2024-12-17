@@ -3,6 +3,7 @@ import { postChatMessage } from "@/services/chatService";
 import { getUserAttributes } from "@/services/userAttributesService";
 import { capitalizeFirstLetter } from "@/utils/utils";
 import { streamGPTResponse } from "@/services/chatService";
+import { useLocation } from "react-router-dom";
 
 type Message = {
     role: "user" | "assistant";
@@ -22,6 +23,15 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
     const [currentView, setCurrentView] = useState<"chat" | "fitnessProfile">("chat");
     const [profileInfo, setProfileInfo] = useState<ProfileInfo>([]);
     const chatEndRef = useRef<HTMLDivElement | null>(null);
+    const location = useLocation();
+
+    const toolsForInitialChat = ["updateUserAttributes", "deleteUserAttributes"];
+    const toolsForMainChat = [
+        "updateUserAttributes",
+        "deleteUserAttributes",
+        "getActivities",
+        "updateActivities",
+    ];
 
     useEffect(() => {
         scrollToBottom();
@@ -59,26 +69,27 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         setMessages(updatedMessages);
         setIsLoading(true);
 
+        // Determine the tools based on route
+        const tools =
+            location.pathname === "/initial-chat"
+                ? toolsForInitialChat
+                : toolsForMainChat;
+
         // Prepare messages for API (remove tools)
         const sanitizedMessages = updatedMessages.map(({ role, content }) => ({ role, content }));
-
+        console.log(tools)
         try {
-            const response = await postChatMessage(
-                sanitizedMessages,
-                ["updateUserAttributes", "deleteUserAttributes"],
-                false,
-                true
-            );
+            const response = await postChatMessage(sanitizedMessages, tools, false, true);
 
             const aiResponse = response?.data?.response || "Sorry, something went wrong.";
             const tool_calls = response?.data?.executed_tool_calls || [];
-            const tools = tool_calls.map((tool: { tool_name: string }) => tool.tool_name);
+            const toolNames = tool_calls.map((tool: { tool_name: string }) => tool.tool_name);
 
             // Attach tools internally
             const newAIMessage: Message = {
                 role: "assistant",
                 content: aiResponse,
-                tools: tools, // Tools stay internal
+                tools: toolNames, // Tools stay internal
             };
 
             setMessages((prev) => [...prev, newAIMessage]);
@@ -95,6 +106,7 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
             setIsLoading(false);
         }
     };
+
 
     // const sendMessage = async (userMessage: string) => {
     //     if (isLoading) return;
