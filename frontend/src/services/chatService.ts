@@ -81,7 +81,7 @@ export const streamGPTResponse = async (
     const url = "https://api.openai.com/v1/chat/completions"; // OpenAI endpoint
     const headers = {
         ...defaultHeaders(),
-        Authorization: `Bearer {ENV.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${ENV.OPENAI_API_KEY}`,
     };
 
     const payload = {
