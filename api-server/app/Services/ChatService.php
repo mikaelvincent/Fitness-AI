@@ -72,6 +72,7 @@ class ChatService
         // if stream is requested, handle gracefully without causing errors.
         try {
             $response = OpenAI::chat()->create($payload);
+
         } catch (Exception $e) {
             Log::error('OpenAI primary model request failed.', [
                 'user_id' => $userId,
