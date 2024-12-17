@@ -49,14 +49,14 @@ export default function ProfileDashboardUI({
   form,
 }: ProfileDashboardUIProps) {
   return (
-    <div className="flex h-full w-full flex-col justify-start gap-8 p-4 lg:p-8 xl:justify-center">
+    <div className="flex h-screen w-full flex-col justify-start gap-8 p-4 lg:p-8 xl:justify-center">
       <div className="flex justify-end">
         <ModeToggle />
       </div>
-      <div className="flex h-4/6 w-full flex-col gap-2 xl:flex-row">
+      <div className="flex h-1/2 w-full flex-col gap-2 xl:h-4/6 xl:flex-row">
         {/* Profile Section */}
-        <Card className="flex-none border-zinc-100 bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900 xl:w-1/3">
-          <CardContent className="flex h-full flex-col justify-between p-6">
+        <Card className="h-auto border-zinc-100 bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900 lg:flex-none xl:h-full xl:w-1/3">
+          <CardContent className="flex h-1/2 flex-col justify-between p-6 sm:h-full">
             <div className="flex flex-1 flex-col justify-center space-y-2">
               {!isUpdateName ? (
                 <div className="flex justify-between">
@@ -130,7 +130,7 @@ export default function ProfileDashboardUI({
           </CardContent>
         </Card>
         {/* Attributes Section */}
-        <Card className="flex-1 border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900">
+        <Card className="h-4/6 flex-none border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900 lg:h-full lg:flex-1">
           <CardContent className="h-full p-6">
             <div className="h-full flex-col">
               <div className="flex w-full justify-end p-0">
@@ -151,12 +151,12 @@ export default function ProfileDashboardUI({
                       {attributes.map((attribute, index) => (
                         <div
                           key={index}
-                          className="flex items-center gap-2 rounded p-4 shadow dark:border-zinc-800 dark:bg-zinc-900"
+                          className="flex flex-col items-center gap-2 rounded p-4 shadow dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row"
                         >
-                          <p className="w-4/12 text-start text-lg capitalize text-orange-400">
+                          <p className="w-full text-wrap text-center text-lg capitalize text-orange-400 md:text-start lg:w-1/2">
                             {attribute.name}
                           </p>
-                          <p className="w-8/12 text-wrap text-start text-xl capitalize">
+                          <p className="w-full text-wrap text-center text-xl capitalize md:text-start lg:w-1/2">
                             {attribute.value}
                           </p>
                         </div>
