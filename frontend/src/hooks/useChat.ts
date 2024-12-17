@@ -67,7 +67,7 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
                 sanitizedMessages,
                 ["updateUserAttributes", "deleteUserAttributes"],
                 false,
-                false
+                true
             );
 
             const aiResponse = response?.data?.response || "Sorry, something went wrong.";

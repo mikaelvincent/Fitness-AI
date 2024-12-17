@@ -1,4 +1,5 @@
 import { ENV } from "@/utils/env";
+import { exec } from "child_process";
 import Cookies from "js-cookie";
 
 const dummyMessage = `# Welcome to Your AI Chat Interface 🚀
@@ -55,7 +56,7 @@ export const postChatMessage = async (
                     message: "Chatbot response generated successfully.",
                     data: {
                         response: dummyMessage,
-                        tools: ['updateUserAttributes', 'deleteUserAttributes', 'getActivities', 'updateActivities', 'deleteActivities'],
+                        executed_tool_calls: [{ tool_name: "dummyTool" }],
                     },
                 });
             }, 200);
