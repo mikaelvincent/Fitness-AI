@@ -46,8 +46,8 @@ const LandingPage: React.FC = () => {
                 <h1 className="text-center font-bold tracking-widest text-outerCard text-xl">REACH YOUR FITNESS GOALS</h1>
                 <div className="w-full grid grid-cols-1 grid-rows-3 md:grid-cols-3 md:grid-rows-1 p-5 gap-5 md:gap-8 lg:gap-10">
                     <div className="flex flex-col transition-all duration-300 hover:scale-[1.05] justify-center gap-5 items-center py-0">
-                        <MdTrackChanges className="h-32 w-32 flex-shrink-0 text-outerCard" />
-                        <section className="space-y-3">
+                        <MdTrackChanges className="h-32 w-32 flex-shrink-0 text-outerCard" fill='hsl(var(--primary))' />
+                        <section className="space-y-3 flex flex-col items-center">
                             <h2 className="text-3xl font-medium text-center text-outerCard">Track Your Workouts</h2>
                             <p className="text-base text-center font-normal text-outerCard max-w-64 md:max-w-xs">
                                 Stay on top of your fitness progress with detailed tracking of your workouts and achievements.
@@ -55,8 +55,8 @@ const LandingPage: React.FC = () => {
                         </section>
                     </div>
                     <div className="flex flex-col transition-all duration-300 hover:scale-[1.05] justify-center gap-5 items-center py-5">
-                        <GiInspiration className="h-32 w-32 flex-shrink-0 text-outerCard" />
-                        <section className="space-y-3">
+                        <GiInspiration className="h-32 w-32 flex-shrink-0 text-outerCard" fill='hsl(var(--primary))' />
+                        <section className="space-y-3 flex flex-col items-center">
                             <h2 className="text-3xl font-medium text-center text-outerCard">Stay Motivated</h2>
                             <p className="text-base text-center font-normal text-outerCard max-w-64 md:max-w-xs">
                                 AI-powered plans and real-time updates keep you inspired and pushing toward your goals.
@@ -64,8 +64,8 @@ const LandingPage: React.FC = () => {
                         </section>
                     </div>
                     <div className="flex flex-col transition-all duration-300 hover:scale-[1.05] justify-center gap-5 items-center py-5">
-                        <GiFist className="h-32 w-32 flex-shrink-0 text-outerCard" />
-                        <section className="space-y-3">
+                        <GiFist className="h-32 w-32 flex-shrink-0 text-outerCard" fill='hsl(var(--primary))' />
+                        <section className="space-y-3 flex flex-col items-center">
                             <h2 className="text-3xl font-medium text-center text-outerCard">Build Strength & Consistency</h2>
                             <p className="text-base text-center font-normal text-outerCard max-w-64 md:max-w-xs">
                                 Develop healthy workout habits and routines that stick—no matter your fitness level.
