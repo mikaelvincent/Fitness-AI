@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationToken;
-use App\Models\User;
 use App\Notifications\RegistrationTokenNotification;
 use App\Services\UserAttributeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
@@ -52,11 +52,33 @@ class RegistrationController extends Controller
      */
     public function initiate(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => ['required', 'email', 'unique:users'],
             'user_attributes' => ['nullable', 'array'],
             'user_attributes.*' => ['string', 'max:255'],
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $attributes = $request->input('user_attributes');
+            if (is_array($attributes)) {
+                foreach ($attributes as $key => $value) {
+                    if (!is_string($key)) {
+                        $validator->errors()->add('user_attributes', 'All attribute keys must be strings.');
+                        break;
+                    }
+                    if (mb_strlen($key) > 255) {
+                        $validator->errors()->add('user_attributes.' . $key, 'Attribute keys may not be greater than 255 characters.');
+                    }
+                }
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         $token = Str::random(60);
 
