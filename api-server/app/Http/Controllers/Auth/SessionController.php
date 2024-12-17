@@ -81,7 +81,16 @@ class SessionController extends Controller
             // Verify the two-factor authentication code
             if (! $google2fa->verifyKey($secretKey, $twoFactorCode)) {
                 // Check if the provided code matches a recovery code
-                $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
+                $recoveryCodes = [];
+                if ($user->two_factor_recovery_codes) {
+                    try {
+                        $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
+                    } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                        return response()->json([
+                            'message' => 'Invalid two-factor recovery codes.',
+                        ], 500);
+                    }
+                }
 
                 if (in_array($twoFactorCode, $recoveryCodes)) {
                     // Invalidate the used recovery code
