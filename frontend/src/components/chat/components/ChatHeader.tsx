@@ -2,7 +2,8 @@ import React from "react";
 import { RiAiGenerate } from "react-icons/ri";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-
+import BackButton from "@/components/custom-ui/BackButton";
+import { useLocation, useNavigate } from "react-router-dom";
 interface ChatHeaderProps {
     currentView: "chat" | "fitnessProfile";
     onGenerateWorkout: () => void;
@@ -17,10 +18,16 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     onBackToChatClick,
 }) => {
     const isChatView = currentView === "chat";
-
+    const location = useLocation();
+    const navigate = useNavigate();
     return (
         <header className="flex flex-col sticky top-0 z-10 p-6 text-center w-full bg-inherit text-foreground">
-            <div className="pt-8">
+            <div className="">
+                {location.pathname === "/chat" && (
+                    <div>
+                        <BackButton onClick={() => navigate(-1)} />
+                    </div>
+                )}
                 {isChatView ? (
                     <>
                         <h1 className="text-2xl lg:text-3xl font-bold">What Is Your Goal?</h1>
