@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx";
 import { Switch } from "@/components/ui/switch.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import {
@@ -18,13 +11,19 @@ import {
 import { Button } from "@/components/ui/button";
 import QRCode from "react-qr-code";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Clipboard } from "lucide-react"; // Added Clipboard icon
+import { ChevronLeft, Clipboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react"; // Import useState for copy functionality
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card.tsx";
 
 interface TwoFactorAuthPageProps {
   is2FAEnabled: boolean;
-  qrCode: string | null; // Assuming this is the secret key
+  qrCode: string | null;
   recoveryCodes: string[] | null;
   handleToggle2FA: (checked: boolean) => void;
   isModalOpen: boolean;
@@ -49,6 +48,18 @@ const TwoFactorAuthUI = ({
 }: TwoFactorAuthPageProps) => {
   const navigate = useNavigate();
   const [copySuccess, setCopySuccess] = useState<string>("");
+
+  // Temporary state to track the intended toggle action
+  const [tempToggle, setTempToggle] = useState<boolean>(is2FAEnabled);
+  const [isDialogConfirmed, setIsDialogConfirmed] = useState<boolean>(false);
+
+  useEffect(() => {
+    // If the dialog was confirmed, update the actual 2FA state
+    if (isDialogConfirmed) {
+      handleToggle2FA(tempToggle);
+      setIsDialogConfirmed(false);
+    }
+  }, [isDialogConfirmed, handleToggle2FA, tempToggle]);
 
   const handleCopy = () => {
     if (qrCode) {
@@ -80,6 +91,7 @@ const TwoFactorAuthUI = ({
   return (
     <div className="flex h-full w-full justify-center">
       <div className="flex h-full w-2/3 flex-col items-center justify-center space-y-6 p-4">
+        {/* Back Button */}
         <Button
           variant="link"
           size="lg"
@@ -89,6 +101,8 @@ const TwoFactorAuthUI = ({
           <ChevronLeft />
           <span>Back</span>
         </Button>
+
+        {/* Toggle Section */}
         <div className="rounded-lg border-2 border-primary p-10">
           <h1 className="mb-4 text-2xl font-bold">Two-Factor Authentication</h1>
 
@@ -103,28 +117,44 @@ const TwoFactorAuthUI = ({
               onCheckedChange={handleToggle2FA}
             />
           </div>
-
-          {is2FAEnabled && recoveryCodes && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Recovery Codes</CardTitle>
-                <CardDescription>
-                  Save these recovery codes in a secure place. You can use these
-                  to regain access to your account if you lose your 2FA device.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-disc space-y-1 pl-5">
-                  {recoveryCodes.map((code, index) => (
-                    <li key={index}>{code}</li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        {/* Recovery Codes */}
+        {is2FAEnabled && recoveryCodes && (
+          <Card>
+            <CardHeader>
+              <CardDescription>
+                Save these recovery codes in a secure place. You can use these
+                to regain access to your account if you lose your 2FA device.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                {recoveryCodes.map((code, index) => (
+                  <div
+                    key={index}
+                    className="rounded border p-2 text-center font-mono"
+                  >
+                    {code}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Dialog for Enabling 2FA */}
+        <Dialog
+          open={isModalOpen}
+          onOpenChange={(open) => {
+            setIsModalOpen(open);
+            if (!open) {
+              // If the dialog is closed without confirming, do not enable 2FA
+              // Ensure that the toggle remains off by not setting is2FAEnabled to true
+              // This is handled in the parent component
+            }
+          }}
+        >
           <DialogContent className="flex flex-col">
             <DialogHeader>
               <DialogTitle>Enable Two-Factor Authentication</DialogTitle>
@@ -134,7 +164,7 @@ const TwoFactorAuthUI = ({
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center self-center py-4">
-              <QRCode value={qrCode ? qrCode : ""} size={256} />
+              <QRCode value={qrCode || ""} size={256} />
 
               {/* Secret Key Section */}
               <div className="mt-6 w-full max-w-sm">
@@ -144,7 +174,7 @@ const TwoFactorAuthUI = ({
                 <div className="flex items-center">
                   <Input
                     id="secret-key"
-                    value={secretKey ? secretKey : ""}
+                    value={secretKey || ""}
                     readOnly
                     className="flex-1"
                   />
@@ -175,7 +205,13 @@ const TwoFactorAuthUI = ({
               className="mt-1"
             />
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  // No action needed here; the parent component manages the toggle
+                }}
+              >
                 Cancel
               </Button>
               <Button onClick={confirmEnable2FA}>Enable 2FA</Button>

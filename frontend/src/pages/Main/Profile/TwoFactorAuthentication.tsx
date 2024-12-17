@@ -1,3 +1,4 @@
+// TwoFactorAuthentication.tsx
 import { useEffect, useState } from "react";
 import TwoFactorAuthUI from "@/components/profile/twoFactorAuthencation/TwoFactorAuthUI.tsx";
 import {
@@ -17,25 +18,14 @@ export const TwoFactorAuthentication = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
 
-  // Handle toggle action from the UI
-  const handleToggle2FA = (checked: boolean) => {
-    if (checked) {
-      // User is attempting to enable 2FA
-      initializeEnable2FA().then((r) => r);
-      refreshToken();
-    } else {
-      // User is attempting to disable 2FA
-      disable2FA().then((r) => r);
-      refreshToken();
-    }
-  };
-
+  // Fetch current 2FA status on component mount
   useEffect(() => {
-    toggled2FA().then((r) => r);
+    fetch2FAStatus().then((r) => r);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     refreshToken();
   }, []);
 
-  const toggled2FA = async () => {
+  const fetch2FAStatus = async () => {
     try {
       const response: EnableTwoFactorAuthResponse =
         await EnableTwoFactorAuth(token);
@@ -45,21 +35,37 @@ export const TwoFactorAuthentication = () => {
         response.message === "Two-factor authentication is already enabled."
       ) {
         setIs2FAEnabled(true);
+        if (response.data) {
+          setRecoveryCodes(response.data.recovery_codes);
+        }
         return;
       }
 
       setIs2FAEnabled(false);
     } catch (err) {
-      console.error("Error during initializing 2FA:", err);
+      console.error("Error fetching 2FA status:", err);
       toast({
         variant: "destructive",
-        title: "Error Initializing 2FA",
-        description: "Failed to initiate two-factor authentication.",
+        title: "Error Fetching 2FA Status",
+        description: "Failed to retrieve two-factor authentication status.",
       });
     }
   };
 
-  // Step 1: Initialize enabling 2FA by fetching QR code and recovery codes
+  // Handle toggle action from the UI
+  const handleToggle2FA = (checked: boolean) => {
+    if (checked) {
+      // User is attempting to enable 2FA
+      initializeEnable2FA().then((r) => r);
+      refreshToken();
+      // Do not set is2FAEnabled here
+    } else {
+      // User is attempting to disable 2FA
+      disable2FA().then((r) => r);
+      refreshToken();
+    }
+  };
+
   const initializeEnable2FA = async () => {
     try {
       const response: EnableTwoFactorAuthResponse =
@@ -74,8 +80,7 @@ export const TwoFactorAuthentication = () => {
         return;
       }
 
-      // Update state with QR code and recovery codes
-      setIs2FAEnabled(true);
+      // Do not set is2FAEnabled to true here
       if (response.data) {
         setQrCode(response.data.qr_code_url);
         setRecoveryCodes(response.data.recovery_codes);
@@ -95,7 +100,6 @@ export const TwoFactorAuthentication = () => {
 
   // Step 2: Confirm enabling 2FA with the verification code
   const confirmEnable2FA = async () => {
-    setIsModalOpen(false);
     try {
       const confirmResponse = await ConfirmTwoFactorAuth({
         token,
@@ -108,18 +112,19 @@ export const TwoFactorAuthentication = () => {
           title: confirmResponse.message || "Confirmation Failed",
           description: "Unable to confirm two-factor authentication.",
         });
-        // Optionally disable 2FA since confirmation failed
-        setIs2FAEnabled(false);
+        // Optionally reset QR codes and recovery codes
         setQrCode(null);
         setRecoveryCodes(null);
         return;
       }
 
-      // Success Toast
+      // Success: Enable 2FA
+      setIs2FAEnabled(true);
       toast({
         title: "Two-Factor Authentication Activated",
         description: "Two-factor authentication has been enabled successfully.",
       });
+      refreshToken();
     } catch (err) {
       console.error("Error during confirming 2FA:", err);
       toast({
@@ -127,12 +132,12 @@ export const TwoFactorAuthentication = () => {
         title: "Error Confirming 2FA",
         description: "Failed to confirm two-factor authentication.",
       });
-      // Optionally disable 2FA since confirmation failed
-      setIs2FAEnabled(false);
+      // Optionally reset QR codes and recovery codes
       setQrCode(null);
       setRecoveryCodes(null);
     } finally {
       setVerificationCode("");
+      setIsModalOpen(false);
     }
   };
 
@@ -147,6 +152,8 @@ export const TwoFactorAuthentication = () => {
           title: response?.message || "Error Disabling 2FA",
           description: "Failed to disable two-factor authentication.",
         });
+        // Revert the toggle in UI by fetching the latest status
+        await fetch2FAStatus();
         return;
       }
 
@@ -161,6 +168,7 @@ export const TwoFactorAuthentication = () => {
       setIs2FAEnabled(false);
       setQrCode(null);
       setRecoveryCodes(null);
+      refreshToken();
     } catch (err) {
       console.error("Error during disabling 2FA:", err);
       toast({
@@ -168,6 +176,8 @@ export const TwoFactorAuthentication = () => {
         title: "Error Disabling 2FA",
         description: "Failed to disable two-factor authentication.",
       });
+      // Revert the toggle in UI by fetching the latest status
+      await fetch2FAStatus();
     }
   };
 
