@@ -47,7 +47,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                 </div>
             </div>
             {isLoading && (
-                <div className="text-xl text-center animate-pulse mt-4 text-gray-900">Genie is thinking...</div>
+                <div className="text-xl font-semibold text-center animate-pulse mt-4 text-gray-900">Genie is thinking...</div>
             )}
         </div>
     );
