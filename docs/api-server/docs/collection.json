@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "9a2292c7-c477-4dcb-9b22-4449e431dcfb",
+        "_postman_id": "c00964d8-aa66-41ff-8b02-bd404e462529",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -103,44 +103,6 @@
                             "header": [],
                             "code": 200,
                             "body": "{\n  \"message\": \"You have been successfully logged out.\"\n}",
-                            "name": ""
-                        },
-                        {
-                            "header": [],
-                            "code": 429,
-                            "body": "{\n  \"message\": \"You have exceeded the maximum number of attempts. Please try again in 60 seconds.\",\n  \"retry_after\": 60\n}",
-                            "name": ""
-                        }
-                    ]
-                },
-                {
-                    "name": "Refresh the authentication token.",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/token\/refresh",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/token\/refresh"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": null,
-                        "description": "Revokes the current token and issues a new one."
-                    },
-                    "response": [
-                        {
-                            "header": [],
-                            "code": 200,
-                            "body": "{\n  \"message\": \"Your authentication token has been refreshed successfully.\",\n  \"data\": {\n    \"token\": \"new-example-token\"\n  }\n}",
                             "name": ""
                         },
                         {
@@ -337,7 +299,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T14:42:55\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
+                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T19:31:19\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
                         },
                         "description": "",
                         "auth": {

@@ -139,51 +139,6 @@ paths:
                     example: 60
       tags:
         - Authentication
-  /api/token/refresh:
-    post:
-      summary: 'Refresh the authentication token.'
-      operationId: refreshTheAuthenticationToken
-      description: 'Revokes the current token and issues a new one.'
-      parameters: []
-      responses:
-        200:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'Your authentication token has been refreshed successfully.'
-                  data:
-                    token: new-example-token
-                properties:
-                  message:
-                    type: string
-                    example: 'Your authentication token has been refreshed successfully.'
-                  data:
-                    type: object
-                    properties:
-                      token:
-                        type: string
-                        example: new-example-token
-        429:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  message: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
-                  retry_after: 60
-                properties:
-                  message:
-                    type: string
-                    example: 'You have exceeded the maximum number of attempts. Please try again in 60 seconds.'
-                  retry_after:
-                    type: integer
-                    example: 60
-      tags:
-        - Authentication
   /api/user/attributes:
     get:
       summary: 'Retrieve all attributes for the authenticated user.'
@@ -305,7 +260,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-17T14:42:55'
+                        example: '2024-12-17T19:31:19'
                         nullable: false
                       parent_id:
                         type: integer
