@@ -22,7 +22,7 @@ class ChatContextService
     }
 
     /**
-     * Retrieve context from the past three months.
+     * Retrieve context from 3 months ago to 1 month from now.
      *
      * @param int $userId
      * @return array
@@ -30,12 +30,12 @@ class ChatContextService
     public function getContext(int $userId): array
     {
         $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
-        $today = Carbon::now()->format('Y-m-d');
+        $oneMonthFromNow = Carbon::now()->addMonth(1)->format('Y-m-d');
 
         $attributes = $this->userAttributeService->getAttributes($userId);
         $activities = $this->activityService->getActivities($userId, [
             'from_date' => $threeMonthsAgo,
-            'to_date' => $today,
+            'to_date' => $oneMonthFromNow,
         ]);
 
         return [
