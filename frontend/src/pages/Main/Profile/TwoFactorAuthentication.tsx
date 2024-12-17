@@ -112,14 +112,14 @@ export const TwoFactorAuthentication = () => {
           title: confirmResponse.message || "Confirmation Failed",
           description: "Unable to confirm two-factor authentication.",
         });
-        // Optionally reset QR codes and recovery codes
-        setQrCode(null);
-        setRecoveryCodes(null);
+        setIs2FAEnabled(false);
+        setIsModalOpen(true);
         return;
       }
 
       // Success: Enable 2FA
       setIs2FAEnabled(true);
+      setIsModalOpen(false);
       toast({
         title: "Two-Factor Authentication Activated",
         description: "Two-factor authentication has been enabled successfully.",
@@ -135,9 +135,6 @@ export const TwoFactorAuthentication = () => {
       // Optionally reset QR codes and recovery codes
       setQrCode(null);
       setRecoveryCodes(null);
-    } finally {
-      setVerificationCode("");
-      setIsModalOpen(false);
     }
   };
 
