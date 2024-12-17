@@ -43,21 +43,24 @@ class TwoFactorControllerTest extends TestCase
      */
     public function test_enable_two_factor_authentication_when_already_enabled()
     {
-        $user = User::factory()->create([
+        $user = User::factory()->create();
+
+        $user->forceFill([
             'two_factor_secret' => encrypt('existingsecret'),
             'two_factor_recovery_codes' => encrypt(json_encode(['code1', 'code2'])),
-        ]);
+            'two_factor_confirmed_at' => now(),
+        ])->save();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         $response = $this->withHeaders([
-                            'Authorization' => 'Bearer ' . $token,
-                        ])->postJson('/api/two-factor/enable');
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/two-factor/enable');
 
         $response->assertStatus(400)
-                 ->assertJson([
-                     'message' => 'Two-factor authentication is already enabled.',
-                 ]);
+            ->assertJson([
+                'message' => 'Two-factor authentication is already enabled.',
+            ]);
     }
 
     /**
