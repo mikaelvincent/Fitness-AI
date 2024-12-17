@@ -16,6 +16,16 @@ import LogoutButton from "@/components/authentication/LogoutButton";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { UpdateNameSchema } from "@/utils/schema/UpdateName.ts";
 
 export interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
@@ -26,6 +36,7 @@ export interface ProfileDashboardUIProps {
   onNameChange: (newName: string) => void;
   handleNavigation: (path: string) => void;
   attributes: Attribute[]; // Updated to an array of Attribute objects
+  form: UseFormReturn<z.infer<typeof UpdateNameSchema>>;
 }
 
 export default function ProfileDashboardUI({
@@ -37,6 +48,7 @@ export default function ProfileDashboardUI({
   onNameChange,
   handleNavigation,
   attributes,
+  form,
 }: ProfileDashboardUIProps) {
   return (
     <div className="flex h-full w-full flex-col justify-start gap-8 p-4 lg:p-8 xl:justify-center">
@@ -57,20 +69,39 @@ export default function ProfileDashboardUI({
                 </div>
               ) : (
                 <div className="flex justify-between">
-                  <Input
-                    type="text"
-                    className="text-2xl font-bold"
-                    value={profileInfo.name}
-                    onChange={(e) => onNameChange(e.target.value)}
-                  />
-                  <div className="flex">
-                    <Button variant="ghost" onClick={onSaveName}>
-                      <Save className="text-primary" />
-                    </Button>
-                    <Button variant="ghost" onClick={onCancelEditName}>
-                      <X className="text-red-500" />
-                    </Button>
-                  </div>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSaveName)}
+                      className="flex w-full"
+                      noValidate
+                    >
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem className="w-full flex-1">
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="text"
+                                value={profileInfo.name}
+                                onChange={(e) => onNameChange(e.target.value)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex flex-initial">
+                        <Button type="submit" variant="ghost">
+                          <Save className="text-primary" />
+                        </Button>
+                        <Button variant="ghost" onClick={onCancelEditName}>
+                          <X className="text-red-500" />
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
                 </div>
               )}
 
