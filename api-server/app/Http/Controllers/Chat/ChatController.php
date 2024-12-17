@@ -108,12 +108,17 @@ class ChatController extends Controller
                 'user_id' => $request->user()->id,
             ]);
 
-            // Flatten the response so that the final message is directly in data.response
+            $executedToolCalls = $response['executed_tool_calls'] ?? [];
+            $executedToolCalls = array_map(function ($call) {
+                unset($call['result']);
+                return $call;
+            }, $executedToolCalls);
+
             return response()->json([
                 'message' => 'Chat response generated successfully.',
                 'data' => [
                     'response' => $response['response'] ?? null,
-                    'executed_tool_calls' => $response['executed_tool_calls'] ?? []
+                    'executed_tool_calls' => $executedToolCalls
                 ],
             ], 200);
 
@@ -130,4 +135,3 @@ class ChatController extends Controller
         }
     }
 }
-
