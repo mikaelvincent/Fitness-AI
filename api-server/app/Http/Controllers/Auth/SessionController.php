@@ -106,11 +106,15 @@ class SessionController extends Controller
             }
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Create token with expiration
+        $tokenResult = $user->createToken('auth_token');
+        $tokenResult->accessToken->expires_at = now()->addMinutes(config('sanctum.expiration', 60));
+        $tokenResult->accessToken->save();
+        $token = $tokenResult->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful. You are now authenticated.',
-            'data'    => [
+            'data' => [
                 'token' => $token,
             ],
         ], 200);

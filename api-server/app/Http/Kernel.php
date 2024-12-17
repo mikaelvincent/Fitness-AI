@@ -47,5 +47,6 @@ class Kernel extends HttpKernel
         "throttle" => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         "verified" => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'custom.rate_limiter' => \App\Http\Middleware\RateLimitingMiddleware::class,
+        'update.token.expiry' => \App\Http\Middleware\UpdateTokenExpiry::class,
     ];
 }

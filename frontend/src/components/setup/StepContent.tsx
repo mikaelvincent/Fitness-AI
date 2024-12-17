@@ -13,9 +13,10 @@ interface StepContentProps {
     stepId: string;
     data: SetupData;
     onChange: (key: string, value: any) => void;
+    setCurrentStep: (stepId: number) => void;
 }
 
-export const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange }) => {
+export const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange, setCurrentStep }) => {
     const stepsMap: Record<string, JSX.Element> = {
         gender: <GenderStep gender={data.gender} onChange={onChange} />,
         birthdate: <BirthdateStep birthdate={data.birthdate} onChange={onChange} />,
@@ -24,7 +25,7 @@ export const StepContent: React.FC<StepContentProps> = ({ stepId, data, onChange
         height: <HeightStep height={data.height} heightUnit={data.heightUnit} onChange={onChange} />,
         activity: <ActivityStep activity={data.activity} onChange={onChange} />,
         nickname: <NicknameStep nickname={data.nickname} onChange={onChange} />,
-        summary: <SummaryStep data={data} />,
+        summary: <SummaryStep data={data} setCurrentStep={setCurrentStep} />,
     };
 
     return stepsMap[stepId] || null;

@@ -81,9 +81,6 @@
                                                                                 <li class="tocify-item level-2" data-unique="authentication-POSTapi-logout">
                                 <a href="#authentication-POSTapi-logout">Logout the authenticated user.</a>
                             </li>
-                                                                                <li class="tocify-item level-2" data-unique="authentication-POSTapi-token-refresh">
-                                <a href="#authentication-POSTapi-token-refresh">Refresh the authentication token.</a>
-                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-endpoints" class="tocify-header">
@@ -604,182 +601,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Accept"                data-endpoint="POSTapi-logout"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                        </form>
-
-                    <h2 id="authentication-POSTapi-token-refresh">Refresh the authentication token.</h2>
-
-<p>
-<small class="badge badge-darkred">requires authentication</small>
-</p>
-
-<p>Revokes the current token and issues a new one.</p>
-
-<span id="example-requests-POSTapi-token-refresh">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1:8000/api/token/refresh" \
-    --header "Authorization: Bearer {YOUR_AUTH_KEY}" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1:8000/api/token/refresh"
-);
-
-const headers = {
-    "Authorization": "Bearer {YOUR_AUTH_KEY}",
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-}).then(response =&gt; response.json());</code></pre></div>
-
-
-<div class="php-example">
-    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://127.0.0.1:8000/api/token/refresh';
-$response = $client-&gt;post(
-    $url,
-    [
-        'headers' =&gt; [
-            'Authorization' =&gt; 'Bearer {YOUR_AUTH_KEY}',
-            'Content-Type' =&gt; 'application/json',
-            'Accept' =&gt; 'application/json',
-        ],
-    ]
-);
-$body = $response-&gt;getBody();
-print_r(json_decode((string) $body));</code></pre></div>
-
-
-<div class="python-example">
-    <pre><code class="language-python">import requests
-import json
-
-url = 'http://127.0.0.1:8000/api/token/refresh'
-headers = {
-  'Authorization': 'Bearer {YOUR_AUTH_KEY}',
-  'Content-Type': 'application/json',
-  'Accept': 'application/json'
-}
-
-response = requests.request('POST', url, headers=headers)
-response.json()</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTapi-token-refresh">
-            <blockquote>
-            <p>Example response (200):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Your authentication token has been refreshed successfully.&quot;,
-    &quot;data&quot;: {
-        &quot;token&quot;: &quot;new-example-token&quot;
-    }
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (429):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;You have exceeded the maximum number of attempts. Please try again in 60 seconds.&quot;,
-    &quot;retry_after&quot;: 60
-}</code>
- </pre>
-    </span>
-<span id="execution-results-POSTapi-token-refresh" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTapi-token-refresh"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-token-refresh"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTapi-token-refresh" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-token-refresh">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTapi-token-refresh" data-method="POST"
-      data-path="api/token/refresh"
-      data-authed="1"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-token-refresh', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-token-refresh"
-                    onclick="tryItOut('POSTapi-token-refresh');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-token-refresh"
-                    onclick="cancelTryOut('POSTapi-token-refresh');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-token-refresh"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>api/token/refresh</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-token-refresh"
-               value="Bearer {YOUR_AUTH_KEY}"
-               data-component="header">
-    <br>
-<p>Example: <code>Bearer {YOUR_AUTH_KEY}</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-token-refresh"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-token-refresh"
                value="application/json"
                data-component="header">
     <br>
@@ -1469,7 +1290,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"activities\": [
         {
             \"id\": 10,
-            \"date\": \"2024-12-17T14:42:55\",
+            \"date\": \"2024-12-17T19:31:19\",
             \"parent_id\": 10,
             \"position\": 10,
             \"name\": \"cjanyizogaho\",
@@ -1496,7 +1317,7 @@ let body = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-17T14:42:55",
+            "date": "2024-12-17T19:31:19",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1528,7 +1349,7 @@ $response = $client-&gt;put(
             'activities' =&gt; [
                 [
                     'id' =&gt; 10,
-                    'date' =&gt; '2024-12-17T14:42:55',
+                    'date' =&gt; '2024-12-17T19:31:19',
                     'parent_id' =&gt; 10,
                     'position' =&gt; 10,
                     'name' =&gt; 'cjanyizogaho',
@@ -1553,7 +1374,7 @@ payload = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-17T14:42:55",
+            "date": "2024-12-17T19:31:19",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1671,10 +1492,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="activities.0.date"                data-endpoint="PUTapi-activities"
-               value="2024-12-17T14:42:55"
+               value="2024-12-17T19:31:19"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2024-12-17T14:42:55</code></p>
+<p>Must be a valid date. Example: <code>2024-12-17T19:31:19</code></p>
                     </div>
                                                                 <div style="margin-left: 14px; clear: unset;">
                         <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;

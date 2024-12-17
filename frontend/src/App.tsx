@@ -30,6 +30,8 @@ import PublicRoute from "@/components/protected-routes/PublicRoute";
 
 import LandingPage from "./pages/LandingPage.tsx";
 
+
+
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">

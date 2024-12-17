@@ -243,7 +243,11 @@ class RegistrationController extends Controller
 
         $registrationToken->delete();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Create token with expiration
+        $tokenResult = $user->createToken('auth_token');
+        $tokenResult->accessToken->expires_at = now()->addMinutes(config('sanctum.expiration', 60));
+        $tokenResult->accessToken->save();
+        $token = $tokenResult->plainTextToken;
 
         return response()->json([
             'message' => 'Registration completed successfully. Welcome aboard!',
