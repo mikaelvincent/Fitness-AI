@@ -19,14 +19,14 @@ const LandingPage: React.FC = () => {
                 <div className="py-5 lg:px-8 sm:px-6 px-6 rounded-2xl ">
                     <section className="font-medium w-full max-w-lg md:max-w-2xl text-lightYellow flex flex-col gap-6">
                         <WordPullUp
-                            className="text-start xl:text-6xl lg:text-5xl sm:text-4xl text-4xl font-medium tracking-[-0.02em] md:text-6xl md:leading-[4rem]"
+                            className="text-center xl:text-6xl lg:text-5xl sm:text-4xl text-4xl font-medium tracking-[-0.02em] md:text-6xl md:leading-[4rem]"
                             words="Transform Your Fitness Journey with GymGenie"
                         />
-                        <p className="lg:leading-[2rem] sm:leading-[1.5rem] leading-[1.5rem] lg:text-md sm:text-sm text-sm text-left">
+                        <p className="lg:leading-[2rem] sm:leading-[1.5rem] leading-[1.5rem] lg:text-md sm:text-sm text-sm text-center">
                             GymGenie is your AI-powered fitness assistant that helps you achieve your goals effortlessly. Create personalized workout plans, track progress, and stay motivated—whether you're a beginner or a pro. Let GymGenie make fitness easy, effective, and tailored for you.
                         </p>
 
-                        <Link to="/login" className="flex justify-start">
+                        <Link to="/login" className="flex justify-center">
                             <Button
                                 variant="outline"
                                 size="lg"
