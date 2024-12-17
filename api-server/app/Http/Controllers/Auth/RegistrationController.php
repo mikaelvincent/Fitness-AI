@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationToken;
+use App\Models\User;
 use App\Notifications\RegistrationTokenNotification;
 use App\Services\UserAttributeService;
 use Illuminate\Http\Request;
@@ -42,12 +42,12 @@ class RegistrationController extends Controller
      * @bodyParam user_attributes object optional Key-value pairs of user attributes.
      *
      * @response 200 {
-     *   "message": "Registration process has been initiated. Please check your email for further instructions."
+     *  "message": "Registration process has been initiated. Please check your email for further instructions."
      * }
      *
      * @response 429 {
-     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
-     *   "retry_after": 60
+     *  "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *  "retry_after": 60
      * }
      */
     public function initiate(Request $request)
@@ -108,12 +108,12 @@ class RegistrationController extends Controller
      * @bodyParam email string required The user's email address.
      *
      * @response 200 {
-     *   "message": "A new verification email has been sent to your address."
+     *  "message": "A new verification email has been sent to your address."
      * }
      *
      * @response 429 {
-     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
-     *   "retry_after": 60
+     *  "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *  "retry_after": 60
      * }
      */
     public function resend(Request $request)
@@ -147,19 +147,19 @@ class RegistrationController extends Controller
      * @bodyParam token string required The registration token.
      *
      * @response 200 {
-     *   "message": "The registration token is valid.",
-     *   "data": {
-     *     "expires_in": 3600
-     *   }
+     *  "message": "The registration token is valid.",
+     *  "data": {
+     *      "expires_in": 3600
+     *  }
      * }
      *
      * @response 400 {
-     *   "message": "The registration token is invalid or has expired."
+     *  "message": "The registration token is invalid or has expired."
      * }
      *
      * @response 429 {
-     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
-     *   "retry_after": 60
+     *  "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *  "retry_after": 60
      * }
      */
     public function validateToken(Request $request)
@@ -169,6 +169,7 @@ class RegistrationController extends Controller
         ]);
 
         $hashedToken = hash('sha256', $request->token);
+
         $registrationToken = RegistrationToken::where('token', $hashedToken)->firstOrFail();
 
         if ($registrationToken->isExpired()) {
@@ -197,19 +198,19 @@ class RegistrationController extends Controller
      * @bodyParam password_confirmation string required Confirmation of the password.
      *
      * @response 201 {
-     *   "message": "Registration completed successfully. Welcome aboard!",
-     *   "data": {
-     *     "token": "example-token"
-     *   }
+     *  "message": "Registration completed successfully. Welcome aboard!",
+     *  "data": {
+     *      "token": "example-token"
+     *  }
      * }
      *
      * @response 400 {
-     *   "message": "The registration token provided is invalid or has expired."
+     *  "message": "The registration token provided is invalid or has expired."
      * }
      *
      * @response 429 {
-     *   "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
-     *   "retry_after": 60
+     *  "message": "You have exceeded the maximum number of attempts. Please try again in 60 seconds.",
+     *  "retry_after": 60
      * }
      */
     public function complete(Request $request)
@@ -221,6 +222,7 @@ class RegistrationController extends Controller
         ]);
 
         $hashedToken = hash('sha256', $request->token);
+
         $registrationToken = RegistrationToken::where('token', $hashedToken)->firstOrFail();
 
         if ($registrationToken->isExpired()) {
