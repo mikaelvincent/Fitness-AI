@@ -51,7 +51,7 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         }
     };
 
-    const sendMessages = async (userMessage: string) => {
+    const sendMessage = async (userMessage: string) => {
         if (isLoading) return;
 
         const newUserMessage: Message = { role: "user", content: userMessage };
@@ -71,7 +71,8 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
             );
 
             const aiResponse = response?.data?.response || "Sorry, something went wrong.";
-            const tools = response?.data?.tools || [];
+            const tool_calls = response?.data?.executed_tool_calls || [];
+            const tools = tool_calls.map((tool: { tool_name: string }) => tool.tool_name);
 
             // Attach tools internally
             const newAIMessage: Message = {
@@ -95,54 +96,54 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         }
     };
 
-    const sendMessage = async (userMessage: string) => {
-        if (isLoading) return;
+    // const sendMessage = async (userMessage: string) => {
+    //     if (isLoading) return;
 
-        const newUserMessage: Message = { role: "user", content: userMessage };
-        setMessages((prev) => [...prev, newUserMessage]); // Add user message
+    //     const newUserMessage: Message = { role: "user", content: userMessage };
+    //     setMessages((prev) => [...prev, newUserMessage]); // Add user message
 
-        setIsLoading(true);
+    //     setIsLoading(true);
 
-        try {
-            // Add an empty assistant message to start streaming
-            setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+    //     try {
+    //         // Add an empty assistant message to start streaming
+    //         setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
-            const handleStream = (chunk: string) => {
-                setMessages((prevMessages) => {
-                    const lastMessage = prevMessages[prevMessages.length - 1];
-                    if (lastMessage?.role === "assistant") {
-                        return [
-                            ...prevMessages.slice(0, -1),
-                            { ...lastMessage, content: lastMessage.content + chunk },
-                        ];
-                    }
-                    return [...prevMessages, { role: "assistant", content: chunk }];
-                });
-            };
+    //         const handleStream = (chunk: string) => {
+    //             setMessages((prevMessages) => {
+    //                 const lastMessage = prevMessages[prevMessages.length - 1];
+    //                 if (lastMessage?.role === "assistant") {
+    //                     return [
+    //                         ...prevMessages.slice(0, -1),
+    //                         { ...lastMessage, content: lastMessage.content + chunk },
+    //                     ];
+    //                 }
+    //                 return [...prevMessages, { role: "assistant", content: chunk }];
+    //             });
+    //         };
 
-            await streamGPTResponse(
-                [...messages, newUserMessage],
-                handleStream,
-                ["updateUserAttributes", "deleteUserAttributes"],
-                "gpt-4"
-            );
+    //         await streamGPTResponse(
+    //             [...messages, newUserMessage],
+    //             handleStream,
+    //             ["updateUserAttributes", "deleteUserAttributes"],
+    //             "gpt-4"
+    //         );
 
-        } catch (error) {
-            console.error("Error streaming GPT response:", error);
-            setMessages((prevMessages) => {
-                const lastMessage = prevMessages[prevMessages.length - 1];
-                if (lastMessage?.role === "assistant") {
-                    return [
-                        ...prevMessages.slice(0, -1),
-                        { ...lastMessage, content: "Oops! There was an error. Please try again later." },
-                    ];
-                }
-                return prevMessages;
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    //     } catch (error) {
+    //         console.error("Error streaming GPT response:", error);
+    //         setMessages((prevMessages) => {
+    //             const lastMessage = prevMessages[prevMessages.length - 1];
+    //             if (lastMessage?.role === "assistant") {
+    //                 return [
+    //                     ...prevMessages.slice(0, -1),
+    //                     { ...lastMessage, content: "Oops! There was an error. Please try again later." },
+    //                 ];
+    //             }
+    //             return prevMessages;
+    //         });
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
 
     const switchToFitnessProfile = () => setCurrentView("fitnessProfile");
