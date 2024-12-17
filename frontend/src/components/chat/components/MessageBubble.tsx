@@ -57,7 +57,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ sender, message, tools })
                     h3: ({ ...props }) => <h3 {...props} className="text-2xl font-medium my-2 break-words" />,
                     p: ({ ...props }) => <p {...props} className="my-2 leading-relaxed break-words" />,
                     ul: ({ ...props }) => <ul {...props} className="list-disc list-inside pl-4 my-2 break-words" />,
-                    ol: ({ ...props }) => <ol {...props} className="list-decimal list-inside pl-4 my-2 break-words" />,
+                    ol: ({ ...props }) => <ol {...props} className="list-decimal list-outside pl-4 my-2 break-words" />,
                     li: ({ ...props }) => <li {...props} className="leading-relaxed break-words" />,
                     blockquote: ({ ...props }) => (
                         <blockquote {...props} className="border-l-4 border-blue-400 pl-4 italic my-4 text-gray-600 break-words" />
