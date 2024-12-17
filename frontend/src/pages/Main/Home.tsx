@@ -306,7 +306,7 @@ const Home = () => {
         description: newExercise.type.trim(),
         completed: false,
         notes: "",
-        metrics: [],
+        metrics: {},
         parent_id: newExercise.parentId,
         date: currentDate,
         children: [],

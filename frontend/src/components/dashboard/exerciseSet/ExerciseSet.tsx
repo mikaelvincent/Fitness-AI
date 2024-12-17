@@ -1,5 +1,3 @@
-// frontend/src/components/dashboard/exerciseSet/ExerciseSet.tsx
-
 import { forwardRef, ReactNode, useEffect, useState } from "react";
 import {
   Check,
@@ -13,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { Exercise, Metric } from "@/types/exerciseTypes.ts";
+import { Exercise } from "@/types/exerciseTypes.ts";
 import { Input } from "@/components/ui/input.tsx";
 
 interface ExerciseSetProps {
@@ -37,149 +35,141 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
       onDeleteExercise,
       onAddChildExercise,
       onUpdateExercise,
-      children
+      children,
     },
-    ref
+    ref,
   ) => {
     const [isEditingNotes, setIsEditingNotes] = useState(false);
     const [tempNotes, setTempNotes] = useState(exercise.notes);
-    
+
     // States for editing the exercise itself
     const [editingExercise, setEditingExercise] = useState(false);
     const [tempExerciseName, setTempExerciseName] = useState(exercise.name);
     const [tempExerciseDescription, setTempExerciseDescription] = useState(
-      exercise.description
+      exercise.description,
     );
-    
+
     // State for adding a new metric
     const [isAddingMetric, setIsAddingMetric] = useState(false);
-    const [newMetricName, setNewMetricName] = useState("");
-    const [newMetricValue, setNewMetricValue] = useState<number>(0);
-    const [newMetricUnit, setNewMetricUnit] = useState("");
-    
-    // State for editing an existing metric by index
-    const [editingMetricIndex, setEditingMetricIndex] = useState<number | null>(
-      null
+    const [newMetricKey, setNewMetricKey] = useState("");
+    const [newMetricValue, setNewMetricValue] = useState("");
+
+    // State for editing an existing metric by key
+    const [editingMetricKey, setEditingMetricKey] = useState<string | null>(
+      null,
     );
-    const [tempMetricName, setTempMetricName] = useState("");
-    const [tempMetricValue, setTempMetricValue] = useState<number>(0);
-    const [tempMetricUnit, setTempMetricUnit] = useState("");
-    
-    
+    const [tempMetricKey, setTempMetricKey] = useState("");
+    const [tempMetricValue, setTempMetricValue] = useState("");
+
     useEffect(() => {
       setTempNotes(exercise.notes);
     }, [exercise.notes]);
-    
+
     useEffect(() => {
       if (!isActive) {
         setIsEditingNotes(false);
-        setEditingMetricIndex(null);
+        setEditingMetricKey(null);
         setIsAddingMetric(false);
       }
     }, [isActive]);
-    
-    
+
     const handleNotesSave = () => {
       const updatedExercise: Exercise = {
         ...exercise,
-        notes: tempNotes
+        notes: tempNotes,
       };
       onUpdateExercise(updatedExercise);
       setIsEditingNotes(false);
     };
-    
+
     const handleNotesCancel = () => {
       setTempNotes(exercise.notes);
       setIsEditingNotes(false);
     };
-    
-    const handleMetricClick = (index: number, metric: Metric) => {
+
+    const handleMetricClick = (key: string, value: string) => {
       // If we're already editing this metric, clicking again cancels editing
-      if (editingMetricIndex === index) {
-        setEditingMetricIndex(null);
+      if (editingMetricKey === key) {
+        setEditingMetricKey(null);
       } else {
         // Start editing this metric
-        setEditingMetricIndex(index);
-        setTempMetricName(metric.name);
-        setTempMetricValue(metric.value);
-        setTempMetricUnit(metric.unit);
+        setEditingMetricKey(key);
+        setTempMetricKey(key);
+        setTempMetricValue(value);
       }
     };
-    
+
     const handleSaveMetric = () => {
-      if (editingMetricIndex === null) return;
-      
-      const updatedMetrics = [...(exercise.metrics || [])];
-      updatedMetrics[editingMetricIndex] = {
-        name: tempMetricName,
-        value: tempMetricValue,
-        unit: tempMetricUnit
-      };
-      
+      if (!editingMetricKey) return;
+
+      const updatedMetrics = { ...(exercise.metrics || {}) };
+      // If the key has changed, remove the old key
+      if (tempMetricKey !== editingMetricKey) {
+        delete updatedMetrics[editingMetricKey];
+      }
+      // Add/Update the metric with the new key/value
+      updatedMetrics[tempMetricKey.trim()] = tempMetricValue.trim();
+
       const updatedExercise: Exercise = {
         ...exercise,
-        metrics: updatedMetrics
+        metrics: updatedMetrics,
       };
-      
+
       onUpdateExercise(updatedExercise);
-      setEditingMetricIndex(null);
+      setEditingMetricKey(null);
     };
-    
-    
+
     const handleCancelMetricEdit = () => {
-      setEditingMetricIndex(null);
+      setEditingMetricKey(null);
     };
-    
+
     const handleAddMetricSubmit = () => {
-      // Create the new metric
-      const newMetric: Metric = {
-        name: newMetricName.trim(),
-        value: newMetricValue,
-        unit: newMetricUnit.trim()
-      };
-      
+      const key = newMetricKey.trim();
+      const value = newMetricValue.trim();
+      if (!key) return;
+
+      const updatedMetrics = { ...(exercise.metrics || {}) };
+      updatedMetrics[key] = value;
+
       const updatedExercise: Exercise = {
         ...exercise,
-        metrics: [...(exercise.metrics || []), newMetric]
+        metrics: updatedMetrics,
       };
-      
-      
+
       onUpdateExercise(updatedExercise);
+
       // Reset the form and close it
       setIsAddingMetric(false);
-      setNewMetricName("");
-      setNewMetricValue(0);
-      setNewMetricUnit("");
+      setNewMetricKey("");
+      setNewMetricValue("");
     };
-    
-    const handleDeleteMetric = (index: number) => {
-      const updatedMetrics = (exercise.metrics || []).filter(
-        (_, i) => i !== index
-      );
+
+    const handleDeleteMetric = (key: string) => {
+      const updatedMetrics = { ...(exercise.metrics || {}) };
+      delete updatedMetrics[key];
       const updatedExercise: Exercise = {
         ...exercise,
-        metrics: updatedMetrics
+        metrics: updatedMetrics,
       };
       onUpdateExercise(updatedExercise);
     };
-    
-    
+
     const handleSaveExercise = () => {
       const updatedExercise: Exercise = {
         ...exercise,
         name: tempExerciseName,
-        description: tempExerciseDescription
+        description: tempExerciseDescription,
       };
       onUpdateExercise(updatedExercise);
       setEditingExercise(false);
     };
-    
+
     const detailsVariants = {
       hidden: { opacity: 0, height: 0 },
       visible: { opacity: 1, height: "auto" },
-      exit: { opacity: 0, height: 0 }
+      exit: { opacity: 0, height: 0 },
     };
-    
+
     return (
       <div ref={ref} className="border-b-2 border-b-primary p-4">
         <div className="mb-2 flex items-center justify-between gap-3">
@@ -207,12 +197,12 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     initial={{
                       rotate: exercise.completed ? 0 : 180,
                       scale: exercise.completed ? 1 : 0.8,
-                      opacity: exercise.completed ? 1 : 0
+                      opacity: exercise.completed ? 1 : 0,
                     }}
                     animate={{
                       rotate: exercise.completed ? 0 : 180,
                       scale: exercise.completed ? 1 : 0.8,
-                      opacity: exercise.completed ? 1 : 0
+                      opacity: exercise.completed ? 1 : 0,
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="inline-block"
@@ -261,17 +251,17 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
           )}
           {editingExercise && (
             <>
-              <div className="flex items-center gap-2 1/2 w-10/12">
+              <div className="flex w-10/12 items-center gap-2">
                 <Input
                   type="text"
-                  value={tempExerciseName}
+                  value={tempExerciseName || ""}
                   onChange={(e) => setTempExerciseName(e.target.value)}
                   className="rounded px-2 py-1 text-sm"
                   placeholder="Exercise Name"
                 />
                 <Input
                   type="text"
-                  value={tempExerciseDescription}
+                  value={tempExerciseDescription || ""}
                   onChange={(e) => setTempExerciseDescription(e.target.value)}
                   className="rounded px-2 py-1 text-sm"
                   placeholder="Description"
@@ -351,111 +341,111 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                     </Button>
                   )}
                 </div>
-                
+
                 {/* Metrics Section */}
                 <div className="space-y-2">
                   <h4 className="font-semibold">Metrics:</h4>
-                  {(Array.isArray(exercise.metrics) ? exercise.metrics : []).map((metric, index) => (
-                    <div
-                      key={index}
-                      className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
-                      onClick={() => handleMetricClick(index, metric)}
-                    >
-                      {editingMetricIndex === index ? (
-                        <div
-                          className="w-full"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="grid grid-cols-3 gap-2">
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor={`metric-name-${index}`}
-                                className="text-xs text-gray-300"
-                              >
-                                Name
-                              </label>
-                              <Input
-                                id={`metric-name-${index}`}
-                                type="text"
-                                value={tempMetricName}
-                                onChange={(e) =>
-                                  setTempMetricName(e.target.value)
-                                }
-                                className="w-full rounded px-2 py-1 text-sm"
-                                placeholder="Metric Name"
-                              />
+                  {Object.entries(exercise.metrics || {}).map(
+                    ([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex cursor-pointer items-center justify-between rounded p-2 text-sm hover:bg-muted"
+                        onClick={() => handleMetricClick(key, value)}
+                      >
+                        {editingMetricKey === key ? (
+                          <div
+                            className="w-full"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="flex flex-col">
+                                <label
+                                  htmlFor={`metric-key-${key}`}
+                                  className="text-xs text-gray-300"
+                                >
+                                  Name
+                                </label>
+                                <Input
+                                  id={`metric-key-${key}`}
+                                  type="text"
+                                  value={tempMetricKey}
+                                  onChange={(e) =>
+                                    setTempMetricKey(e.target.value)
+                                  }
+                                  className="w-full rounded px-2 py-1 text-sm"
+                                  placeholder="Metric Key"
+                                />
+                              </div>
+                              <div className="flex flex-col">
+                                <label
+                                  htmlFor={`metric-value-${key}`}
+                                  className="text-xs text-gray-300"
+                                >
+                                  Value
+                                </label>
+                                <Input
+                                  id={`metric-value-${key}`}
+                                  type="text"
+                                  value={tempMetricValue}
+                                  onChange={(e) =>
+                                    setTempMetricValue(e.target.value)
+                                  }
+                                  className="w-full rounded px-2 py-1 text-sm"
+                                  placeholder="Value"
+                                />
+                              </div>
                             </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor={`metric-value-${index}`}
-                                className="text-xs text-gray-300"
+                            <div className="mt-2 flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSaveMetric();
+                                }}
+                                className="text-primary transition-colors hover:text-orange-400"
+                                aria-label="Save metric"
+                                size="icon"
                               >
-                                Value
-                              </label>
-                              <Input
-                                id={`metric-value-${index}`}
-                                type="number"
-                                value={tempMetricValue}
-                                onChange={(e) =>
-                                  setTempMetricValue(
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
-                                className="w-full rounded px-2 py-1 text-sm"
-                                min="0"
-                                step="0.1"
-                                placeholder="Value"
-                              />
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor={`metric-unit-${index}`}
-                                className="text-xs text-gray-300"
+                                <Save />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCancelMetricEdit();
+                                }}
+                                className="text-red-500 transition-colors hover:text-red-700"
+                                aria-label="Cancel editing metric"
+                                size="icon"
                               >
-                                Unit
-                              </label>
-                              <Input
-                                id={`metric-unit-${index}`}
-                                type="text"
-                                value={tempMetricUnit}
-                                onChange={(e) =>
-                                  setTempMetricUnit(e.target.value)
-                                }
-                                className="w-full rounded px-2 py-1 text-sm"
-                                placeholder="Unit"
-                              />
+                                <X />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteMetric(key);
+                                }}
+                                className="text-red-500 transition-colors hover:text-red-700"
+                                aria-label="Delete metric"
+                                size="icon"
+                              >
+                                <Trash2 />
+                              </Button>
                             </div>
                           </div>
-                          <div className="mt-2 flex items-center justify-end gap-2">
+                        ) : (
+                          <>
+                            <div className="flex-grow">
+                              <p>
+                                <strong>{key}</strong>: {value}
+                              </p>
+                            </div>
                             <Button
                               variant="ghost"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleSaveMetric();
-                              }}
-                              className="text-primary transition-colors hover:text-orange-400"
-                              aria-label="Save metric"
-                              size="icon"
-                            >
-                              <Save />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCancelMetricEdit();
-                              }}
-                              className="text-red-500 transition-colors hover:text-red-700"
-                              aria-label="Cancel editing metric"
-                              size="icon"
-                            >
-                              <X />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteMetric(index);
+                                handleDeleteMetric(key);
                               }}
                               className="text-red-500 transition-colors hover:text-red-700"
                               aria-label="Delete metric"
@@ -463,79 +453,39 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                             >
                               <Trash2 />
                             </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="grid flex-grow grid-cols-3">
-                            <p>{metric.name}: </p>
-                            <p>
-                              {metric.value} {metric.unit}
-                            </p>
-                            <p></p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteMetric(index);
-                            }}
-                            className="text-red-500 transition-colors hover:text-red-700"
-                            aria-label="Delete metric"
-                            size="icon"
-                          >
-                            <Trash2 />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  
+                          </>
+                        )}
+                      </div>
+                    ),
+                  )}
+
                   {/* Add new metric form */}
                   {isAddingMetric && (
                     <div className="space-y-2 rounded bg-muted p-4">
                       <h4 className="font-semibold">New Metric</h4>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col">
-                          <label className="text-xs text-gray-300">
-                            Name
-                          </label>
+                          <label className="text-xs text-gray-300">Key</label>
                           <Input
                             type="text"
-                            value={newMetricName}
-                            onChange={(e) => setNewMetricName(e.target.value)}
-                            placeholder="Metric Name"
+                            value={newMetricKey}
+                            onChange={(e) => setNewMetricKey(e.target.value)}
+                            placeholder="Metric Key"
                             className="rounded px-2 py-1 text-sm"
                           />
                         </div>
                         <div className="flex flex-col">
-                          <label className="text-xs text-gray-300">
-                            Value
-                          </label>
+                          <label className="text-xs text-gray-300">Value</label>
                           <Input
-                            type="number"
+                            type="text"
                             value={newMetricValue}
-                            onChange={(e) => setNewMetricValue(parseFloat(e.target.value) || 0)}
-                            min="0"
-                            step="0.1"
+                            onChange={(e) => setNewMetricValue(e.target.value)}
                             placeholder="Value"
                             className="rounded px-2 py-1 text-sm"
                           />
                         </div>
-                        <div className="flex flex-col">
-                          <label className="text-xs text-gray-300">
-                            Unit
-                          </label>
-                          <Input
-                            type="text"
-                            value={newMetricUnit}
-                            onChange={(e) => setNewMetricUnit(e.target.value)}
-                            placeholder="Unit"
-                            className="rounded px-2 py-1 text-sm"
-                          />
-                        </div>
                       </div>
-                      <div className="flex items-center justify-end gap-2 mt-2">
+                      <div className="mt-2 flex items-center justify-end gap-2">
                         <Button
                           variant="default"
                           onClick={(e) => {
@@ -558,7 +508,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex w-full justify-between">
                     <Button
                       variant="ghost"
@@ -603,7 +553,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
                   </div>
                 </div>
               </div>
-              
+
               {/* Render children (if any) under the metrics section */}
               {children}
             </motion.div>
@@ -611,7 +561,7 @@ export const ExerciseSet = forwardRef<HTMLDivElement, ExerciseSetProps>(
         </AnimatePresence>
       </div>
     );
-  }
+  },
 );
 
-ExerciseSet.displayName = "ExerciseSet"; // Optional: Helps with debugging
+ExerciseSet.displayName = "ExerciseSet";
