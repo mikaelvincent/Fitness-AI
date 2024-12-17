@@ -16,15 +16,24 @@ interface CalendarProps {
   children: ReactNode;
   currentDate: Date;
   setCurrentDate: Dispatch<SetStateAction<Date>>;
+  rerenderWeekHeader: boolean;
+  setRerenderWeekHeader: Dispatch<SetStateAction<boolean>>;
 }
 
-const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
+const Calendar = ({
+  children,
+  currentDate,
+  setCurrentDate,
+  rerenderWeekHeader,
+  setRerenderWeekHeader,
+}: CalendarProps) => {
   const [dayTransitionDirection, setDayTransitionDirection] = useState<
     "next" | "prev" | null
   >(null);
   const [weekTransitionDirection, setWeekTransitionDirection] = useState<
     "next" | "prev" | null
   >(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const navigate = useNavigate();
 
@@ -66,6 +75,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   };
 
   const navigateWeek = (direction: "prev" | "next") => {
+    setIsAnimating(true); // Start the animation
     setWeekTransitionDirection(direction);
     setDayTransitionDirection(direction); // Set the day transition direction based on week navigation
     setCurrentDate((prevDate) => {
@@ -76,6 +86,7 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
   };
 
   const navigateDay = (direction: "prev" | "next") => {
+    setIsAnimating(true); // Start the animation
     setDayTransitionDirection(direction);
     setCurrentDate((prevDate) => {
       const newDate = new Date(prevDate);
@@ -134,25 +145,26 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
       <div className="mx-2 flex items-center py-6 sm:mx-8">
         <Button
           variant="ghost"
-          size="icon"
-          asChild
+          size="lg"
           onClick={handleMonthProgressView}
+          className="px-0 text-2xl text-primary hover:text-orange-300"
         >
-          <ChevronLeft className="h-10 w-10 text-primary hover:text-orange-400" />
-        </Button>
-        <h2 className="text-lg font-semibold dark:text-primary sm:text-2xl">
+          <ChevronLeft />
           {formatMonthYear(currentDate)}
-        </h2>
+        </Button>
       </div>
 
-      <div className="rounded-lg bg-muted py-4 sm:mx-8">
+      <div className="overflow-hidden rounded-lg bg-muted pb-6 pt-4 sm:mx-8 sm:pb-8 sm:pt-6">
         {/* Navigation Buttons with Swipeable Week Header */}
         <WeekHeaderNavigation onNavigateWeek={navigateWeek}>
-          <div className="relative h-10 overflow-hidden sm:h-14">
+          <div className="relative h-auto">
             <AnimatePresence
               initial={false}
               custom={weekTransitionDirection}
-              onExitComplete={() => setWeekTransitionDirection(null)}
+              onExitComplete={() => {
+                setWeekTransitionDirection(null);
+                setIsAnimating(false); // Animation fully completed
+              }}
             >
               <SwipableWeekHeader
                 key={weekStart.getTime()}
@@ -164,6 +176,9 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
                   weekDates={weekDates}
                   currentDate={currentDate}
                   onSelectDate={selectDate}
+                  isAnimating={isAnimating}
+                  rerender={rerenderWeekHeader}
+                  setRerender={setRerenderWeekHeader}
                 />
               </SwipableWeekHeader>
             </AnimatePresence>
@@ -175,7 +190,10 @@ const Calendar = ({ children, currentDate, setCurrentDate }: CalendarProps) => {
           <AnimatePresence
             initial={false}
             custom={dayTransitionDirection}
-            onExitComplete={() => setDayTransitionDirection(null)}
+            onExitComplete={() => {
+              setDayTransitionDirection(null);
+              setIsAnimating(false); // Day animation finished
+            }}
           >
             <SwipableView
               key={currentDate.getTime()}

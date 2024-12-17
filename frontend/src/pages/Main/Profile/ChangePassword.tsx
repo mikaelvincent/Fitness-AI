@@ -17,7 +17,7 @@ export const ChangePassword = () => {
   const navigate = useNavigate();
   const [formMessage, setFormMessage] = useState<string>("");
   const formStatus = useFormStatus();
-  const { token } = useUser();
+  const { token, refreshToken } = useUser();
 
   // Initialize the timer with a 60-second cooldown
   const {
@@ -43,6 +43,7 @@ export const ChangePassword = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof ChangePasswordSchema>) => {
+    refreshToken();
     try {
       setLoading();
       const response = await ChangePasswordRequest({ token, data });

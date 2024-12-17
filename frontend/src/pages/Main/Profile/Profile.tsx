@@ -6,24 +6,84 @@ import { useNavigate } from "react-router-dom";
 import { RetrieveAttributes } from "@/services/User/RetreiveAllAttributes.ts";
 import { useUser } from "@/hooks/context/UserContext.tsx";
 import { toast } from "@/hooks/use-toast.tsx";
+import { UpdateNameSchema } from "@/utils/schema/UpdateName.ts";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UpdateName } from "@/services/User/UpdateName.ts";
+import { FetchUserInfo } from "@/services/User/FetchUserInfo.ts";
+import { LoadingSpinner } from "@/components/ui/loading-spinner.tsx";
 
 const Profile = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [profileInfo, setProfileInfo] = useState<UserProfileInfo>({
-    name: "Jericho",
-    email: "pascojericho@gmail.com",
+    name: "",
+    email: "",
   });
-
-  const { token } = useUser();
+  const [loading, setLoading] = useState<boolean>(true);
+  const { token, refreshToken } = useUser();
 
   const [isUpdateName, setIsUpdateName] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  const form = useForm<z.infer<typeof UpdateNameSchema>>({
+    resolver: zodResolver(UpdateNameSchema),
+    defaultValues: {
+      name: profileInfo.name,
+    },
+  });
+
   useEffect(() => {
     handleRetrieveAttributes().then((r) => r);
+    fetchUserInfo().then((r) => r);
   }, []);
 
+  useEffect(() => {
+    // Reset the form with the updated profileInfo
+    form.reset({
+      name: profileInfo.name,
+    });
+  }, [profileInfo, form]);
+
+  const fetchUserInfo = async () => {
+    refreshToken();
+    setLoading(true);
+    try {
+      const response = await FetchUserInfo({ token });
+
+      console.log(response);
+      if (!response?.success) {
+        toast({
+          variant: "destructive",
+          title: response?.message || "Failed to retrieve User Info",
+        });
+        return;
+      }
+
+      if (response?.success) {
+        setProfileInfo(response.data as UserProfileInfo);
+        console.log("Response Data:", response.data);
+        return;
+      }
+
+      // Handle the case where response.success is true but response.data is undefined
+      toast({
+        variant: "destructive",
+        title: "User Info retrieved but data is missing.",
+      });
+    } catch (error) {
+      console.error("Error retrieving user info:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to retrieve user info.",
+      });
+    } finally {
+      setLoading(false); // Ensures loading is set to false in all cases
+    }
+  };
+
   const handleRetrieveAttributes = async () => {
+    refreshToken();
     try {
       const response = await RetrieveAttributes({ token });
       if (!response?.success) {
@@ -52,6 +112,7 @@ const Profile = () => {
   };
 
   const handleNavigation = (path: string) => {
+    refreshToken();
     navigate(path);
   };
 
@@ -59,10 +120,35 @@ const Profile = () => {
     setIsUpdateName(true);
   };
 
-  const handleSaveName = () => {
-    // Implement save logic here, e.g., API call to update the name
-    // For now, we'll just exit the edit mode
-    setIsUpdateName(false);
+  const handleSaveName = async (data: z.infer<typeof UpdateNameSchema>) => {
+    const { name } = data;
+    console.log("Save named: ", name);
+    refreshToken();
+    try {
+      const response = await UpdateName({ token, name });
+      if (!response?.success) {
+        toast({
+          variant: "destructive",
+          title: response?.message || "Failed to update name",
+        });
+        setIsUpdateName(false);
+        // Optionally reset the form or handle as needed
+        return;
+      }
+      if (response?.success && response?.data) {
+        toast({
+          title: response?.message || "Name updated successfully",
+        });
+        setProfileInfo((prev) => ({ ...prev, name }));
+        setIsUpdateName(false);
+      }
+    } catch (error) {
+      console.error("Error updating name:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed to update name",
+      });
+    }
   };
 
   const handleCancelEditName = () => {
@@ -71,21 +157,23 @@ const Profile = () => {
     setIsUpdateName(false);
   };
 
-  const handleNameChange = (newName: string) => {
-    setProfileInfo((prev) => ({ ...prev, name: newName }));
-  };
-
-  return (
-    <ProfileDashboardUI
-      profileInfo={profileInfo}
-      isUpdateName={isUpdateName}
-      onEditName={handleEditName}
-      onSaveName={handleSaveName}
-      onCancelEditName={handleCancelEditName}
-      onNameChange={handleNameChange}
-      handleNavigation={handleNavigation}
-      attributes={attributes}
-    />
+  return loading ? (
+    <div className="flex h-screen items-center justify-center">
+      <LoadingSpinner size={48} className="text-primary" />
+    </div>
+  ) : (
+    profileInfo && (
+      <ProfileDashboardUI
+        profileInfo={profileInfo}
+        isUpdateName={isUpdateName}
+        onEditName={handleEditName}
+        onSaveName={handleSaveName}
+        onCancelEditName={handleCancelEditName}
+        handleNavigation={handleNavigation}
+        attributes={attributes}
+        form={form}
+      />
+    )
   );
 };
 

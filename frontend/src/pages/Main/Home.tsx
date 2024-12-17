@@ -11,9 +11,9 @@ import NewExercise from "@/components/dashboard/NewExercise.tsx";
 import ExerciseTree from "@/components/dashboard/exerciseSet/ExerciseTree.tsx";
 import useStatus from "@/hooks/useStatus.tsx";
 import { useUser } from "@/hooks/context/UserContext.tsx";
-import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.tsx";
+import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.ts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AddOrUpdateActivities } from "@/services/exercises/AddOrUpdateActivities.tsx";
+import { AddOrUpdateActivities } from "@/services/exercises/AddOrUpdateActivities.ts";
 import { toast } from "@/hooks/use-toast.tsx";
 import {
   Card,
@@ -22,16 +22,16 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { updateExerciseInTree } from "@/utils/updateExerciseInTree.ts";
-import { convertDates } from "@/utils/convertDates.ts";
-import { DeleteActivities } from "@/services/exercises/DeleteActivities.tsx";
+import { convertDates, convertDatesFromObject } from "@/utils/convertDates.ts";
+import { DeleteActivities } from "@/services/exercises/DeleteActivities.ts";
 import {
   addChildToParent,
   flattenExercises,
   getAncestorChainExercises,
   getExerciseById,
+  locateNewExercise,
   recalculateAncestorsCompletion,
   removeExerciseFromTree,
-  replaceExerciseByPosition,
   toggleCompletionRecursive,
 } from "@/utils/ExerciseHelperFunction.ts";
 
@@ -43,7 +43,7 @@ const Home = () => {
     : new Date();
 
   const { status, setLoading, setDone, setError } = useStatus();
-  const { token } = useUser();
+  const { token, refreshToken } = useUser();
 
   const [currentDate, setCurrentDate] = useState<Date>(initialDate);
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -65,6 +65,7 @@ const Home = () => {
   const lastExerciseRef = useRef<HTMLDivElement>(null);
   const prevNewExerciseRef = useRef<typeof newExercise>(null);
   const [noExercises, setNoExercises] = useState<boolean>(false);
+  const [rerenderWeekHeader, setRerenderWeekHeader] = useState<boolean>(false);
 
   // Separate useStatus for updating activities
   const {
@@ -101,6 +102,7 @@ const Home = () => {
 
   const fetchExercises = async () => {
     setLoading();
+    refreshToken();
     try {
       const response = await RetrieveActivities({
         token,
@@ -136,6 +138,7 @@ const Home = () => {
   };
 
   const toggleExerciseCompletion = async (id: number | null | undefined) => {
+    refreshToken();
     if (id === null || id === undefined) return;
 
     const originalExercises = exercises;
@@ -193,27 +196,26 @@ const Home = () => {
       console.log("Activities to update:", activitiesToUpdate);
 
       // Send updates to backend one by one
-      for (const activity of activitiesToUpdate) {
-        const response = await AddOrUpdateActivities({
-          token,
-          activities: activity, // Single activity per request
-        });
+      const response = await AddOrUpdateActivities({
+        token,
+        activities: activitiesToUpdate,
+      });
 
-        if (!response.success) {
-          // Revert if backend fails
-          setExercises(originalExercises);
-          setUpdateError();
-          setResponseMessage(response.message || "Failed to toggle activity");
-          toast({
-            variant: "destructive",
-            title: "Failed to toggle activity",
-            description: response.message || "Failed to toggle activity",
-            duration: 500,
-          });
-          return;
-        }
+      if (!response.success) {
+        // Revert if backend fails
+        setExercises(originalExercises);
+        setUpdateError();
+        setResponseMessage(response.message || "Failed to toggle activity");
+        toast({
+          variant: "destructive",
+          title: "Failed to toggle activity",
+          description: response.message || "Failed to toggle activity",
+          duration: 500,
+        });
+        return;
       }
 
+      setRerenderWeekHeader(true);
       setResponseMessage("Activity toggled successfully.");
       setUpdateDone();
       toast({
@@ -273,25 +275,23 @@ const Home = () => {
       newExercise.name.trim() !== "" &&
       newExercise.type.trim() !== ""
     ) {
-      // Generate a temporary ID
+      refreshToken();
+      const originalExercises = exercises;
       const tempId = Date.now() * 10 + Math.floor(Math.random() * 10);
-
-      // Modify this part in handleSaveNewExercise
       const exDate = currentDate.toISOString().split("T")[0];
 
       let newPosition: number;
       if (newExercise.parentId === null) {
-        // This is a top-level exercise
+        // Top-level exercise
         const topLevelExercisesForDate = exercises.filter((ex) => {
           const exerciseDate = ex.date?.toISOString().split("T")[0];
           return ex.parent_id === null && exerciseDate === exDate;
         });
         newPosition = topLevelExercisesForDate.length + 1;
       } else {
-        // This is a child exercise
+        // Child exercise
         const parentExercise = getExerciseById(exercises, newExercise.parentId);
         if (!parentExercise) {
-          // In case parent isn't found, default to 1
           newPosition = 1;
         } else {
           newPosition = parentExercise.children?.length
@@ -313,68 +313,119 @@ const Home = () => {
         position: newPosition,
       };
 
-      // Optimistically update the frontend state
-      // Optimistic update: if it's a child exercise, add it to the parent;
-      // if it's top-level, just push it to exercises.
+      // **Step 1: Compute updatedExercises**
+      let updatedExercises: Exercise[];
       if (newExercise.parentId !== null) {
-        setExercises((prev) =>
-          addChildToParent(prev, newExercise.parentId, exerciseToAdd),
+        updatedExercises = addChildToParent(
+          exercises,
+          newExercise.parentId,
+          exerciseToAdd,
         );
       } else {
-        setExercises((prev) => [...prev, exerciseToAdd]);
+        updatedExercises = [...exercises, exerciseToAdd];
       }
 
-      // Clear the new exercise form
+      // Update ancestors' completion states
+      updatedExercises = recalculateAncestorsCompletion(
+        updatedExercises,
+        newExercise.parentId,
+      );
+
+      // **Step 2: Set the updatedExercises to state**
+      setExercises(updatedExercises);
+
+      // **Step 3: Create flattenedExercises from updatedExercises**
+      const flattenedExercises = flattenExercises(updatedExercises);
+
+      // **Step 4: Clear the new exercise form**
       setNewExercise(null);
 
       try {
-        // Set loading state for updating activities
         setUpdateLoading();
 
-        // Call the UpdateOrAddActivity service
+        // **Step 5: Send the flattened exercises to the backend**
+        // Filter out the new exercise using tempId
+        const activitiesToUpdate: Exercise[] = [
+          { ...exerciseToAdd, id: null }, // New exercise with id set to null
+          ...flattenedExercises.filter((ex) => ex.id !== tempId),
+        ];
+
+        console.log("Activities to update:", activitiesToUpdate);
+
         const response = await AddOrUpdateActivities({
           token,
-          activities: {
-            ...exerciseToAdd,
-            id: null, // Backend will assign the actual ID
-          },
+          activities: activitiesToUpdate,
         });
 
         if (!response.success) {
           setUpdateError();
-          setResponseMessage(response.message || "Failed to add activity");
+          setResponseMessage(response.message || "Failed to add the activity");
           toast({
             variant: "destructive",
             title: "Failed to add activity",
             description: response.message || "Failed to add activity",
             duration: 500,
           });
+
+          setExercises(originalExercises);
           return;
         }
 
-        if (response.success && response.data) {
-          const rawDataSavedExercise = response.data as Exercise;
-          const formattedSavedExercise = convertDates(rawDataSavedExercise);
-          console.log("Saved exercise:", formattedSavedExercise);
+        // Assuming `response.data` is an array of Exercise objects
+        const savedExercises = convertDatesFromObject(
+          response.data as Exercise[],
+        );
 
-          // Replace the temporary exercise with the returned exercise using position
-          setExercises((prev) =>
-            replaceExerciseByPosition(
-              prev,
-              formattedSavedExercise.parent_id,
-              formattedSavedExercise.position,
-              formattedSavedExercise,
-            ),
-          );
+        // Replace the temporary exercise in the frontend with the saved one from the backend.
+        const newExerciseFromBackend = locateNewExercise(
+          savedExercises, // Pass the array of saved exercises
+          exerciseToAdd.parent_id!, // Parent ID
+          exerciseToAdd.position!, // Position
+        );
 
-          setNoExercises(false);
-          setUpdateDone();
-          setResponseMessage("Activity added successfully.");
+        if (newExerciseFromBackend) {
+          // Function to replace the temporary exercise with the saved one
+          const replaceTempExercise = (exercises: Exercise[]): Exercise[] => {
+            return exercises.map((ex) => {
+              if (ex.id === exerciseToAdd.id) {
+                return newExerciseFromBackend;
+              }
+              if (ex.children && ex.children.length > 0) {
+                return {
+                  ...ex,
+                  children: replaceTempExercise(ex.children),
+                };
+              }
+              return ex;
+            });
+          };
+
+          // Use a new variable name to avoid shadowing
+          const updatedExercisesFinal = replaceTempExercise(updatedExercises);
+
+          // Update the exercises state by replacing the temp exercise with the one from the backend
+          setExercises(updatedExercisesFinal);
+        } else {
+          // If for some reason the new exercise isn't found, you might want to refetch exercises
+          setExercises(originalExercises); // Revert to original exercises
+          setUpdateError();
+          setResponseMessage("Failed to add activity.");
           toast({
-            title: "Activity added successfully.",
+            variant: "destructive",
+            title: "Failed to add activity",
             duration: 500,
           });
+          return;
         }
+
+        // setExercises(updatedExercises);
+        setNoExercises(false);
+        setUpdateDone();
+        setResponseMessage("Activity added successfully.");
+        toast({
+          title: "Activity added successfully.",
+          duration: 500,
+        });
       } catch (error) {
         console.error("Error adding activity:", error);
         setUpdateError();
@@ -389,8 +440,7 @@ const Home = () => {
           duration: 500,
         });
 
-        // Revert the optimistic update by removing the temporary exercise
-        setExercises((prev) => prev.filter((ex) => ex.id !== tempId));
+        setExercises(originalExercises);
       }
     }
   };
@@ -401,6 +451,7 @@ const Home = () => {
 
   const deleteExercise = async (exerciseId: number | null | undefined) => {
     try {
+      refreshToken();
       // Optimistically update the frontend state
       setExercises((prev) => {
         const updatedExercises = removeExerciseFromTree(prev, exerciseId);
@@ -470,6 +521,7 @@ const Home = () => {
   });
 
   const handleUpdateExercise = async (updatedExercise: Exercise) => {
+    refreshToken();
     try {
       // Indicate that an update is in progress
       setUpdateLoading();
@@ -517,7 +569,12 @@ const Home = () => {
 
   return (
     <div className="flex h-full w-full flex-col xl:px-24 2xl:px-32">
-      <Calendar currentDate={currentDate} setCurrentDate={setCurrentDate}>
+      <Calendar
+        currentDate={currentDate}
+        setCurrentDate={setCurrentDate}
+        rerenderWeekHeader={rerenderWeekHeader}
+        setRerenderWeekHeader={setRerenderWeekHeader}
+      >
         {status === "loading" && (
           <Skeleton className="h-[500px] w-[500px] rounded-xl" />
         )}

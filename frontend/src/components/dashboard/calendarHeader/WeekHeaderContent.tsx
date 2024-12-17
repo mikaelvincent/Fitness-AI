@@ -1,57 +1,104 @@
 // components/WeekHeaderContent.tsx
-'use client'
 
-import {Button} from "@/components/ui/button"
+import WeekHeaderContentUI from "@/components/dashboard/calendarHeader/WeekHeaderContentUI.tsx";
+import { Exercise } from "@/types/exerciseTypes.ts";
+import { useEffect, useState } from "react";
+import { useUser } from "@/hooks/context/UserContext.tsx";
+import { RetrieveActivities } from "@/services/exercises/RetrieveActivities.ts";
 
 interface WeekHeaderContentProps {
-    weekDates: Date[]
-    currentDate: Date
-    onSelectDate: (date: Date) => void
+  weekDates: Date[];
+  currentDate: Date;
+  onSelectDate: (date: Date) => void;
+  isAnimating: boolean;
+  rerender: boolean;
+  setRerender: (rerender: boolean) => void;
 }
 
 const WeekHeaderContent = ({
-                               weekDates,
-                               currentDate,
-                               onSelectDate,
-                           }: WeekHeaderContentProps) => {
+  weekDates,
+  currentDate,
+  onSelectDate,
+  isAnimating,
+  rerender,
+  setRerender,
+}: WeekHeaderContentProps) => {
+  const [activities, setActivities] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const isCurrentDate = (date: Date) => {
-        return date.toDateString() === currentDate.toDateString()
+  const { token } = useUser();
+
+  const isCurrentDate = (date: Date) => {
+    return date.toDateString() === currentDate.toDateString();
+  };
+
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  useEffect(() => {
+    fetchActivities().then((r) => r);
+    setRerender(false);
+  }, [weekDates, token, rerender]);
+
+  const fetchActivities = async () => {
+    setLoading(true);
+    setError(null);
+
+    const firstDay = weekDates[0];
+    const lastDay = weekDates[weekDates.length - 1];
+
+    try {
+      const response = await RetrieveActivities({
+        token: token,
+        date: firstDay,
+        date2: lastDay,
+        nested: "false",
+      });
+
+      if (response.success && response.data) {
+        // Assuming response.data is an array of activities
+        setActivities(response.data as Exercise[]);
+      } else {
+        setError(response.message || "Failed to retrieve activities.");
+      }
+    } catch (err) {
+      console.error("Error fetching activities:", err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const isToday = (date: Date) => {
-        const today = new Date()
-        return date.toDateString() === today.toDateString()
-    }
+  // Determine the completion ratio for each day
+  const DaysOfWeekCompletedList = weekDates.map((date) => {
+    const activitiesForDay = activities.filter(
+      (activity) =>
+        new Date(activity.date!).toDateString() === date.toDateString(),
+    );
+    if (activitiesForDay.length === 0) return 0; // No activities
+    const completedActivities = activitiesForDay.filter(
+      (activity) => activity.completed,
+    ).length;
+    return completedActivities / activitiesForDay.length; // Ratio between 0 and 1
+  });
 
-    return (
-        <div className="flex-1 flex justify-between px-2 my-2">
-            {weekDates.map((date, index) => (
-                <div key={index} className="flex-1 flex justify-center">
-                    <Button
-                        variant={isCurrentDate(date) ? "default" : "ghost"}
-                        className={`w-10 h-10 sm:w-14 sm:h-14 my-0 p-0 gap-0 rounded-full flex flex-col items-center justify-center ${
-                            isToday(date) && !isCurrentDate(date) ? 'text-primary' : ''
-                        }`}
-                        onClick={() => onSelectDate(date)}
-                    >
-                        <span className="text-xs sm:text-lg leading-tight uppercase">
-                            {date.toLocaleDateString('en-US', {weekday: 'short'}).charAt(0)}
-                        </span>
-                        <span
-                            className={`text-xs sm:text-xl font-semibold leading-tight ${
-                                isToday(date)
-                                    ? 'bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center'
-                                    : ''
-                            }`}
-                        >
-                            {date.getDate()}
-                        </span>
-                    </Button>
-                </div>
-            ))}
-        </div>
-    )
-}
+  useEffect(() => {
+    console.log("DaysOfWeekCompletedList:", DaysOfWeekCompletedList);
+  }, [DaysOfWeekCompletedList]);
 
-export default WeekHeaderContent
+  return (
+    <WeekHeaderContentUI
+      weekDates={weekDates}
+      onSelectDate={onSelectDate}
+      isToday={isToday}
+      isCurrentDate={isCurrentDate}
+      isAnimating={isAnimating}
+      DaysOfWeekCompletedList={DaysOfWeekCompletedList}
+    />
+  );
+};
+
+export default WeekHeaderContent;

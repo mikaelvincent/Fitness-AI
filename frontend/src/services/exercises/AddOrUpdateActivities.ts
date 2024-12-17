@@ -8,12 +8,12 @@ interface AddOrUpdateActivitiesResponse {
   message: string;
   status: number;
   retry_after?: number;
-  data?: Exercise;
+  data?: Exercise[];
 }
 
 interface AddOrUpdateActivitiesProps {
   token: string | null;
-  activities: Exercise;
+  activities: Exercise | Exercise[];
 }
 
 export const AddOrUpdateActivities = async ({
@@ -23,19 +23,27 @@ export const AddOrUpdateActivities = async ({
   try {
     console.log("Activities to submit:", activities);
 
-    const data = {
-      activities: {
-        id: activities.id,
-        name: activities.name,
-        description: activities.description,
-        completed: activities.completed,
-        notes: activities.notes,
-        metrics: activities.metrics,
-        parent_id: activities.parent_id,
-        date: activities.date?.toISOString(),
-        position: activities.position,
-      },
-    };
+    const isArray = Array.isArray(activities);
+
+    // Helper function to transform an activity
+    const transformActivity = (activity: Exercise) => ({
+      date: activity.date ? activity.date.toISOString().split("T")[0] : null, // Format date as 'YYYY-MM-DD'
+      parent_id: activity.parent_id,
+      position: activity.position,
+      name: activity.name,
+      description: activity.description,
+      notes: activity.notes,
+      metrics: activity.metrics,
+      completed: activity.completed,
+      id: activity.id,
+    });
+
+    // Construct the data payload as a raw array
+    const data = isArray
+      ? activities.map(transformActivity)
+      : [transformActivity(activities)];
+
+    console.log("Data to submit:", data);
 
     const url = new URL("/api/activities", ENV.API_URL);
 
@@ -45,7 +53,7 @@ export const AddOrUpdateActivities = async ({
       Authorization: `Bearer ${token}`,
     };
 
-    const response = await fetch(url, {
+    const response = await fetch(url.toString(), {
       method: "PUT",
       headers: headers,
       body: JSON.stringify(data),
@@ -77,7 +85,7 @@ export const AddOrUpdateActivities = async ({
       message:
         responseData.message || "Activities added or updated successfully",
       status: response.status,
-      data: responseData.data[0],
+      data: responseData.data, // Assuming responseData.data is an array
     };
   } catch (error) {
     console.log("Error during submission:", error);

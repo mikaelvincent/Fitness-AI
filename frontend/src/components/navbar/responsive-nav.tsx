@@ -5,7 +5,12 @@ import { BotMessageSquare, CircleUser, Home } from "lucide-react";
 
 // Define your navigation items with activePaths
 const navItems = [
-  { name: "Home", href: "/", icon: Home, activePaths: ["/", "/progress"] },
+  {
+    name: "Home",
+    href: "/dashboard",
+    icon: Home,
+    activePaths: ["/dashboard", "/progress"],
+  },
   { name: "Chat with Genie", href: "/chat", icon: BotMessageSquare },
   { name: "Profile", href: "/profile", icon: CircleUser, isPrefix: true },
 ];

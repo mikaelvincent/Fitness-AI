@@ -16,16 +16,26 @@ import LogoutButton from "@/components/authentication/LogoutButton";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { UpdateNameSchema } from "@/utils/schema/UpdateName.ts";
 
 export interface ProfileDashboardUIProps {
   profileInfo: UserProfileInfo;
   isUpdateName: boolean;
   onEditName: () => void;
-  onSaveName: () => void;
+  onSaveName: any;
   onCancelEditName: () => void;
-  onNameChange: (newName: string) => void;
   handleNavigation: (path: string) => void;
   attributes: Attribute[]; // Updated to an array of Attribute objects
+  form: UseFormReturn<z.infer<typeof UpdateNameSchema>>;
 }
 
 export default function ProfileDashboardUI({
@@ -34,9 +44,9 @@ export default function ProfileDashboardUI({
   onEditName,
   onSaveName,
   onCancelEditName,
-  onNameChange,
   handleNavigation,
   attributes,
+  form,
 }: ProfileDashboardUIProps) {
   return (
     <div className="flex h-full w-full flex-col justify-start gap-8 p-4 lg:p-8 xl:justify-center">
@@ -57,20 +67,34 @@ export default function ProfileDashboardUI({
                 </div>
               ) : (
                 <div className="flex justify-between">
-                  <Input
-                    type="text"
-                    className="text-2xl font-bold"
-                    value={profileInfo.name}
-                    onChange={(e) => onNameChange(e.target.value)}
-                  />
-                  <div className="flex">
-                    <Button variant="ghost" onClick={onSaveName}>
-                      <Save className="text-primary" />
-                    </Button>
-                    <Button variant="ghost" onClick={onCancelEditName}>
-                      <X className="text-red-500" />
-                    </Button>
-                  </div>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSaveName)}
+                      className="flex w-full"
+                      noValidate
+                    >
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem className="w-full flex-1">
+                            <FormControl>
+                              <Input {...field} type="text" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex flex-initial">
+                        <Button type="submit" variant="ghost">
+                          <Save className="text-primary" />
+                        </Button>
+                        <Button variant="ghost" onClick={onCancelEditName}>
+                          <X className="text-red-500" />
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
                 </div>
               )}
 
@@ -109,17 +133,31 @@ export default function ProfileDashboardUI({
         <Card className="flex-1 border-zinc-100 bg-gray-50 text-center dark:border-zinc-800 dark:bg-zinc-900">
           <CardContent className="h-full p-6">
             <div className="h-full flex-col">
+              <div className="flex w-full justify-end p-0">
+                <Button variant="link" size="lg" asChild>
+                  <Link
+                    to="/chat"
+                    className="flex h-auto items-center gap-1 px-0 pb-2"
+                  >
+                    <BotMessageSquare />
+                    Chat with GENIE to update your attributes
+                  </Link>
+                </Button>
+              </div>
               <div className="flex h-5/6 w-full flex-col rounded-lg bg-primary">
-                <ScrollArea className="h-full w-full">
+                <ScrollArea className="h-full w-full p-4">
                   {attributes && attributes.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <div className="flex flex-col gap-2">
                       {attributes.map((attribute, index) => (
-                        <div key={index} className="rounded p-4 shadow">
-                          <p className="text-2xl font-semibold">
-                            {attribute.value}
-                          </p>
-                          <p className="text-sm text-orange-200">
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 rounded p-4 shadow dark:border-zinc-800 dark:bg-zinc-900"
+                        >
+                          <p className="w-4/12 text-start text-lg capitalize text-orange-400">
                             {attribute.name}
+                          </p>
+                          <p className="w-8/12 text-wrap text-start text-xl capitalize">
+                            {attribute.value}
                           </p>
                         </div>
                       ))}
@@ -131,14 +169,6 @@ export default function ProfileDashboardUI({
                   )}
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>
-              </div>
-              <div className="mt-4 flex w-full justify-end">
-                <Button variant="link" size="lg">
-                  <Link to="/chat" className="flex items-center gap-1">
-                    <BotMessageSquare />
-                    Chat with GENIE to update your attributes
-                  </Link>
-                </Button>
               </div>
             </div>
           </CardContent>
