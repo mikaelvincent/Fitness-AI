@@ -104,6 +104,11 @@ const Login = () => {
       if (response?.success && response?.token) {
         setDone();
         setFormMessage(response?.message || "Login successful!");
+
+        // Clear the 'setUpData' from SessionStorage
+        sessionStorage.removeItem("setupData");
+        sessionStorage.removeItem("currentStepIndex");
+
         // Set user data and token in UserContext
         contextLoginUser(response.token);
 
