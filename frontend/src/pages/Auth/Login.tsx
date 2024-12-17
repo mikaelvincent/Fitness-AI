@@ -104,7 +104,7 @@ const Login = () => {
         contextLoginUser(response.token);
 
         // Navigate to the dashboard
-        navigate("/");
+        navigate("/dashboard");
         return;
       }
     } catch (error) {
