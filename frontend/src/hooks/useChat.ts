@@ -31,6 +31,7 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         "deleteUserAttributes",
         "getActivities",
         "updateActivities",
+        "deleteActivities",
     ];
 
     useEffect(() => {
@@ -79,7 +80,7 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         const sanitizedMessages = updatedMessages.map(({ role, content }) => ({ role, content }));
         console.log(tools)
         try {
-            const response = await postChatMessage(sanitizedMessages, tools, false, true);
+            const response = await postChatMessage(sanitizedMessages, tools, false, false);
 
             const aiResponse = response?.data?.response || "Sorry, something went wrong.";
             const tool_calls = response?.data?.executed_tool_calls || [];
