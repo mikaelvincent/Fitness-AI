@@ -323,4 +323,132 @@ class RegistrationControllerTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    /**
+     * Test successful initiation of registration with user attributes.
+     */
+    public function test_successful_initiate_registration_with_attributes()
+    {
+        Notification::fake();
+
+        $userAttributes = [
+            'preferred_language' => 'en',
+            'timezone' => 'UTC',
+        ];
+
+        $response = $this->postJson('/api/registration/initiate', [
+            'email' => 'uniqueuser@example.com',
+            'user_attributes' => $userAttributes,
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJson([
+                     'message' => 'Registration process has been initiated. Please check your email for further instructions.',
+                 ]);
+
+        $this->assertDatabaseHas('registration_tokens', [
+            'email' => 'uniqueuser@example.com',
+        ]);
+
+        $registrationToken = RegistrationToken::where('email', 'uniqueuser@example.com')->first();
+        $this->assertEquals($userAttributes, $registrationToken->user_attributes);
+
+        Notification::assertSentTo(
+            new \Illuminate\Notifications\AnonymousNotifiable,
+            RegistrationTokenNotification::class,
+            function ($notification, $channels, $notifiable) {
+                return $notifiable->routes['mail'] === 'uniqueuser@example.com';
+            }
+        );
+    }
+
+    /**
+     * Test completion of registration with user attributes.
+     */
+    public function test_successful_complete_registration_with_attributes()
+    {
+        Notification::fake();
+
+        $token = 'completetoken';
+        $userAttributes = [
+            'preferred_language' => 'en',
+            'timezone' => 'UTC',
+        ];
+
+        RegistrationToken::create([
+            'email' => 'completeuser@example.com',
+            'token' => hash('sha256', $token),
+            'expires_at' => now()->addHour(),
+            'user_attributes' => $userAttributes,
+        ]);
+
+        $response = $this->postJson('/api/registration/complete', [
+            'token' => $token,
+            'name' => 'Complete User',
+            'password' => 'StrongPassword123!',
+            'password_confirmation' => 'StrongPassword123!',
+        ]);
+
+        $response->assertStatus(201)
+                 ->assertJson([
+                     'message' => 'Registration completed successfully. Welcome aboard!',
+                 ])
+                 ->assertJsonStructure([
+                     'data' => [
+                         'token',
+                     ],
+                 ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'completeuser@example.com',
+            'name' => 'Complete User',
+        ]);
+
+        $user = User::where('email', 'completeuser@example.com')->first();
+        $this->assertNotNull($user);
+
+        foreach ($userAttributes as $key => $value) {
+            $this->assertDatabaseHas('user_attributes', [
+                'user_id' => $user->id,
+                'key' => $key,
+                'value' => $value,
+            ]);
+        }
+
+        $this->assertDatabaseMissing('registration_tokens', [
+            'email' => 'completeuser@example.com',
+        ]);
+    }
+
+    /**
+     * Test initiation of registration with invalid user attributes.
+     */
+    public function test_initiate_registration_with_invalid_user_attributes()
+    {
+        $response = $this->postJson('/api/registration/initiate', [
+            'email' => 'uniqueuser@example.com',
+            'user_attributes' => 'invalid', // Should be an array
+        ]);
+
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrors(['user_attributes']);
+    }
+
+    /**
+     * Test initiation of registration with excessively long attribute keys.
+     */
+    public function test_initiate_registration_with_long_attribute_keys()
+    {
+        $longKey = Str::random(256);
+
+        $response = $this->postJson('/api/registration/initiate', [
+            'email' => 'uniqueuser@example.com',
+            'user_attributes' => [
+                $longKey => 'value',
+            ],
+        ]);
+
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrors(['user_attributes.' . $longKey]);
+    }
 }
