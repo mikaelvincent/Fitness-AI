@@ -23,6 +23,8 @@ import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentic
 
 import ChatPage from "./pages/ChatPage.tsx";
 
+import LandingPage from "./pages/LandingPage.tsx";
+
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
@@ -80,7 +82,8 @@ const App = () => {
 
         <Routes>
           {/* Main layout routes */}
-          <Route path="/" element={<MainLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/Home" element={<MainLayout />}>
             {/* Root Route */}
             <Route index element={<Home />} />
 
