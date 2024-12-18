@@ -1,5 +1,3 @@
-// Define a type for individual attributes
-
 export interface UserProfileInfo {
   name: string;
   email: string;

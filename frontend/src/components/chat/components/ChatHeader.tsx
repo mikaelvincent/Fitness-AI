@@ -1,19 +1,16 @@
 import React from "react";
-import { RiAiGenerate } from "react-icons/ri";
 import { MdOutlineInfo, MdMessage } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/custom-ui/BackButton";
 import { useLocation, useNavigate } from "react-router-dom";
 interface ChatHeaderProps {
     currentView: "chat" | "fitnessProfile";
-    onGenerateWorkout: () => void;
     onFitnessProfileClick: () => void;
     onBackToChatClick: () => void;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
     currentView,
-    onGenerateWorkout,
     onFitnessProfileClick,
     onBackToChatClick,
 }) => {

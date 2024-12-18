@@ -4,11 +4,11 @@ import { MdArrowBack } from "react-icons/md";
 type BackButtonProps = {
     onClick?: () => void;
     className?: string;
-    text?: string; // Optional custom text
+    text?: string;
 };
 
 const BackButton: React.FC<BackButtonProps> = ({
-    onClick = () => window.history.back(), // Default behavior: go back in history
+    onClick = () => window.history.back(),
     className = "",
     text = "Back",
 }) => {

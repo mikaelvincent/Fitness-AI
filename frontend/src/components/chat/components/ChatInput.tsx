@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { IoIosSend } from "react-icons/io";
 import { Textarea } from "@/components/ui/textarea";
 type ChatInputProps = {
@@ -24,10 +23,10 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey && !isLoading) {
-            e.preventDefault() // Prevents the default newline insertion
+            e.preventDefault()
             if (message.trim()) {
                 onSend(message.trim())
-                setMessage("") // Clear the textarea after sending
+                setMessage("")
             }
         }
     }
@@ -43,7 +42,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
             />
             <Button
                 type="submit"
-                disabled={isLoading} // Disable button when loading
+                disabled={isLoading}
                 className="ml-2 rounded-2xl border-2"
             >
                 <IoIosSend size={20} />

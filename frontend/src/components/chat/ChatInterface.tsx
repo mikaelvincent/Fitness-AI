@@ -44,7 +44,6 @@ const ChatInterface: React.FC = () => {
     <div className="mx-2 flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
       <ChatHeader
         currentView={currentView}
-        onGenerateWorkout={handleGenerateWorkout}
         onFitnessProfileClick={switchToFitnessProfile}
         onBackToChatClick={switchToChat}
       />

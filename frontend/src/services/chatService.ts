@@ -7,13 +7,10 @@ const dummyMessage = `# Welcome to Your AI Chat Interface 🚀
 Hello! 👋 I'm here to help you with any questions or tasks you may have. Below are some examples of how you can interact with me:
 `;
 
-// Define the structure of a chat message
 interface ChatMessage {
     role: string;
     content: string;
 }
-
-// Define the structure of the response from the backend
 interface ChatResponse {
     message: string;
     data: {
@@ -22,7 +19,6 @@ interface ChatResponse {
     };
 }
 
-// Helper function to set default headers
 const defaultHeaders = () => {
     const token = Cookies.get("token");
     return {
@@ -32,13 +28,12 @@ const defaultHeaders = () => {
     };
 };
 
-// Generalized fetch API function
 const fetchAPI = async (
     endpoint: string,
     method: string,
     body?: object
 ): Promise<any> => {
-    const url = new URL(endpoint, ENV.API_URL); // Base URL + endpoint 
+    const url = new URL(endpoint, ENV.API_URL);
     const headers = defaultHeaders();
 
     const options: RequestInit = {
@@ -57,7 +52,6 @@ const fetchAPI = async (
     return responseData;
 };
 
-// Utility function to pause execution for a given number of milliseconds
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
@@ -72,7 +66,7 @@ export const postChatMessage = async (
     messages: ChatMessage[],
     tools: string[],
     stream: boolean = false,
-    emulate: boolean = false, // Changed default to false for real implementation
+    emulate: boolean = false,
 ): Promise<ChatResponse> => {
     if (emulate) {
         return new Promise((resolve) => {
@@ -88,7 +82,6 @@ export const postChatMessage = async (
         });
     }
 
-    // Step 1: Send the initial POST request
     const payload = {
         messages,
         stream: stream,
@@ -121,14 +114,13 @@ export const postChatMessage = async (
     throw new Error("GPT response not received within the expected time.");
 };
 
-// Function to call OpenAI GPT API with streaming support
 export const streamGPTResponse = async (
     messages: { role: string; content: string }[],
     callback: (chunk: string) => void,
     tools: string[] = [],
     model: string = "gpt-4",
 ) => {
-    const url = "https://api.openai.com/v1/chat/completions"; // OpenAI endpoint
+    const url = "https://api.openai.com/v1/chat/completions";
     const headers = {
         ...defaultHeaders(),
         Authorization: `Bearer ${ENV.OPENAI_API_KEY}`,
@@ -137,7 +129,7 @@ export const streamGPTResponse = async (
     const payload = {
         model,
         messages,
-        stream: true, // Enable streaming
+        stream: true,
     };
 
     try {
@@ -150,7 +142,6 @@ export const streamGPTResponse = async (
         if (!response.body) throw new Error("No readable stream available.");
         if (!response.ok) {
             if (response.status === 401) {
-                // Trigger logout if unauthorized
                 logout();
             }
             throw new Error("API request failed.");
@@ -165,18 +156,17 @@ export const streamGPTResponse = async (
             done = readerDone;
 
             const chunk = decoder.decode(value, { stream: true });
-            // Extract data chunks and handle callback
             const lines = chunk
                 .split("\n")
                 .filter((line) => line.trim().startsWith("data:"));
 
             for (const line of lines) {
                 const message = line.replace("data: ", "").trim();
-                if (message === "[DONE]") return; // Stream ends
+                if (message === "[DONE]") return;
                 try {
                     const parsed = JSON.parse(message);
                     const content = parsed.choices[0]?.delta?.content || "";
-                    callback(content); // Pass content chunk to callback
+                    callback(content);
                 } catch (err) {
                     console.error("Error parsing stream chunk:", err);
                 }

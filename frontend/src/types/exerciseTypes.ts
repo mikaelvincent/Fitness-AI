@@ -1,5 +1,3 @@
-// frontend/src/types/exercise/exerciseTypes.ts
-
 export interface Exercise {
   id?: number | null;
   date?: Date;

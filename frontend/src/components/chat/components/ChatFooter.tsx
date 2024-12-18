@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { IoIosSend } from "react-icons/io";
 import { Textarea } from "@/components/ui/textarea"
 interface ChatFooterProps {
@@ -21,13 +20,12 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ onSend, isLoading, showInput })
     };
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey && !isLoading) {
-            e.preventDefault() // Prevents the default newline insertion
+            e.preventDefault()
             if (message.trim()) {
                 onSend(message.trim())
-                setMessage("") // Clear the textarea after sending
+                setMessage("")
             }
         }
-        // If Shift + Enter, do nothing special (allows newline)
     }
 
     if (!showInput) return null;

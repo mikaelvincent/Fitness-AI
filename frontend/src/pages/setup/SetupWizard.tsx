@@ -16,7 +16,6 @@ export const SetupWizard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // Load saved progress from sessionStorage on component mount
   useEffect(() => {
     const savedStep = sessionStorage.getItem("currentStepIndex");
     const savedData = sessionStorage.getItem("setupData");
@@ -31,7 +30,6 @@ export const SetupWizard: React.FC = () => {
 
   const currentStep = steps[currentStepIndex];
 
-  // Function to save progress to sessionStorage
   const saveProgress = (index: number, newData: any) => {
     sessionStorage.setItem("currentStepIndex", index.toString());
     sessionStorage.setItem("setupData", JSON.stringify(newData));
@@ -74,7 +72,6 @@ export const SetupWizard: React.FC = () => {
 
       await updateUserAttributes(payload);
 
-      // Clear sessionStorage upon successful submission
       sessionStorage.removeItem("currentStepIndex");
       sessionStorage.removeItem("setupData");
 
@@ -181,7 +178,7 @@ export const SetupWizard: React.FC = () => {
   const handleChange = (key: string, value: any) => {
     const updatedData = { ...data, [key]: value };
     updateData(updatedData);
-    saveProgress(currentStepIndex, updatedData); // Save updated data
+    saveProgress(currentStepIndex, updatedData);
   };
 
   const isFirstStep = currentStepIndex === 0;

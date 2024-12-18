@@ -78,13 +78,11 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
     setMessages(updatedMessages);
     setIsLoading(true);
 
-    // Determine the tools based on route
     const tools =
       location.pathname === "/initial-chat"
         ? toolsForInitialChat
         : toolsForMainChat;
 
-    // Prepare messages for API (remove tools)
     const sanitizedMessages = updatedMessages.map(({ role, content }) => ({
       role,
       content,
@@ -103,11 +101,11 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         (tool: { tool_name: string }) => tool.tool_name,
       );
 
-      // Attach tools internally
+
       const newAIMessage: Message = {
         role: "assistant",
         content: aiResponse,
-        tools: toolNames, // Tools stay internal
+        tools: toolNames,
       };
 
       setMessages((prev) => [...prev, newAIMessage]);
