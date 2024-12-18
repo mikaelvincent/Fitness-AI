@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IoIosSend } from "react-icons/io";
-
+import { Textarea } from "@/components/ui/textarea"
 interface ChatFooterProps {
     onSend: (message: string) => void;
     isLoading: boolean;
@@ -19,16 +19,29 @@ const ChatFooter: React.FC<ChatFooterProps> = ({ onSend, isLoading, showInput })
             setMessage("");
         }
     };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey && !isLoading) {
+            e.preventDefault() // Prevents the default newline insertion
+            if (message.trim()) {
+                onSend(message.trim())
+                setMessage("") // Clear the textarea after sending
+            }
+        }
+        // If Shift + Enter, do nothing special (allows newline)
+    }
 
     if (!showInput) return null;
 
     return (
         <form onSubmit={handleSubmit} className="flex items-center p-4">
-            <Input
+            <Textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 rounded-lg px-4 py-2"
+                className="min-flex-1 rounded-lg px-4 py-2"
+                minRows={1}
+                maxRows={5}
+                onKeyDown={handleKeyDown}
             />
             <Button
                 type="submit"
