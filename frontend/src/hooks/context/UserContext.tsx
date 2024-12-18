@@ -42,7 +42,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   const loginUser = (userToken: string) => {
     setToken(userToken);
-    
 
     Cookies.set("token", userToken, {
       expires: 69,
@@ -69,6 +68,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       });
       console.log("Token lifetime set to 69 days");
     }
+  };
 
   useEffect(() => {
     setLogoutFunction(logoutUser);

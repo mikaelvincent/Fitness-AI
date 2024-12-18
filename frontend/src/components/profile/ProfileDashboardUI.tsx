@@ -151,9 +151,9 @@ export default function ProfileDashboardUI({
                       {attributes.map((attribute, index) => (
                         <div
                           key={index}
-                          className="flex flex-col items-center gap-2 rounded p-4 shadow dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row"
+                          className="flex flex-col items-center gap-2 rounded border-zinc-800 p-4 shadow dark:bg-zinc-900 sm:flex-row"
                         >
-                          <p className="w-full text-wrap text-center text-lg capitalize text-orange-400 md:text-start lg:w-1/2">
+                          <p className="w-full text-wrap text-center text-lg capitalize text-orange-900 dark:text-orange-400 md:text-start lg:w-1/2">
                             {attribute.name}
                           </p>
                           <p className="w-full text-wrap text-center text-xl capitalize md:text-start lg:w-1/2">
