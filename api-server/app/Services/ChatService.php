@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use OpenAI\Laravel\Facades\OpenAI;
@@ -24,7 +25,6 @@ class ChatService
     public function getResponse(int $userId, array $userMessages, array $context, bool $stream = false, array $selectedTools = [])
     {
         $model = env('GPT_MODEL', 'gpt-4o');
-        $fallbackModel = env('GPT_FALLBACK_MODEL', 'gpt-3.5-turbo');
 
         // Load system prompts from config
         $systemPrompts = config('chatprompts.assistant_intro', []);
@@ -71,43 +71,26 @@ class ChatService
             'messages' => $messages,
         ];
 
-        // Only include tools if not empty
+        // Include tools if any are selected
         if (!empty($tools)) {
             $payload['tools'] = $tools;
         }
 
-        // For initial request, streaming may not be supported by some configurations;
-        // if stream is requested, handle gracefully without causing errors.
         try {
             $response = OpenAI::chat()->create($payload);
         } catch (Exception $e) {
-            Log::error('OpenAI primary model request failed.', [
+            Log::error('OpenAI model request failed.', [
                 'user_id' => $userId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
             ]);
-
-            // Attempt fallback model
-            $payload['model'] = $fallbackModel;
-            try {
-                $response = OpenAI::chat()->create($payload);
-                Log::info('Fallback model used successfully.', [
-                    'user_id' => $userId
-                ]);
-            } catch (Exception $fallbackException) {
-                Log::error('Fallback model request failed.', [
-                    'user_id' => $userId,
-                    'error' => $fallbackException->getMessage(),
-                    'trace' => $fallbackException->getTraceAsString()
-                ]);
-                return 'An error occurred while processing your request. Please try again later.';
-            }
+            return 'An error occurred while processing your request. Please try again later.';
         }
 
         $executedToolCalls = [];
-        $finalContent = $this->processToolCalls($userId, $tools, $model, $messages, $response, $executedToolCalls, $fallbackModel, $stream);
+        $finalContent = $this->processToolCalls($userId, $tools, $model, $messages, $response, $executedToolCalls, $stream);
 
-        // If stream is requested, we will simulate streaming the final result.
+        // Simulate streaming if requested
         if ($stream) {
             return (function () use ($finalContent) {
                 yield $finalContent;
@@ -115,8 +98,8 @@ class ChatService
         }
 
         return [
-            'response' => $finalContent,
-            'executed_tool_calls' => $executedToolCalls
+            'response'           => $finalContent,
+            'executed_tool_calls' => $executedToolCalls,
         ];
     }
 
@@ -128,23 +111,18 @@ class ChatService
         switch ($toolName) {
             case 'updateUserAttributes':
                 return $this->chatToolService->updateUserAttributes($userId, $arguments);
-
             case 'deleteUserAttributes':
                 return $this->chatToolService->deleteUserAttributes($userId, $arguments);
-
             case 'getActivities':
                 return $this->chatToolService->getActivities($userId, $arguments);
-
             case 'updateActivities':
                 return $this->chatToolService->updateActivities($userId, $arguments);
-
             case 'deleteActivities':
                 return $this->chatToolService->deleteActivities($userId, $arguments);
-
             default:
                 Log::warning('Tool not recognized.', [
-                    'user_id' => $userId,
-                    'tool_name' => $toolName
+                    'user_id'   => $userId,
+                    'tool_name' => $toolName,
                 ]);
                 return ['message' => 'Tool not recognized.'];
         }
@@ -154,55 +132,54 @@ class ChatService
      * Handle multiple tool calls if any, and ensure a final response.
      */
     protected function processToolCalls(
-        int $userId,
-        array $tools,
+        int    $userId,
+        array  $tools,
         string $model,
-        array &$messages,
-        $response,
-        array &$executedToolCalls,
-        string $fallbackModel,
-        bool $stream
+        array  &$messages,
+               $response,
+        array  &$executedToolCalls,
+        bool   $stream
     ): string {
         while (true) {
-            $choice = $response->choices[0];
+            $choice    = $response->choices[0];
             $toolCalls = $choice->message->toolCalls ?? [];
 
             if (empty($toolCalls)) {
                 if (!isset($choice->message->content)) {
                     return 'No response generated. Please try again.';
                 }
-
                 Log::info('Response generated successfully without further tool calls.', [
                     'user_id' => $userId,
                 ]);
-
                 return trim($choice->message->content);
             }
 
             foreach ($toolCalls as $toolCall) {
-                $toolName = $toolCall->function->name;
+                $toolName  = $toolCall->function->name;
                 $arguments = json_decode($toolCall->function->arguments, true);
 
                 Log::info('Executing tool call.', [
-                    'user_id' => $userId,
+                    'user_id'   => $userId,
                     'tool_name' => $toolName,
-                    'arguments' => $arguments
+                    'arguments' => $arguments,
                 ]);
 
                 $toolResult = $this->executeTool($userId, $toolName, $arguments);
+
                 $executedToolCalls[] = [
                     'tool_name' => $toolName,
                     'arguments' => $arguments,
-                    'result' => $toolResult,
+                    'result'    => $toolResult,
                 ];
 
                 $messages[] = [
-                    'role' => 'function',
-                    'name' => $toolName,
+                    'role'    => 'function',
+                    'name'    => $toolName,
                     'content' => json_encode($toolResult),
                 ];
 
-                $response = $this->safeOpenAIRequest($userId, $model, $fallbackModel, $messages, $tools, $stream);
+                $response = $this->safeOpenAIRequest($userId, $model, $messages, $tools, $stream);
+
                 if (!$response) {
                     return 'An error occurred while processing your request. Please try again later.';
                 }
@@ -214,15 +191,14 @@ class ChatService
      * Safely request a follow-up response from OpenAI.
      */
     protected function safeOpenAIRequest(
-        int $userId,
+        int    $userId,
         string $model,
-        string $fallbackModel,
-        array $messages,
-        array $tools,
-        bool $stream
+        array  $messages,
+        array  $tools,
+        bool   $stream
     ) {
         $payload = [
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
         ];
 
@@ -235,23 +211,11 @@ class ChatService
         } catch (Exception $e) {
             Log::error('OpenAI request failed during follow-up.', [
                 'user_id' => $userId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
             ]);
 
-            // Attempt fallback model
-            $payload['model'] = $fallbackModel;
-            try {
-                return OpenAI::chat()->create($payload);
-            } catch (Exception $fallbackException) {
-                Log::error('Fallback model request failed during follow-up.', [
-                    'user_id' => $userId,
-                    'error' => $fallbackException->getMessage(),
-                    'trace' => $fallbackException->getTraceAsString()
-                ]);
-
-                return null;
-            }
+            return null;
         }
     }
 }
