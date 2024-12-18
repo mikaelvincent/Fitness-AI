@@ -74,9 +74,21 @@ php artisan test
 
 Start the application server with the following command:
 
-```bash
-php artisan serve
-```
+1. **Start the Application Server**
+
+   ```bash
+   php artisan serve
+   ```
+
+2. **Start the Queue Worker**
+
+   In a separate terminal window, start the queue worker to process queued jobs:
+
+   ```bash
+   php artisan queue:work
+   ```
+
+   > **Note**: The queue worker must be running to handle asynchronous tasks such as OpenAI API calls.
 
 ---
 
@@ -151,7 +163,7 @@ Start the development server with the following command:
 
 The application will be accessible at:  
 ```bash
-http://localhost:3000
+http://localhost:5173
 ```
 
 > **Note**: Ensure the backend API server is running and reachable at the specified `REACT_APP_API_URL`.
