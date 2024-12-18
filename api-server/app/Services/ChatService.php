@@ -9,13 +9,16 @@ use Exception;
 class ChatService
 {
     protected ChatToolService $chatToolService;
+    protected ChatContextService $chatContextService;
 
     /**
      * @param ChatToolService $chatToolService
+     * @param ChatContextService $chatContextService
      */
-    public function __construct(ChatToolService $chatToolService)
+    public function __construct(ChatToolService $chatToolService, ChatContextService $chatContextService)
     {
         $this->chatToolService = $chatToolService;
+        $this->chatContextService = $chatContextService;
     }
 
     /**
@@ -23,7 +26,7 @@ class ChatService
      */
     public function getResponse(int $userId, array $userMessages, array $context, array $selectedTools = [])
     {
-        // Log when a request by a user is made
+        // Log the chat request
         Log::info('Chat request received.', [
             'user_id' => $userId,
             'user_messages' => $userMessages,
@@ -32,29 +35,10 @@ class ChatService
 
         $model = env('GPT_MODEL', 'gpt-4o');
 
-        // Load system prompts from config
-        $systemPrompts = config('chatprompts.assistant_intro', []);
+        // Generate system prompts with the initial context
+        $messages = $this->generateSystemPrompts($context);
 
-        // Replace placeholders with dynamic values
-        $todayDate = Carbon::now()->format('F j, Y');
-        foreach ($systemPrompts as &$prompt) {
-            if (isset($prompt['content'])) {
-                $prompt['content'] = str_replace('{{today_date}}', $todayDate, $prompt['content']);
-            }
-        }
-        unset($prompt);
-
-        // Append the user attributes and activities data
-        if (isset($systemPrompts[1]['content'])) {
-            $systemPrompts[1]['content'] .= json_encode($context['user_attributes']);
-        }
-
-        if (isset($systemPrompts[2]['content'])) {
-            $systemPrompts[2]['content'] .= json_encode($context['activities']);
-        }
-
-        $messages = $systemPrompts;
-
+        // Append user messages
         foreach ($userMessages as $msg) {
             $messages[] = [
                 'role' => $msg['role'],
@@ -65,7 +49,6 @@ class ChatService
         // Load tool definitions from config
         $allTools = config('chattools', []);
         $tools = [];
-
         if (!empty($selectedTools)) {
             foreach ($allTools as $tool) {
                 if (in_array($tool['function']['name'], $selectedTools)) {
@@ -85,7 +68,7 @@ class ChatService
             $payload['tools'] = $tools;
         }
 
-        // Log when an API call is made
+        // Log the API call
         Log::info('Sending request to OpenAI.', [
             'user_id' => $userId,
             'payload' => $payload,
@@ -94,7 +77,7 @@ class ChatService
         try {
             $response = OpenAI::chat()->create($payload);
 
-            // Log when an API response is received
+            // Log the API response
             Log::info('Received response from OpenAI.', [
                 'user_id' => $userId,
                 'response' => $response,
@@ -109,9 +92,17 @@ class ChatService
         }
 
         $executedToolCalls = [];
-        $finalContent = $this->processToolCalls($userId, $tools, $model, $messages, $response, $executedToolCalls);
+        $finalContent = $this->processToolCalls(
+            $userId,
+            $tools,
+            $model,
+            $messages,
+            $response,
+            $executedToolCalls,
+            $userMessages
+        );
 
-        // Log when a final response is made
+        // Log the final response
         Log::info('Generated final response.', [
             'user_id' => $userId,
             'final_content' => $finalContent,
@@ -125,6 +116,37 @@ class ChatService
     }
 
     /**
+     * Generate system prompts with the given context.
+     */
+    protected function generateSystemPrompts(array $context): array
+    {
+        // Load system prompts from config
+        $systemPrompts = config('chatprompts.assistant_intro', []);
+
+        // Replace placeholders with dynamic values
+        $todayDate = Carbon::now()->format('F j, Y');
+        foreach ($systemPrompts as &$prompt) {
+            if (isset($prompt['content'])) {
+                $prompt['content'] = str_replace('{{today_date}}', $todayDate, $prompt['content']);
+            }
+        }
+        unset($prompt);
+
+        // Append the user attributes and activities data
+        if (isset($systemPrompts[1]['content'])) {
+            $systemPrompts[1]['content'] .= '';
+        }
+        if (isset($systemPrompts[2]['content'])) {
+            $systemPrompts[2]['content'] .= json_encode($context['user_attributes'] ?? []);
+        }
+        if (isset($systemPrompts[3]['content'])) {
+            $systemPrompts[3]['content'] .= json_encode($context['activities'] ?? []);
+        }
+
+        return $systemPrompts;
+    }
+
+    /**
      * Handle multiple tool calls if any, and ensure a final response.
      */
     protected function processToolCalls(
@@ -133,11 +155,11 @@ class ChatService
         string $model,
         array &$messages,
         $response,
-        array &$executedToolCalls
+        array &$executedToolCalls,
+        array $userMessages
     ): string {
         while (true) {
             $choice = $response->choices[0];
-
             $toolCalls = $choice->message->toolCalls ?? [];
 
             if (empty($toolCalls)) {
@@ -151,7 +173,7 @@ class ChatService
                 $toolName = $toolCall->function->name;
                 $arguments = json_decode($toolCall->function->arguments, true);
 
-                // Log when a tool is executed
+                // Log the tool execution
                 Log::info('Executing tool.', [
                     'user_id' => $userId,
                     'tool_name' => $toolName,
@@ -160,7 +182,7 @@ class ChatService
 
                 $toolResult = $this->executeTool($userId, $toolName, $arguments);
 
-                // Include tool execution result in logs
+                // Log the tool execution result
                 Log::info('Tool execution completed.', [
                     'user_id' => $userId,
                     'tool_name' => $toolName,
@@ -179,8 +201,17 @@ class ChatService
                     'content' => json_encode($toolResult),
                 ];
 
-                $response = $this->safeOpenAIRequest($userId, $model, $messages, $tools);
+                // Update context after tool execution
+                $context = $this->chatContextService->getContext($userId);
 
+                // Regenerate system prompts with updated context
+                $systemPrompts = $this->generateSystemPrompts($context);
+
+                // Rebuild messages with updated system prompts
+                $nonSystemMessages = array_slice($messages, count($systemPrompts));
+                $messages = array_merge($systemPrompts, $nonSystemMessages);
+
+                $response = $this->safeOpenAIRequest($userId, $model, $messages, $tools);
                 if (!$response) {
                     return 'An error occurred while processing your request. Please try again later.';
                 }
@@ -206,7 +237,7 @@ class ChatService
             $payload['tools'] = $tools;
         }
 
-        // Log when an API call is made (follow-up)
+        // Log the follow-up API call
         Log::info('Sending follow-up request to OpenAI.', [
             'user_id' => $userId,
             'payload' => $payload,
@@ -215,12 +246,11 @@ class ChatService
         try {
             $response = OpenAI::chat()->create($payload);
 
-            // Log when an API response is received (follow-up)
+            // Log the follow-up API response
             Log::info('Received follow-up response from OpenAI.', [
                 'user_id' => $userId,
                 'response' => $response,
             ]);
-
             return $response;
         } catch (Exception $e) {
             Log::error('OpenAI request failed during follow-up.', [
@@ -260,7 +290,6 @@ class ChatService
                 ]);
                 return ['message' => 'Unknown tool name.'];
         }
-
         return $result;
     }
 }
