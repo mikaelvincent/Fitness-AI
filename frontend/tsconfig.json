@@ -16,7 +16,7 @@
       ]
     },
     "typeRoots": [
-      "./src/types",
+      "src/shared/types",
       "./node_modules/@types"
     ]
   }
