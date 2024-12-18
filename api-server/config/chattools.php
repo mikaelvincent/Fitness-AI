@@ -4,15 +4,16 @@ return [
         'type' => 'function',
         'function' => [
             'name' => 'updateUserAttributes',
-            'description' => 'Adds or updates user attributes to enhance chat responses and personalized recommendations. These attributes serve as context in future interactions. Include any information about the user, even if not immediately relevant, including opinions or observations about the user. Strive to keep the user attributes updated by adding and updating as much pertinent information as possible.',
-            'strict' => true,
+            'description' => 'Adds or updates user attributes to enhance chat responses and personalized recommendations. These attributes serve as context in future interactions. Include any information about the user, even if not immediately relevant, including opinions or observations about the user. Strive to keep the user attributes updated by adding and updating as much pertinent information as possible. Avoid making repetitive or redundant updates.',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'attributes' => [
                         'type' => 'object',
-                        'description' => 'Key-value pairs of attributes to add or update. Keys are concise attribute names (strings), and values are their corresponding values (strings). For example: {"Weight": "75 kg", "Preferred Exercises": "yoga, cycling", "Current Illnesses": "dengue fever since first week of November 2024; last updated 2024-11-16"}. Ensure attribute keys and values are in a user-friendly format; they will be displayed without additional validation.',
-                        'additionalProperties' => ['type' => 'string'],
+                        'description' => 'An object containing key-value pairs of attributes to update or add. Both keys (attribute name) and values should be strings. For example: {"age": "30", "Fitness Level": "intermediate", "Preferred Exercises": "yoga, cycling", "Current Illnesses": "dengue fever since first week of November 2024, last updated 2024-11-16"}. Ensure keys and values are in a user-friendly format; they will be displayed without additional validation.',
+                        'additionalProperties' => [
+                            'type' => 'string',
+                        ],
                     ],
                 ],
                 'required' => ['attributes'],
@@ -103,7 +104,7 @@ return [
                                 ],
                                 'description' => [
                                     'type' => ['string', 'null'],
-                                    'description' => 'An short description or purpose of the activity, such as "A scenic walk at the park" or "To elevate your heart rate".',
+                                    'description' => 'A short description or purpose of the activity, such as "A scenic walk at the park" or "To elevate your heart rate".',
                                 ],
                                 'notes' => [
                                     'type' => ['string', 'null'],
