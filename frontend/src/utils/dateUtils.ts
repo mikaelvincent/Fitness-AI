@@ -1,4 +1,3 @@
-// utils/dateUtils.ts
 export const isSameWeek = (date1: Date, date2: Date): boolean => {
     const startOfWeek = (date: Date) => {
         const d = new Date(date);
