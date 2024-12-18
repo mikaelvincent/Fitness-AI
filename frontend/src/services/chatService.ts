@@ -7,6 +7,21 @@ const dummyMessage = `# Welcome to Your AI Chat Interface 🚀
 Hello! 👋 I'm here to help you with any questions or tasks you may have. Below are some examples of how you can interact with me:
 `;
 
+// Define the structure of a chat message
+interface ChatMessage {
+    role: string;
+    content: string;
+}
+
+// Define the structure of the response from the backend
+interface ChatResponse {
+    message: string;
+    data: {
+        response: string;
+        executed_tool_calls: { tool_name: string }[];
+    };
+}
+
 // Helper function to set default headers
 const defaultHeaders = () => {
     const token = Cookies.get("token");
@@ -18,8 +33,12 @@ const defaultHeaders = () => {
 };
 
 // Generalized fetch API function
-const fetchAPI = async (endpoint: string, method: string, body?: object) => {
-    const url = new URL(endpoint, ENV.API_URL); // Base URL + endpoint
+const fetchAPI = async (
+    endpoint: string,
+    method: string,
+    body?: object
+): Promise<any> => {
+    const url = new URL(endpoint, ENV.API_URL); // Base URL + endpoint 
     const headers = defaultHeaders();
 
     const options: RequestInit = {
@@ -38,6 +57,17 @@ const fetchAPI = async (endpoint: string, method: string, body?: object) => {
     return responseData;
 };
 
+// Utility function to pause execution for a given number of milliseconds
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Sends a chat message and polls the backend for the GPT response.
+ * @param messages Array of chat messages.
+ * @param tools Array of tools to be used.
+ * @param stream Whether to stream the response.
+ * @param emulate Whether to use dummy response.
+ * @returns The GPT response.
+ */
 export const postChatMessage = async (
     messages: { role: string; content: string }[],
     tools: string[],
@@ -63,6 +93,39 @@ export const postChatMessage = async (
     };
 
     return fetchAPI("/api/chat", "POST", payload);
+
+    const postResponse = await fetchAPI("/api/chat", "POST", payload);
+    console.log("POST response:", postResponse);
+    // Assume the POST response contains an identifier to fetch the GPT response
+    const message = postResponse.message;
+    console.log("Message from the server:", message);
+    if (!message || message !== "Your request is being processed.") {
+        throw new Error("No message from the server.");
+    }
+
+    // Step 2: Poll the backend with GET requests until the GPT response is ready
+    const maxAttempts = 20; // Maximum number of polling attempts
+    let attempts = 0;
+    let currentInterval = 1000; // Start with 1 second
+
+    while (attempts < maxAttempts) {
+        await delay(currentInterval);
+        attempts += 1;
+        currentInterval *= 2; // Double the interval each time
+
+        try {
+            const getResponse = await fetchAPI(`/api/chat/response`, "GET");
+            const chatResponse: ChatResponse = getResponse;
+            if (chatResponse.data && chatResponse.data.response) {
+                return chatResponse;
+            }
+        } catch (error) {
+            console.error("Error while polling for GPT response:", error);
+            throw error;
+        }
+    }
+
+    throw new Error("GPT response not received within the expected time.");
 };
 
 // Function to call OpenAI GPT API with streaming support

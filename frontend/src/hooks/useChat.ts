@@ -82,14 +82,13 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
       role,
       content,
     }));
-    console.log(tools);
+
     try {
       const response = await postChatMessage(
         sanitizedMessages,
         tools,
         false,
       );
-
       const aiResponse =
         response?.data?.response || "Sorry, something went wrong.";
       const tool_calls = response?.data?.executed_tool_calls || [];

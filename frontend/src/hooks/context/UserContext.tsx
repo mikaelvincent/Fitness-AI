@@ -43,10 +43,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const loginUser = (userToken: string) => {
     setToken(userToken);
 
-    const expirationDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
-
     Cookies.set("token", userToken, {
-      expires: expirationDate,
+      expires: 69,
       secure: true,
       sameSite: "strict",
     });
@@ -63,13 +61,12 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const refreshToken = () => {
     const currentToken = Cookies.get("token");
     if (currentToken) {
-      const newExpirationDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
       Cookies.set("token", currentToken, {
-        expires: newExpirationDate,
+        expires: 69, // 69 days
         secure: true,
         sameSite: "strict",
       });
-      console.log("Token lifetime refreshed");
+      console.log("Token lifetime set to 69 days");
     }
   };
 
