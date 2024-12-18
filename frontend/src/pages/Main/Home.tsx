@@ -589,7 +589,7 @@ const Home = () => {
             </AlertDescription>
           </Alert>
         )}
-        {noExercises && status !== "error" && status !== "loading" && (
+        {noExercises && status === "done" && (
           <Card className="mx-8">
             <CardHeader>
               <h1 className="text-center text-2xl font-semibold">
