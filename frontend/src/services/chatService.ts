@@ -69,10 +69,11 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
  * @returns The GPT response.
  */
 export const postChatMessage = async (
-    messages: { role: string; content: string }[],
+    messages: ChatMessage[],
     tools: string[],
-    emulate: boolean = true,
-) => {
+    stream: boolean = false,
+    emulate: boolean = false, // Changed default to false for real implementation
+): Promise<ChatResponse> => {
     if (emulate) {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -87,32 +88,24 @@ export const postChatMessage = async (
         });
     }
 
+    // Step 1: Send the initial POST request
     const payload = {
         messages,
+        stream: stream,
         tools: tools,
     };
 
-    return fetchAPI("/api/chat", "POST", payload);
-
     const postResponse = await fetchAPI("/api/chat", "POST", payload);
-    console.log("POST response:", postResponse);
-    // Assume the POST response contains an identifier to fetch the GPT response
     const message = postResponse.message;
     console.log("Message from the server:", message);
     if (!message || message !== "Your request is being processed.") {
         throw new Error("No message from the server.");
     }
 
-    // Step 2: Poll the backend with GET requests until the GPT response is ready
-    const maxAttempts = 20; // Maximum number of polling attempts
-    let attempts = 0;
-    let currentInterval = 1000; // Start with 1 second
+    let currentInterval = 1000;
 
-    while (attempts < maxAttempts) {
+    while (1) {
         await delay(currentInterval);
-        attempts += 1;
-        currentInterval *= 2; // Double the interval each time
-
         try {
             const getResponse = await fetchAPI(`/api/chat/response`, "GET");
             const chatResponse: ChatResponse = getResponse;
