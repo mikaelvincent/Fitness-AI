@@ -1,27 +1,27 @@
 // src/App.jsx
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import MainLayout from "./layout/MainLayout";
-import AuthLayout from "./layout/AuthLayout";
-import Home from "./pages/Main/Home.tsx";
-import Login from "./pages/Auth/Login.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Register from "./pages/Auth/Register.tsx";
-import ForgotPassword from "./pages/Auth/ForgotPassword.tsx";
-import VerifyEmail from "./pages/Auth/VerifyEmail.tsx";
-import Progress from "./pages/Main/Progress.tsx";
-import Profile from "./pages/Main/Profile/Profile.tsx";
-import { ThemeProvider } from "./components/theme/theme-provider.tsx";
-import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
-import { Toaster } from "@/components/ui/toaster";
-import SetupLayout from "./layout/SetupLayout.tsx";
-import { SetupProvider } from "./components/setup/SetupContext.tsx";
-import SetupWizard from "./pages/setup/SetupWizard";
-import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
-import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
-import ChatPage from "./pages/ChatPage.tsx";
-import ProtectedRoute from "@/components/protected-routes/ProtectedRoute";
-import PublicRoute from "@/components/protected-routes/PublicRoute";
-import LandingPage from "./pages/LandingPage.tsx";
+import MainLayout from "./features/profile/MainLayout.tsx";
+import AuthLayout from "./features/authentication/AuthLayout.tsx";
+import Home from "./features/profile/pages/Main/Home.tsx";
+import Login from "./features/authentication/pages/Login.tsx";
+import NotFound from "./shared/pages/NotFound.tsx";
+import Register from "./features/authentication/pages/Register.tsx";
+import ForgotPassword from "./features/authentication/pages/ForgotPassword.tsx";
+import VerifyEmail from "./features/authentication/pages/VerifyEmail.tsx";
+import Progress from "./features/profile/pages/Main/Progress.tsx";
+import Profile from "./features/profile/pages/Main/Profile/Profile.tsx";
+import { ThemeProvider } from "./shared/components/theme/theme-provider.tsx";
+import ResetPassword from "@/features/authentication/pages/ResetPassword.tsx";
+import { Toaster } from "@/shared/components/ui/toaster.tsx";
+import SetupLayout from "./features/setup/SetupLayout.tsx";
+import { SetupProvider } from "./features/setup/components/SetupContext.tsx";
+import SetupWizard from "./features/setup/pages/SetupWizard.tsx";
+import { ChangePassword } from "@/features/profile/pages/Main/Profile/ChangePassword.tsx";
+import { TwoFactorAuthentication } from "@/features/profile/pages/Main/Profile/TwoFactorAuthentication.tsx";
+import ChatPage from "./features/chat/pages/ChatPage.tsx";
+import ProtectedRoute from "@/shared/components/protected-routes/ProtectedRoute.tsx";
+import PublicRoute from "@/shared/components/protected-routes/PublicRoute.tsx";
+import LandingPage from "./shared/pages/LandingPage.tsx";
 
 const App = () => {
   return (
