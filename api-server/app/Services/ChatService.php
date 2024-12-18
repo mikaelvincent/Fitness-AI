@@ -48,13 +48,14 @@ class ChatService
         $messages = $systemPrompts;
         foreach ($userMessages as $msg) {
             $messages[] = [
-                'role' => $msg['role'],
+                'role'    => $msg['role'],
                 'content' => $msg['content'],
             ];
         }
 
         // Load tool definitions from config
         $allTools = config('chattools', []);
+
         $tools = [];
         if (!empty($selectedTools)) {
             foreach ($allTools as $tool) {
@@ -66,10 +67,9 @@ class ChatService
 
         // Build request payload
         $payload = [
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
         ];
-
         // Include tools if any are selected
         if (!empty($tools)) {
             $payload['tools'] = $tools;
@@ -80,8 +80,8 @@ class ChatService
         } catch (Exception $e) {
             Log::error('OpenAI model request failed.', [
                 'user_id' => $userId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
             ]);
             return 'An error occurred while processing your request. Please try again later.';
         }
@@ -90,7 +90,7 @@ class ChatService
         $finalContent = $this->processToolCalls($userId, $tools, $model, $messages, $response, $executedToolCalls);
 
         return [
-            'response' => $finalContent,
+            'response'           => $finalContent,
             'executed_tool_calls' => $executedToolCalls,
         ];
     }
@@ -109,7 +109,6 @@ class ChatService
         while (true) {
             $choice = $response->choices[0];
             $toolCalls = $choice->message->toolCalls ?? [];
-
             if (empty($toolCalls)) {
                 if (!isset($choice->message->content)) {
                     return 'No response generated. Please try again.';
@@ -121,25 +120,26 @@ class ChatService
             }
 
             foreach ($toolCalls as $toolCall) {
-                $toolName = $toolCall->function->name;
+                $toolName  = $toolCall->function->name;
                 $arguments = json_decode($toolCall->function->arguments, true);
 
                 Log::info('Executing tool call.', [
-                    'user_id' => $userId,
+                    'user_id'   => $userId,
                     'tool_name' => $toolName,
                     'arguments' => $arguments,
                 ]);
 
                 $toolResult = $this->executeTool($userId, $toolName, $arguments);
+
                 $executedToolCalls[] = [
                     'tool_name' => $toolName,
                     'arguments' => $arguments,
-                    'result' => $toolResult,
+                    'result'    => $toolResult,
                 ];
 
                 $messages[] = [
-                    'role' => 'function',
-                    'name' => $toolName,
+                    'role'    => 'function',
+                    'name'    => $toolName,
                     'content' => json_encode($toolResult),
                 ];
 
@@ -161,23 +161,46 @@ class ChatService
         array $tools
     ) {
         $payload = [
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
         ];
-
         if (!empty($tools)) {
             $payload['tools'] = $tools;
         }
-
         try {
             return OpenAI::chat()->create($payload);
         } catch (Exception $e) {
             Log::error('OpenAI request failed during follow-up.', [
                 'user_id' => $userId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
             ]);
             return null;
+        }
+    }
+
+    /**
+     * Execute the specified tool with given arguments.
+     */
+    protected function executeTool(int $userId, string $toolName, array $arguments): array
+    {
+        switch ($toolName) {
+            case 'updateUserAttributes':
+                return $this->chatToolService->updateUserAttributes($userId, $arguments);
+            case 'deleteUserAttributes':
+                return $this->chatToolService->deleteUserAttributes($userId, $arguments);
+            case 'getActivities':
+                return $this->chatToolService->getActivities($userId, $arguments);
+            case 'updateActivities':
+                return $this->chatToolService->updateActivities($userId, $arguments);
+            case 'deleteActivities':
+                return $this->chatToolService->deleteActivities($userId, $arguments);
+            default:
+                Log::warning('Unknown tool called.', [
+                    'user_id'   => $userId,
+                    'tool_name' => $toolName,
+                ]);
+                return ['message' => 'Unknown tool name.'];
         }
     }
 }
