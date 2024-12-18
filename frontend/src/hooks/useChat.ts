@@ -9,6 +9,13 @@ type Message = {
   content: string;
   tools?: string[];
 };
+interface PostChatMessageResponse {
+  message: string;
+  data: {
+    response: string;
+    executed_tool_calls: { tool_name: string }[];
+  };
+}
 
 type ProfileInfo = { label: string; value: string }[];
 

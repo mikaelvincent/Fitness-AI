@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IoIosSend } from "react-icons/io";
-
+import { Textarea } from "@/components/ui/textarea";
 type ChatInputProps = {
     onSend: (message: string) => void;
     isLoading: boolean;
@@ -11,6 +11,9 @@ type ChatInputProps = {
 const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
     const [message, setMessage] = useState("");
 
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMessage(e.target.value)
+    }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (message.trim() && !isLoading) {
@@ -19,11 +22,22 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading }) => {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey && !isLoading) {
+            e.preventDefault() // Prevents the default newline insertion
+            if (message.trim()) {
+                onSend(message.trim())
+                setMessage("") // Clear the textarea after sending
+            }
+        }
+    }
+
     return (
         <form onSubmit={handleSubmit} className="flex items-center p-4">
-            <Input
+            <Textarea
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Type your message..."
                 className="flex-1 rounded-lg px-4 py-2"
             />
