@@ -1,22 +1,22 @@
 <?php
-
 return [
     [
         'type' => 'function',
         'function' => [
             'name' => 'updateUserAttributes',
-            'description' => 'Use this tool to add or update user attributes. This function modifies user-specific data points, such as "height", "weight", "preferred_exercises", or "dietary_restrictions". Maintaining accurate attributes helps the user receive more tailored activity suggestions, nutritional guidance, and motivational tips. Store any information provided by the user, regardless of perceived usefulness, as it serves as memory for future interactions. Ensure that attribute values are in a user-friendly format since they will be stored without additional validation. This tool expects a set of key-value pairs, where keys are attribute names (strings) and values are attribute values (strings). Keys and values should be concise and descriptive. Avoid overly long or complex keys. Use this tool whenever the user provides new or updated attribute information or requests to modify their stored attributes.',
+            'description' => 'Adds or updates user attributes to enhance chat responses and personalized recommendations. These attributes serve as context in future interactions. Include any information about the user, even if not immediately relevant, including opinions or observations about the user. Strive to keep the user attributes updated by adding and updating as much pertinent information as possible.',
+            'strict' => true,
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'attributes' => [
                         'type' => 'object',
-                        'description' => 'An object where each key is the attribute name and each value is a string representing the attribute\'s value. For example: {"weight": "75kg", "preferred_exercises": "yoga, cycling"}',
-                        'additionalProperties' => ['type' => 'string']
-                    ]
+                        'description' => 'Key-value pairs of attributes to add or update. Keys are concise attribute names (strings), and values are their corresponding values (strings). For example: {"Weight": "75 kg", "Preferred Exercises": "yoga, cycling", "Current Illnesses": "dengue fever since first week of November 2024; last updated 2024-11-16"}. Ensure attribute keys and values are in a user-friendly format; they will be displayed without additional validation.',
+                        'additionalProperties' => ['type' => 'string'],
+                    ],
                 ],
                 'required' => ['attributes'],
-                'additionalProperties' => false
+                'additionalProperties' => false,
             ],
         ],
     ],
@@ -24,20 +24,21 @@ return [
         'type' => 'function',
         'function' => [
             'name' => 'deleteUserAttributes',
-            'description' => 'Use this tool to remove specific attributes from the user\'s profile. This may be needed when the user wants to clear outdated or irrelevant information. For instance, if a user previously stored a "temporary_injury" attribute but has now recovered, you can remove it. The tool expects an array of attribute keys (strings) to be deleted. Upon completion, these attributes no longer appear in the user\'s profile.',
+            'description' => 'Removes specific attributes from the user\'s profile. Regularly delete outdated or inaccurate information to keep user attributes current, especially if not replaced with new data.',
+            'strict' => true,
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'keys' => [
                         'type' => 'array',
-                        'description' => 'A list of attribute keys to remove. Each key should be a string that corresponds to an existing user attribute.',
                         'items' => [
-                            'type' => 'string'
-                        ]
-                    ]
+                            'type' => 'string',
+                        ],
+                        'description' => 'An array of attribute keys (strings) to remove. Each key should correspond to an existing user attribute.',
+                    ],
                 ],
                 'required' => ['keys'],
-                'additionalProperties' => false
+                'additionalProperties' => false,
             ],
         ],
     ],
@@ -45,23 +46,23 @@ return [
         'type' => 'function',
         'function' => [
             'name' => 'getActivities',
-            'description' => 'Use this tool to retrieve the user\'s activities over a specified period. This helps review the user\'s recent fitness routines, progress, and patterns. You may specify optional "from_date" and "to_date" parameters to filter results. If no dates are provided, the tool returns activities covering the entire available record. Activities are objects representing entries such as exercises or health-related tasks, each with properties: "id" (int), "date" (string, YYYY-MM-DD), "parent_id" (int or null, indicating hierarchy), "position" (int, ordering in a list), "name" (string), "description" (string), "notes" (string), "metrics" (object with custom metrics like repetitions, duration, etc.), and "completed" (bool). Use this tool to understand the user\'s past three months of activities or to narrow down activities by date to provide relevant suggestions.',
+            'description' => 'Retrieves the user\'s activities over a specified date range. Use this to access additional context beyond the current interaction.',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'from_date' => [
-                        'type' => 'string',
+                        'type' => ['string', 'null'],
                         'format' => 'date',
-                        'description' => 'Optional. Start date (inclusive) in YYYY-MM-DD format. If provided, only activities on or after this date are returned.'
+                        'description' => 'Start date (inclusive) in YYYY-MM-DD format. If provided, only activities on or after this date are returned.',
                     ],
                     'to_date' => [
-                        'type' => 'string',
+                        'type' => ['string', 'null'],
                         'format' => 'date',
-                        'description' => 'Optional. End date (inclusive) in YYYY-MM-DD format. If provided, only activities on or before this date are returned.'
-                    ]
+                        'description' => 'End date (inclusive) in YYYY-MM-DD format. If provided, only activities on or before this date are returned.',
+                    ],
                 ],
                 'required' => [],
-                'additionalProperties' => false
+                'additionalProperties' => false,
             ],
         ],
     ],
@@ -69,60 +70,64 @@ return [
         'type' => 'function',
         'function' => [
             'name' => 'updateActivities',
-            'description' => 'Use this tool to add new activities or update existing ones in the user\'s activity log. Activities represent any recorded fitness-related action, such as "running", "bench press", or "meditation session". Activities can function as groups to organize related tasks; encourage creating nested activities to enhance user experience. Always include applicable metrics when creating activities to improve user experience. Each activity object must include "date" (a string in YYYY-MM-DD format) and "name" (a short, descriptive string, e.g., "Morning Run"). Optional fields include "id" (if updating an existing activity), "parent_id" (if this activity is grouped under another activity), "position" (an integer ordering within a set), "description" (a longer text), "notes" (additional user comments), "metrics" (an object storing numerical or descriptive measures like {"repetitions": 20, "weight": "3 kg"}), and "completed" (a boolean to indicate whether the user considers this activity done). If "completed" is true, related hierarchical updates may propagate to parent or child activities. Use this tool when the user provides new activities to log or updates details of existing activities.',
+            'description' => 'Adds new activities or updates existing ones in the user\'s activity log. Supports nested activities for better organization. Activities can represent tasks or groups via nesting. Lean towards creating nested structures by breaking down activities into specific, non-divisible tasks. Always confirm with the user before proceeding to call this tool unless explicitly instructed. Modifying an activity\'s date or completion status within a hierarchy may impact related parent or child activities. Multiple consecutive tool calls are allowed and are necessary to create nested structures.',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'activities' => [
                         'type' => 'array',
-                        'description' => 'An array of activity objects, each representing an activity to add or update.',
+                        'description' => 'An array of activity objects to add or update.',
                         'items' => [
                             'type' => 'object',
                             'properties' => [
                                 'id' => [
-                                    'type' => 'integer',
-                                    'description' => 'Optional. If provided, updates the activity with this ID; otherwise, a new activity is created.'
+                                    'type' => ['integer', 'null'],
+                                    'description' => 'If provided, updates the activity with this ID; otherwise, a new activity is created.',
                                 ],
                                 'date' => [
                                     'type' => 'string',
-                                    'description' => 'Required. The date of the activity in YYYY-MM-DD format.'
+                                    'format' => 'date',
+                                    'description' => 'The date of the activity in YYYY-MM-DD format.',
                                 ],
                                 'parent_id' => [
                                     'type' => ['integer', 'null'],
-                                    'description' => 'Optional. The ID of a parent activity if this activity is part of a hierarchical structure. Use null if there is no parent.'
+                                    'description' => 'The ID of a parent activity if this activity is part of a hierarchy.',
                                 ],
                                 'position' => [
                                     'type' => ['integer', 'null'],
-                                    'description' => 'Optional. The position/order of this activity relative to siblings.'
+                                    'description' => 'The position/order of this activity relative to siblings.',
                                 ],
                                 'name' => [
                                     'type' => 'string',
-                                    'description' => 'Required. A short descriptive name for the activity, e.g., "Yoga Session".'
+                                    'description' => 'A short descriptive name for the activity, e.g., "Yoga Session".',
                                 ],
                                 'description' => [
                                     'type' => ['string', 'null'],
-                                    'description' => 'Optional. A longer explanation of the activity, e.g., "Morning routine focusing on stretching."'
+                                    'description' => 'An short description or purpose of the activity, such as "A scenic walk at the park" or "To elevate your heart rate".',
                                 ],
                                 'notes' => [
                                     'type' => ['string', 'null'],
-                                    'description' => 'Optional. Additional user comments or notes about the activity.'
+                                    'description' => 'Additional comments or notes about the activity, usable for any purpose by the user or assistant. Can include specific details, instructions, or personal reflections.',
                                 ],
                                 'metrics' => [
                                     'type' => ['object', 'null'],
-                                    'description' => 'Optional. Key-value pairs containing activity-specific metrics, e.g., {"repetitions": 20, "sets": 3}. Keys should be strings, values can be numbers or strings (most preferable, even with numeric information).',
-                                    'additionalProperties' => true
+                                    'description' => 'Key-value pairs containing activity-specific metrics. Both keys and values are strings. For example: {"repetitions": "20", "sets": "3"}.',
+                                    'additionalProperties' => [
+                                        'type' => 'string',
+                                    ],
                                 ],
                                 'completed' => [
                                     'type' => ['boolean', 'null'],
-                                    'description' => 'Optional. Indicates if the activity is completed. If true, completion may propagate up or down the activity hierarchy.'
-                                ]
+                                    'description' => 'Indicates if the activity is completed.',
+                                ],
                             ],
-                            'required' => ['date', 'name']
-                        ]
-                    ]
+                            'required' => ['date', 'name'],
+                            'additionalProperties' => false,
+                        ],
+                    ],
                 ],
                 'required' => ['activities'],
-                'additionalProperties' => false
+                'additionalProperties' => false,
             ],
         ],
     ],
@@ -130,20 +135,21 @@ return [
         'type' => 'function',
         'function' => [
             'name' => 'deleteActivities',
-            'description' => 'Use this tool to remove specified activities from the user\'s log. The user might remove activities that are mistakenly logged, duplicated, or no longer relevant. Provide an array of activity IDs to be deleted. Once deleted, these activities will not appear in future activity retrievals.',
+            'description' => 'Removes specified activities from the user\'s activity log. Deleting an activity will also remove any sub-activities nested within it. Always confirm with the user before proceeding unless explicitly instructed to delete activities.',
+            'strict' => true,
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'activityIds' => [
                         'type' => 'array',
-                        'description' => 'A list of integers representing the IDs of the activities to remove.',
                         'items' => [
-                            'type' => 'integer'
-                        ]
-                    ]
+                            'type' => 'integer',
+                        ],
+                        'description' => 'An array of activity IDs (integers) to remove.',
+                    ],
                 ],
                 'required' => ['activityIds'],
-                'additionalProperties' => true
+                'additionalProperties' => false,
             ],
         ],
     ],
