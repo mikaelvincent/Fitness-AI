@@ -260,7 +260,7 @@ paths:
                       date:
                         type: string
                         description: 'Must be a valid date.'
-                        example: '2024-12-17T21:05:24'
+                        example: '2024-12-18T10:29:23'
                         nullable: false
                       parent_id:
                         type: integer
@@ -356,7 +356,7 @@ paths:
                       role:
                         type: string
                         description: ''
-                        example: assistant
+                        example: user
                         nullable: false
                         enum:
                           - user
@@ -369,16 +369,11 @@ paths:
                     required:
                       - role
                       - content
-                stream:
-                  type: boolean
-                  description: ''
-                  example: false
-                  nullable: false
                 tools:
                   type: array
                   description: ''
                   example:
-                    - deleteActivities
+                    - updateActivities
                   items:
                     type: string
                     enum:

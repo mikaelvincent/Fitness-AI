@@ -1293,7 +1293,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"activities\": [
         {
             \"id\": 10,
-            \"date\": \"2024-12-17T21:05:24\",
+            \"date\": \"2024-12-18T10:29:23\",
             \"parent_id\": 10,
             \"position\": 10,
             \"name\": \"cjanyizogaho\",
@@ -1320,7 +1320,7 @@ let body = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-17T21:05:24",
+            "date": "2024-12-18T10:29:23",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1352,7 +1352,7 @@ $response = $client-&gt;put(
             'activities' =&gt; [
                 [
                     'id' =&gt; 10,
-                    'date' =&gt; '2024-12-17T21:05:24',
+                    'date' =&gt; '2024-12-18T10:29:23',
                     'parent_id' =&gt; 10,
                     'position' =&gt; 10,
                     'name' =&gt; 'cjanyizogaho',
@@ -1377,7 +1377,7 @@ payload = {
     "activities": [
         {
             "id": 10,
-            "date": "2024-12-17T21:05:24",
+            "date": "2024-12-18T10:29:23",
             "parent_id": 10,
             "position": 10,
             "name": "cjanyizogaho",
@@ -1495,10 +1495,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="activities.0.date"                data-endpoint="PUTapi-activities"
-               value="2024-12-17T21:05:24"
+               value="2024-12-18T10:29:23"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2024-12-17T21:05:24</code></p>
+<p>Must be a valid date. Example: <code>2024-12-18T10:29:23</code></p>
                     </div>
                                                                 <div style="margin-left: 14px; clear: unset;">
                         <b style="line-height: 2;"><code>parent_id</code></b>&nbsp;&nbsp;
@@ -1787,13 +1787,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"messages\": [
         {
-            \"role\": \"assistant\",
+            \"role\": \"user\",
             \"content\": \"voluptatum\"
         }
     ],
-    \"stream\": false,
     \"tools\": [
-        \"deleteActivities\"
+        \"updateActivities\"
     ]
 }"
 </code></pre></div>
@@ -1813,13 +1812,12 @@ const headers = {
 let body = {
     "messages": [
         {
-            "role": "assistant",
+            "role": "user",
             "content": "voluptatum"
         }
     ],
-    "stream": false,
     "tools": [
-        "deleteActivities"
+        "updateActivities"
     ]
 };
 
@@ -1844,13 +1842,12 @@ $response = $client-&gt;post(
         'json' =&gt; [
             'messages' =&gt; [
                 [
-                    'role' =&gt; 'assistant',
+                    'role' =&gt; 'user',
                     'content' =&gt; 'voluptatum',
                 ],
             ],
-            'stream' =&gt; false,
             'tools' =&gt; [
-                'deleteActivities',
+                'updateActivities',
             ],
         ],
     ]
@@ -1867,13 +1864,12 @@ url = 'http://127.0.0.1:8000/api/chat'
 payload = {
     "messages": [
         {
-            "role": "assistant",
+            "role": "user",
             "content": "voluptatum"
         }
     ],
-    "stream": false,
     "tools": [
-        "deleteActivities"
+        "updateActivities"
     ]
 }
 headers = {
@@ -1985,10 +1981,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="messages.0.role"                data-endpoint="POSTapi-chat"
-               value="assistant"
+               value="user"
                data-component="body">
     <br>
-<p>Example: <code>assistant</code></p>
+<p>Example: <code>user</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>user</code></li> <li><code>assistant</code></li></ul>
                     </div>
@@ -2004,27 +2000,6 @@ Must be one of:
 <p>Example: <code>voluptatum</code></p>
                     </div>
                                     </details>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>stream</code></b>&nbsp;&nbsp;
-<small>boolean</small>&nbsp;
-<i>optional</i> &nbsp;
-                <label data-endpoint="POSTapi-chat" style="display: none">
-            <input type="radio" name="stream"
-                   value="true"
-                   data-endpoint="POSTapi-chat"
-                   data-component="body"             >
-            <code>true</code>
-        </label>
-        <label data-endpoint="POSTapi-chat" style="display: none">
-            <input type="radio" name="stream"
-                   value="false"
-                   data-endpoint="POSTapi-chat"
-                   data-component="body"             >
-            <code>false</code>
-        </label>
-    <br>
-<p>Example: <code>false</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>tools</code></b>&nbsp;&nbsp;

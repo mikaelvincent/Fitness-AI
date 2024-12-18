@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Fitness AI",
-        "_postman_id": "6f0ddb82-535b-4719-bcac-defbbb7c99aa",
+        "_postman_id": "132ea352-4b59-43aa-afe8-dda112ddbda1",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -299,7 +299,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-17T21:05:24\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
+                            "raw": "{\"activities\":[{\"id\":10,\"date\":\"2024-12-18T10:29:23\",\"parent_id\":10,\"position\":10,\"name\":\"cjanyizogaho\",\"description\":\"Explicabo ex accusantium excepturi tenetur voluptas.\",\"notes\":\"voluptatum\",\"completed\":true}]}"
                         },
                         "description": "",
                         "auth": {
@@ -361,7 +361,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"messages\":[{\"role\":\"assistant\",\"content\":\"voluptatum\"}],\"stream\":false,\"tools\":[\"deleteActivities\"]}"
+                            "raw": "{\"messages\":[{\"role\":\"user\",\"content\":\"voluptatum\"}],\"tools\":[\"updateActivities\"]}"
                         },
                         "description": ""
                     },
