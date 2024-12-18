@@ -88,7 +88,6 @@ export const useChat = ({ initialMessages = [] }: UseChatProps) => {
         sanitizedMessages,
         tools,
         false,
-        false,
       );
       const aiResponse =
         response?.data?.response || "Sorry, something went wrong.";

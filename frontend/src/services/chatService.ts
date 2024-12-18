@@ -69,11 +69,10 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
  * @returns The GPT response.
  */
 export const postChatMessage = async (
-    messages: ChatMessage[],
+    messages: { role: string; content: string }[],
     tools: string[],
-    stream: boolean = false,
-    emulate: boolean = false, // Changed default to false for real implementation
-): Promise<ChatResponse> => {
+    emulate: boolean = true,
+) => {
     if (emulate) {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -88,12 +87,12 @@ export const postChatMessage = async (
         });
     }
 
-    // Step 1: Send the initial POST request
     const payload = {
         messages,
-        stream: stream,
         tools: tools,
     };
+
+    return fetchAPI("/api/chat", "POST", payload);
 
     const postResponse = await fetchAPI("/api/chat", "POST", payload);
     console.log("POST response:", postResponse);
