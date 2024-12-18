@@ -70,15 +70,11 @@ export const initiateVerifyEmail = async ({
     // Validate the data against the schema
     const parsedData = VerifyEmailSchema.parse(data);
 
-    console.log("Parsed data:", parsedData);
-    console.log("User attributes:", userAttributes);
-
     let stringifiedUserAttributes: Record<string, string> | undefined;
 
     if (userAttributes) {
       // Transform specific attributes
       const transformedUserAttributes = transformUserAttributes(userAttributes);
-      console.log("Transformed user attributes:", transformedUserAttributes);
 
       // Convert all values to strings
       stringifiedUserAttributes = convertValuesToString(
@@ -104,8 +100,6 @@ export const initiateVerifyEmail = async ({
       requestBody.user_attributes = stringifiedUserAttributes;
     }
 
-    console.log("Request body:", requestBody);
-
     // Make the POST request
     const response = await fetch(url, {
       method: "POST",
@@ -115,8 +109,6 @@ export const initiateVerifyEmail = async ({
 
     // Parse the JSON response
     const responseData = await response.json();
-
-    console.log("Response data:", responseData);
 
     // Handle rate limiting (HTTP 429)
     if (response.status === 429) {

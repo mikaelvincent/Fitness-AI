@@ -26,8 +26,6 @@ export const DisableTwoFactorAuth = async (
 
     const responseData = await response.json();
 
-    console.log("Response data:", responseData);
-
     if (!response.ok && response.status === 429) {
       return {
         success: false,
@@ -57,7 +55,6 @@ export const DisableTwoFactorAuth = async (
       status: response.status,
     };
   } catch (error) {
-    console.log("Error during activation:", error);
     return {
       success: false,
       message: "An unexpected error occurred.",

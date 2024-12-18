@@ -39,7 +39,6 @@ const VerifyEmail = () => {
           [key: string]: string | number;
         };
         setUserAttributes(parsedData);
-        console.log("User Attributes loaded:", parsedData);
       } catch (error) {
         console.error("Error parsing setupData from sessionStorage:", error);
         // Optionally, handle the error by setting an error state or notifying the user
@@ -72,7 +71,6 @@ const VerifyEmail = () => {
   );
 
   const handleVerifyEmail = async (data: z.infer<typeof VerifyEmailSchema>) => {
-    console.log("VerifyEmail data:", userAttributes);
     setLoading();
     try {
       const response = !verificationEmailSent

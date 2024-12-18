@@ -25,7 +25,6 @@ export const convertDatesFromObject = (data: any): Exercise[] => {
   const exercises: Exercise[] = [];
 
   for (const key in data) {
-    // Check if the key is a numeric string
     if (!isNaN(Number(key))) {
       const exercise = data[key];
       exercises.push(convertExercise(exercise));

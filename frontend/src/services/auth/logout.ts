@@ -25,8 +25,6 @@ export const logoutUser = async (
 
     const responseData = await response.json();
 
-    console.log("Response data:", responseData);
-
     if (!response.ok && response.status === 429) {
       return {
         success: false,

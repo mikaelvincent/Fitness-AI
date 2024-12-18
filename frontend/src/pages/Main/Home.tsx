@@ -109,7 +109,6 @@ const Home = () => {
         date: currentDate,
       });
 
-      console.log(response.data);
       if (!response?.success) {
         setError();
         setResponseMessage(
@@ -192,8 +191,6 @@ const Home = () => {
         exerciseToSend,
         ...ancestorsToUpdate,
       ]);
-
-      console.log("Activities to update:", activitiesToUpdate);
 
       // Send updates to backend one by one
       const response = await AddOrUpdateActivities({
@@ -349,8 +346,6 @@ const Home = () => {
           { ...exerciseToAdd, id: null }, // New exercise with id set to null
           ...flattenedExercises.filter((ex) => ex.id !== tempId),
         ];
-
-        console.log("Activities to update:", activitiesToUpdate);
 
         const response = await AddOrUpdateActivities({
           token,

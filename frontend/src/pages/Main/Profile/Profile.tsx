@@ -51,7 +51,6 @@ const Profile = () => {
     try {
       const response = await FetchUserInfo({ token });
 
-      console.log(response);
       if (!response?.success) {
         toast({
           variant: "destructive",
@@ -62,7 +61,6 @@ const Profile = () => {
 
       if (response?.success) {
         setProfileInfo(response.data as UserProfileInfo);
-        console.log("Response Data:", response.data);
         return;
       }
 
@@ -122,7 +120,6 @@ const Profile = () => {
 
   const handleSaveName = async (data: z.infer<typeof UpdateNameSchema>) => {
     const { name } = data;
-    console.log("Save named: ", name);
     refreshToken();
     try {
       const response = await UpdateName({ token, name });

@@ -8,7 +8,6 @@ export interface Exercise {
   description?: string;
   notes?: string;
   position?: number;
-  // Instead of Metric[], use a dictionary of { [key: string]: string }
   metrics?: { [key: string]: string };
   completed?: boolean;
   children?: Exercise[];

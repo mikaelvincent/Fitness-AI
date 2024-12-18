@@ -42,9 +42,6 @@ export const FetchUserInfo = async ({
 
     const responseData = await response.json();
 
-    console.log("Response:", response);
-    console.log("Response data:", responseData);
-
     if (!response.ok) {
       if (response.status === 429) {
         return {
