@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
@@ -33,7 +32,7 @@ class ChatController extends Controller
             'messages' => ['required', 'array'],
             'messages.*.role' => ['required', 'string', 'in:user,assistant'],
             'messages.*.content' => ['required', 'string'],
-            'stream' => ['sometimes', 'boolean'],
+            // Removed 'stream' validation
             'tools' => ['sometimes', 'array'],
             'tools.*' => ['string', 'in:updateUserAttributes,deleteUserAttributes,getActivities,updateActivities,deleteActivities'],
         ]);
@@ -43,7 +42,6 @@ class ChatController extends Controller
                 'user_id' => $request->user()->id ?? null,
                 'errors' => $validator->errors()->toArray(),
             ]);
-
             return response()->json([
                 'message' => 'Validation failed.',
                 'errors' => $validator->errors(),
@@ -54,7 +52,6 @@ class ChatController extends Controller
 
         try {
             $context = $this->chatContextService->getContext($request->user()->id);
-            $stream = $validated['stream'] ?? false;
             $tools = $validated['tools'] ?? [];
             $userMessages = $validated['messages'];
 
@@ -63,7 +60,6 @@ class ChatController extends Controller
                 $request->user()->id,
                 $userMessages,
                 $context,
-                $stream,
                 $tools
             );
 
@@ -77,7 +73,6 @@ class ChatController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
-
             return response()->json([
                 'message' => 'An error occurred while processing your request. Please try again later.',
             ], 500);
@@ -96,7 +91,6 @@ class ChatController extends Controller
         if ($response) {
             // Remove the response from cache after retrieval
             Cache::forget("chat_response_{$userId}");
-
             return response()->json([
                 'message' => 'Chat response retrieved successfully.',
                 'data' => $response,

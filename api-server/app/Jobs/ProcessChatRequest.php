@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Jobs;
 
 use App\Services\ChatService;
@@ -17,18 +16,16 @@ class ProcessChatRequest implements ShouldQueue
     protected int $userId;
     protected array $userMessages;
     protected array $context;
-    protected bool $stream;
     protected array $tools;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(int $userId, array $userMessages, array $context, bool $stream, array $tools)
+    public function __construct(int $userId, array $userMessages, array $context, array $tools)
     {
         $this->userId = $userId;
         $this->userMessages = $userMessages;
         $this->context = $context;
-        $this->stream = $stream;
         $this->tools = $tools;
     }
 
@@ -41,7 +38,6 @@ class ProcessChatRequest implements ShouldQueue
             $this->userId,
             $this->userMessages,
             $this->context,
-            $this->stream,
             $this->tools
         );
 
