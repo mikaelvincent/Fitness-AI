@@ -60,7 +60,7 @@ const Login = () => {
       const response = await loginUser(validatedData);
 
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
-      console.log(response.status);
+
       if (
         !response?.success &&
         response?.status !== 429 &&

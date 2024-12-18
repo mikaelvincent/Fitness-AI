@@ -17,14 +17,11 @@ export const DeleteActivities = async ({
   token,
   id,
 }: DeleteActivitiesProps): Promise<DeleteActivitiesResponse> => {
-  console.log("Activities to delete:", id);
   try {
     const url = new URL("/api/activities", ENV.API_URL);
     let body = {
       ids: id,
     };
-
-    console.log("Body:", body);
 
     const headers = {
       "Content-Type": "application/json",
@@ -39,8 +36,6 @@ export const DeleteActivities = async ({
     });
 
     const responseData = await response.json();
-
-    console.log("Response data:", responseData);
 
     if (!response.ok && response.status === 429) {
       return {
@@ -69,7 +64,6 @@ export const DeleteActivities = async ({
       status: response.status,
     };
   } catch (error) {
-    console.log("Error during submission:", error);
     return {
       success: false,
       message: "An unexpected error occurred.",

@@ -34,8 +34,6 @@ export const RetrieveActivities = async ({
     );
     url.searchParams.append("nested", nested ? nested : "true"); // Include if needed
 
-    console.log("URL:", url);
-
     const headers = {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -48,8 +46,6 @@ export const RetrieveActivities = async ({
     });
 
     const responseData = await response.json();
-
-    console.log("Response data:", responseData);
 
     if (!response.ok && response.status === 429) {
       return {
@@ -79,7 +75,6 @@ export const RetrieveActivities = async ({
       data: responseData.data,
     };
   } catch (error) {
-    console.log("Error during submission:", error);
     return {
       success: false,
       message: "An unexpected error occurred.",

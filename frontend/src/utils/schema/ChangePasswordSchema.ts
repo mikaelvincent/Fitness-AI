@@ -11,6 +11,6 @@ export const ChangePasswordSchema = z
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    path: ["password_confirmation"], // Points to the confirmPassword field
+    path: ["password_confirmation"],
     message: "Passwords must match",
   });

@@ -22,8 +22,6 @@ export const AddOrUpdateActivities = async ({
   activities,
 }: AddOrUpdateActivitiesProps): Promise<AddOrUpdateActivitiesResponse> => {
   try {
-    console.log("Activities to submit:", activities);
-
     const isArray = Array.isArray(activities);
 
     // Helper function to transform an activity
@@ -44,8 +42,6 @@ export const AddOrUpdateActivities = async ({
       ? activities.map(transformActivity)
       : [transformActivity(activities)];
 
-    console.log("Data to submit:", data);
-
     const url = new URL("/api/activities", ENV.API_URL);
 
     const headers = {
@@ -61,8 +57,6 @@ export const AddOrUpdateActivities = async ({
     });
 
     const responseData = await response.json();
-
-    console.log("Response data:", responseData);
 
     if (!response.ok && response.status === 429) {
       return {
@@ -93,7 +87,6 @@ export const AddOrUpdateActivities = async ({
       data: responseData.data, // Assuming responseData.data is an array
     };
   } catch (error) {
-    console.log("Error during submission:", error);
     return {
       success: false,
       message: "An unexpected error occurred.",

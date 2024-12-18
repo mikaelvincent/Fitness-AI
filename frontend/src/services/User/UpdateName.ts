@@ -35,9 +35,6 @@ export const UpdateName = async ({
 
     const responseData = await response.json();
 
-    console.log(response);
-    console.log("Response data:", responseData);
-
     if (!response.ok && response.status === 429) {
       return {
         success: false,
@@ -66,7 +63,6 @@ export const UpdateName = async ({
       data: responseData.data,
     };
   } catch (error) {
-    console.log("Error during submission:", error);
     return {
       success: false,
       message: "An unexpected error occurred.",

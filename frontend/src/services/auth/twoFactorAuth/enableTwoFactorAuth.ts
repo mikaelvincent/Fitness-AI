@@ -32,8 +32,6 @@ export const EnableTwoFactorAuth = async (
 
     const responseData = await response.json();
 
-    console.log("Response data:", responseData);
-
     if (!response.ok && response.status === 429) {
       return {
         success: false,
@@ -64,7 +62,6 @@ export const EnableTwoFactorAuth = async (
       data: responseData.data,
     };
   } catch (error) {
-    console.log("Error during activation:", error);
     return {
       success: false,
       message: "An unexpected error occurred.",

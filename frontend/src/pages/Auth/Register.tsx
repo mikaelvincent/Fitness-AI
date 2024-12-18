@@ -36,7 +36,6 @@ const Register = () => {
   }, [location.search, navigate]);
 
   const validateToken = async () => {
-    console.log("Validating token:", token);
     try {
       const response = await validateRegistrationToken(token);
       if (!response?.success) {
@@ -96,7 +95,6 @@ const Register = () => {
       const response = await registerUser({ ...data, token });
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Optional delay
 
-      console.log("tsx: ", response);
       if (!response?.success && response?.status === 429) {
         setInvalidInput("others");
         setError();

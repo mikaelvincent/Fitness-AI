@@ -66,7 +66,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         secure: true,
         sameSite: "strict",
       });
-      console.log("Token lifetime set to 69 days");
     }
   };
 

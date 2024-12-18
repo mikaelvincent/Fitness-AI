@@ -10,27 +10,18 @@ import ForgotPassword from "./pages/Auth/ForgotPassword.tsx";
 import VerifyEmail from "./pages/Auth/VerifyEmail.tsx";
 import Progress from "./pages/Main/Progress.tsx";
 import Profile from "./pages/Main/Profile/Profile.tsx";
-
 import { ThemeProvider } from "./components/theme/theme-provider.tsx";
 import ResetPassword from "@/pages/Auth/ResetPassword.tsx";
 import { Toaster } from "@/components/ui/toaster";
-
 import SetupLayout from "./layout/SetupLayout.tsx";
 import { SetupProvider } from "./components/setup/SetupContext.tsx";
 import SetupWizard from "./pages/setup/SetupWizard";
 import { ChangePassword } from "@/pages/Main/Profile/ChangePassword.tsx";
 import { TwoFactorAuthentication } from "@/pages/Main/Profile/TwoFactorAuthentication.tsx";
-
 import ChatPage from "./pages/ChatPage.tsx";
-
-// Import ProtectedRoute and PublicRoute components
-// Import ProtectedRoute and PublicRoute components
 import ProtectedRoute from "@/components/protected-routes/ProtectedRoute";
 import PublicRoute from "@/components/protected-routes/PublicRoute";
-
 import LandingPage from "./pages/LandingPage.tsx";
-
-
 
 const App = () => {
   return (
